@@ -2303,6 +2303,13 @@
         
         // Current cashier
         let currentCashier = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER)) || null;
+
+        // Tambahkan DUA baris ini
+let promos = JSON.parse(localStorage.getItem('pos_promos')) || [];
+let stockOpname = JSON.parse(localStorage.getItem('pos_stock_opname')) || [];
+
+// Chart instance
+let salesChart = null;
         
         // Chart instance
         let salesChart = null;
@@ -2321,28 +2328,25 @@
             }, duration);
         }
         
-        // Confirmation dialog
-        function showConfirmation(message, callback) {
-            $('#confirmationMessage').text(message);
-            $('#confirmationDialog').show();
-            
-            $('#confirmOk').off('click').on('click', function() {
-                $('#confirmationDialog').hide();
-                if (typeof callback === 'function') {
-                    callback(true);
-                }
-            });
-            
-            $('#confirmCancel').off('click').on('click', function() {
-                $('#confirmationDialog').hide();
-                if (typeof callback === 'function') {
-                    callback(false);
-                }
-            });
+        // GANTI DENGAN FUNGSI BERSIH INI
+function showConfirmation(message, callback) {
+    $('#confirmationMessage').text(message);
+    $('#confirmationDialog').css('display', 'flex'); // Gunakan flex untuk memusatkan
 
-            // Tambahkan variabel global
-let promos = JSON.parse(localStorage.getItem('pos_promos')) || [];
-let stockOpname = JSON.parse(localStorage.getItem('pos_stock_opname')) || [];
+    $('#confirmOk').off('click').on('click', function() {
+        $('#confirmationDialog').hide();
+        if (typeof callback === 'function') {
+            callback(true);
+        }
+    });
+
+    $('#confirmCancel').off('click').on('click', function() {
+        $('#confirmationDialog').hide();
+        if (typeof callback === 'function') {
+            callback(false);
+        }
+    });
+}
 
 // Tambahkan fungsi baru
 function loadPromos() {
@@ -2576,6 +2580,178 @@ $('#saveOpname').click(function() {
         $(document).ready(function() {
             // Initialize data
             initializeData();
+
+            // ===== MULAI TAMBAHKAN KODE BLOK INI =====
+
+// Fitur Dashboard
+function updateDashboard() {
+    const today = moment().startOf('day');
+    const todayTransactions = transactions.filter(t =>
+        moment(t.date).isSameOrAfter(today)
+    );
+
+    const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
+    const lowStockItems = products.filter(p => p.stock <= 5).length;
+    const todayReturns = transactions.filter(t =>
+        t.return && moment(t.return.processedAt).isSameOrAfter(today)
+    ).length;
+
+    $('#todaySales').text(formatCurrency(todaySales));
+    $('#todayTransactions').text(todayTransactions.length);
+    $('#lowStockItems').text(lowStockItems);
+    $('#todayReturns').text(todayReturns);
+}
+
+// Handler untuk Promo
+$('#addPromo').click(function() {
+    $('#promoProducts').empty();
+    products.forEach(product => {
+        $('#promoProducts').append(`<option value="${product.id}">${product.name}</option>`);
+    });
+
+    $('#promoDateRange').daterangepicker({
+        opens: 'left',
+        locale: {
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Pilih',
+            cancelLabel: 'Batal',
+            fromLabel: 'Dari',
+            toLabel: 'Sampai',
+            daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            firstDay: 1
+        }
+    });
+    $('#promoModal').css('display', 'flex');
+});
+
+$('.close-promo-modal').click(function() {
+    $('#promoModal').hide();
+});
+
+$('.save-promo').click(function() {
+    const selectedProducts = Array.from($('#promoProducts').val()).map(id => {
+        const product = products.find(p => p.id === id);
+        return { id: product.id, name: product.name };
+    });
+
+    const promo = {
+        id: 'PR' + moment().format('YYYYMMDDHHmmss'),
+        name: $('#promoName').val(),
+        type: $('#promoType').val(),
+        value: $('#promoValue').val(),
+        products: selectedProducts,
+        startDate: $('#promoDateRange').data('daterangepicker').startDate.toDate(),
+        endDate: $('#promoDateRange').data('daterangepicker').endDate.toDate(),
+        createdAt: new Date()
+    };
+
+    if (!promo.name || !promo.type || !promo.value || promo.products.length === 0) {
+        showToast('Harap isi semua field yang diperlukan', 'error');
+        return;
+    }
+
+    promos.push(promo);
+    localStorage.setItem('pos_promos', JSON.stringify(promos));
+    loadAdminPromos();
+    $('#promoModal').hide();
+    showToast('Promo berhasil ditambahkan', 'success');
+});
+
+// Handler untuk Stock Opname
+$('#startOpname').click(function() {
+    $('#opnameResultsBody').empty();
+    products.forEach(product => {
+        $('#opnameResultsBody').append(`
+            <tr>
+                <td>${product.name}</td>
+                <td>${product.stock}</td>
+                <td><input type="number" class="form-control physical-stock" data-id="${product.id}" value="${product.stock}" min="0"></td>
+                <td class="difference-cell" data-id="${product.id}">0</td>
+            </tr>
+        `);
+    });
+    $('#opnameResults').show();
+});
+
+$(document).on('change keyup', '.physical-stock', function() {
+    const productId = $(this).data('id');
+    const physicalStock = parseInt($(this).val()) || 0;
+    const product = products.find(p => p.id === productId);
+
+    if (product) {
+        const difference = physicalStock - product.stock;
+        const diffCell = $(`.difference-cell[data-id="${productId}"]`);
+        diffCell.text(difference);
+        if (difference > 0) diffCell.css('color', 'green');
+        else if (difference < 0) diffCell.css('color', 'red');
+        else diffCell.css('color', 'black');
+    }
+});
+
+$('#saveOpname').click(function() {
+    showConfirmation("Apakah Anda yakin ingin menyimpan hasil stock opname? Stok produk akan diperbarui.", (confirmed) => {
+        if(confirmed) {
+            const opnameDate = $('#opnameDate').val();
+            const opnameData = [];
+
+            $('.physical-stock').each(function() {
+                const productId = $(this).data('id');
+                const physicalStock = parseInt($(this).val()) || 0;
+                const product = products.find(p => p.id === productId);
+
+                if (product) {
+                    const difference = physicalStock - product.stock;
+                    if(difference !== 0) { // Hanya simpan yang ada selisih
+                         opnameData.push({
+                            productId: productId,
+                            productName: product.name,
+                            systemStock: product.stock,
+                            physicalStock: physicalStock,
+                            difference: difference,
+                        });
+                    }
+                    // Update product stock
+                    const productIndex = products.findIndex(p => p.id === productId);
+                    if (productIndex !== -1) {
+                        products[productIndex].stock = physicalStock;
+                    }
+                }
+            });
+
+            stockOpname.unshift({
+                id: 'SO' + moment().format('YYYYMMDDHHmmss'),
+                date: opnameDate,
+                items: opnameData,
+                createdBy: currentCashier
+            });
+
+            localStorage.setItem('pos_stock_opname', JSON.stringify(stockOpname));
+            saveProducts();
+            loadProducts(); // Refresh list produk di halaman utama
+
+            showToast('Stock opname berhasil disimpan dan stok diperbarui', 'success');
+            $('#opnameResults').hide();
+        }
+    });
+});
+
+// Handler untuk Retur
+$('#toggleReturn').click(function() {
+    $('.return-section').toggle();
+    if ($('.return-section').is(':visible')) {
+        $(this).html('<i class="fas fa-times"></i> Batal Retur').removeClass('btn-warning').addClass('btn-danger');
+    } else {
+        $(this).html('<i class="fas fa-undo"></i> Proses Retur').removeClass('btn-danger').addClass('btn-warning');
+        $('#returnReason').val('');
+    }
+});
+
+// ===== SELESAI MENAMBAHKAN KODE BLOK =====
+
+// Complete payment
+$('#completePayment').click(function() {
+    // ...
             
             // Set current date
             updateCurrentDate();
@@ -3685,6 +3861,42 @@ updateDashboard();
                             // Update UI
                             initializeData();
                             loadAdminData();
+
+                            // Tambahkan fungsi baru ini
+function loadAdminPromos() {
+    $('#promosList').empty();
+    if (promos.length === 0) {
+        $('#promosList').html(`
+            <div class="empty-state">
+                <i class="fas fa-tag"></i>
+                <p>Belum ada promo yang dibuat</p>
+            </div>
+        `);
+        return;
+    }
+
+    promos.forEach(promo => {
+        const startDate = moment(promo.startDate).format('DD/MM/YYYY');
+        const endDate = moment(promo.endDate).format('DD/MM/YYYY');
+        const productNames = promo.products.map(p => p.name).join(', ') || 'Semua Produk';
+        $('#promosList').append(`
+            <div class="promo-card">
+                <div class="promo-card-header">
+                    <div class="promo-card-title">${promo.name}</div>
+                    <div class="promo-card-dates">${startDate} - ${endDate}</div>
+                </div>
+                <p><strong>Jenis:</strong> ${promo.type}</p>
+                <p><strong>Nilai:</strong> ${promo.value}</p>
+                <div class="promo-card-products">
+                    <strong>Produk:</strong> ${productNames}
+                </div>
+            </div>
+        `);
+    });
+}
+
+function loadAdminProducts() {
+// ...
                             
                             showToast('Data berhasil dipulihkan', 'success');
                         } catch (error) {
