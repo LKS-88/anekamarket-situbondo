@@ -1172,6 +1172,111 @@
             color: #666;
             margin-top: 3px;
         }
+
+        /* Tambahkan di bagian :root */
+--purple-color: #7e22ce;
+--purple-light: #f3e8ff;
+
+/* Tambahkan di bagian style CSS */
+/* Stock Opname Styles */
+.stock-opname-container {
+    margin-top: 20px;
+    border: 1px solid #eee;
+    border-radius: var(--rounded);
+    padding: 15px;
+}
+
+.stock-opname-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.stock-opname-item:last-child {
+    border-bottom: none;
+}
+
+.stock-opname-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Return Styles */
+.return-reason {
+    margin-top: 15px;
+}
+
+.return-reason textarea {
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: var(--rounded-sm);
+    padding: 10px;
+}
+
+/* Promo Styles */
+.promo-card {
+    background-color: var(--primary-light);
+    border-radius: var(--rounded);
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.promo-card-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.promo-card-title {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.promo-card-dates {
+    font-size: 0.8rem;
+    color: var(--gray-color);
+}
+
+.promo-card-products {
+    margin-top: 10px;
+    font-size: 0.9rem;
+}
+
+/* Dashboard Styles */
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.dashboard-card {
+    background: white;
+    border-radius: var(--rounded);
+    padding: 15px;
+    box-shadow: var(--shadow-sm);
+    text-align: center;
+}
+
+.dashboard-card-icon {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    color: var(--primary-color);
+}
+
+.dashboard-card-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.dashboard-card-label {
+    color: var(--gray-color);
+    font-size: 0.9rem;
+}
+        
     </style>
 </head>
 <body>
@@ -1216,6 +1321,41 @@
             </form>
         </div>
     </div>
+
+    <!-- Tambahkan setelah header dan sebelum main-content -->
+<div class="dashboard-cards" id="dashboardCards">
+    <div class="dashboard-card">
+        <div class="dashboard-card-icon">
+            <i class="fas fa-shopping-cart"></i>
+        </div>
+        <div class="dashboard-card-value" id="todaySales">Rp 0</div>
+        <div class="dashboard-card-label">Penjualan Hari Ini</div>
+    </div>
+    
+    <div class="dashboard-card">
+        <div class="dashboard-card-icon">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <div class="dashboard-card-value" id="todayTransactions">0</div>
+        <div class="dashboard-card-label">Transaksi Hari Ini</div>
+    </div>
+    
+    <div class="dashboard-card">
+        <div class="dashboard-card-icon">
+            <i class="fas fa-box-open"></i>
+        </div>
+        <div class="dashboard-card-value" id="lowStockItems">0</div>
+        <div class="dashboard-card-label">Barang Stok Rendah</div>
+    </div>
+    
+    <div class="dashboard-card">
+        <div class="dashboard-card-icon">
+            <i class="fas fa-exchange-alt"></i>
+        </div>
+        <div class="dashboard-card-value" id="todayReturns">0</div>
+        <div class="dashboard-card-label">Retur Hari Ini</div>
+    </div>
+</div>
 
     <!-- Main Container -->
     <div class="container" id="mainApp" style="display: none;">
@@ -1391,6 +1531,24 @@
                         </div>
                     </div>
 
+                    <!-- Tambahkan sebelum tombol completePayment -->
+<div class="form-group return-section" style="display: none;">
+    <label for="returnReason">Alasan Retur</label>
+    <textarea id="returnReason" class="form-control" rows="3" placeholder="Masukkan alasan retur"></textarea>
+    
+    <div class="form-group mt-2">
+        <label for="returnAction">Tindakan</label>
+        <select id="returnAction" class="form-control">
+            <option value="refund">Pengembalian Dana</option>
+            <option value="exchange">Tukar Barang</option>
+        </select>
+    </div>
+</div>
+
+<button id="toggleReturn" class="btn btn-warning mb-3">
+    <i class="fas fa-undo"></i> Proses Retur
+</button>
+
                     <div class="buttons">
                         <button id="backToCustomer" class="btn btn-warning">Kembali ke Pelanggan</button>
                         <button id="completePayment" class="btn btn-success float-right">
@@ -1476,6 +1634,53 @@
                     <div class="tab admin-tab" data-tab="settings">Pengaturan</div>
                 </div>
 
+                <!-- Tambahkan di bagian tabs admin modal -->
+<div class="tab admin-tab" data-tab="stock">Stock Opname</div>
+<div class="tab admin-tab" data-tab="promos">Promo</div>
+
+<!-- Tambahkan tab content baru setelah settingsTab -->
+<div class="tab-content admin-tab-content" id="stockTab">
+    <div class="form-group">
+        <label for="opnameDate">Tanggal Opname</label>
+        <input type="date" id="opnameDate" class="form-control" value="<?php echo date('Y-m-d'); ?>">
+    </div>
+    
+    <button id="startOpname" class="btn btn-primary mb-3">
+        <i class="fas fa-clipboard-check"></i> Mulai Stock Opname
+    </button>
+    
+    <div id="opnameResults" class="table-responsive" style="display: none;">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Produk</th>
+                    <th>Stok Sistem</th>
+                    <th>Stok Fisik</th>
+                    <th>Selisih</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="opnameResultsBody">
+                <!-- Results will be loaded here -->
+            </tbody>
+        </table>
+        
+        <button id="saveOpname" class="btn btn-success mt-3">
+            <i class="fas fa-save"></i> Simpan Hasil Opname
+        </button>
+    </div>
+</div>
+
+<div class="tab-content admin-tab-content" id="promosTab">
+    <button id="addPromo" class="btn btn-success mb-3">
+        <i class="fas fa-plus"></i> Tambah Promo
+    </button>
+    
+    <div id="promosList">
+        <!-- Promos will be loaded here -->
+    </div>
+</div>
+                
                 <div class="tab-content active admin-tab-content" id="productsTab">
                     <button id="addProduct" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Tambah Produk</button>
                     <div class="table-responsive">
@@ -1987,6 +2192,52 @@
         </div>
     </div>
 
+    <!-- Add Promo Modal -->
+<div id="promoModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Tambah Promo</h3>
+            <button class="modal-close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="promoName">Nama Promo</label>
+                <input type="text" id="promoName" class="form-control" placeholder="Masukkan nama promo">
+            </div>
+            
+            <div class="form-group">
+                <label for="promoType">Jenis Promo</label>
+                <select id="promoType" class="form-control">
+                    <option value="discount">Diskon</option>
+                    <option value="buy_x_get_y">Beli X Gratis Y</option>
+                    <option value="special_price">Harga Spesial</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="promoValue">Nilai Promo</label>
+                <input type="text" id="promoValue" class="form-control" placeholder="Contoh: 10 untuk diskon 10%">
+            </div>
+            
+            <div class="form-group">
+                <label for="promoProducts">Produk yang Terlibat</label>
+                <select id="promoProducts" class="form-control" multiple>
+                    <!-- Products will be loaded here -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="promoDateRange">Periode Promo</label>
+                <input type="text" id="promoDateRange" class="form-control" placeholder="Pilih rentang tanggal">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary close-promo-modal">Batal</button>
+            <button class="btn btn-success save-promo"><i class="fas fa-save"></i> Simpan</button>
+        </div>
+    </div>
+</div>
+    
     <!-- Admin Access Button -->
     <div id="adminAccess" class="fab" title="Admin Access">
         <i class="fas fa-lock"></i>
@@ -2088,6 +2339,190 @@
                     callback(false);
                 }
             });
+
+            // Tambahkan variabel global
+let promos = JSON.parse(localStorage.getItem('pos_promos')) || [];
+let stockOpname = JSON.parse(localStorage.getItem('pos_stock_opname')) || [];
+
+// Tambahkan fungsi baru
+function loadPromos() {
+    $('#promosList').empty();
+    
+    if (promos.length === 0) {
+        $('#promosList').html(`
+            <div class="empty-state">
+                <i class="fas fa-tag"></i>
+                <p>Tidak ada promo yang aktif</p>
+            </div>
+        `);
+    } else {
+        promos.forEach(promo => {
+            const startDate = moment(promo.startDate).format('DD/MM/YYYY');
+            const endDate = moment(promo.endDate).format('DD/MM/YYYY');
+            
+            $('#promosList').append(`
+                <div class="promo-card">
+                    <div class="promo-card-header">
+                        <div class="promo-card-title">${promo.name}</div>
+                        <div class="promo-card-dates">${startDate} - ${endDate}</div>
+                    </div>
+                    <div>Jenis: ${getPromoTypeName(promo.type)}</div>
+                    <div>Nilai: ${promo.value}</div>
+                    <div class="promo-card-products">
+                        Produk: ${promo.products.map(p => p.name).join(', ')}
+                    </div>
+                </div>
+            `);
+        });
+    }
+}
+
+function getPromoTypeName(type) {
+    const types = {
+        'discount': 'Diskon',
+        'buy_x_get_y': 'Beli X Gratis Y',
+        'special_price': 'Harga Spesial'
+    };
+    return types[type] || type;
+}
+
+function startStockOpname() {
+    $('#opnameResultsBody').empty();
+    
+    products.forEach(product => {
+        $('#opnameResultsBody').append(`
+            <tr>
+                <td>${product.name}</td>
+                <td>${product.stock}</td>
+                <td><input type="number" class="form-control physical-stock" data-id="${product.id}" value="${product.stock}" min="0"></td>
+                <td class="difference-cell" data-id="${product.id}">0</td>
+                <td>
+                    <button class="btn btn-info btn-sm adjust-stock" data-id="${product.id}">
+                        <i class="fas fa-sync-alt"></i> Sesuaikan
+                    </button>
+                </td>
+            </tr>
+        `);
+    });
+    
+    $('#opnameResults').show();
+}
+
+// Tambahkan event handler baru di $(document).ready()
+$('#addPromo').click(function() {
+    // Load products for promo
+    $('#promoProducts').empty();
+    products.forEach(product => {
+        $('#promoProducts').append(`<option value="${product.id}">${product.name}</option>`);
+    });
+    
+    // Initialize date range picker
+    $('#promoDateRange').daterangepicker({
+        opens: 'left',
+        locale: {
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Pilih',
+            cancelLabel: 'Batal',
+            fromLabel: 'Dari',
+            toLabel: 'Sampai',
+            customRangeLabel: 'Custom',
+            daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            firstDay: 1
+        }
+    });
+    
+    $('#promoModal').show();
+});
+
+$('.close-promo-modal').click(function() {
+    $('#promoModal').hide();
+});
+
+$('.save-promo').click(function() {
+    const promo = {
+        id: 'PR' + moment().format('YYYYMMDDHHmmss'),
+        name: $('#promoName').val(),
+        type: $('#promoType').val(),
+        value: $('#promoValue').val(),
+        products: Array.from($('#promoProducts').val()).map(id => {
+            const product = products.find(p => p.id === id);
+            return { id: product.id, name: product.name };
+        }),
+        startDate: $('#promoDateRange').data('daterangepicker').startDate.toDate(),
+        endDate: $('#promoDateRange').data('daterangepicker').endDate.toDate(),
+        createdAt: new Date()
+    };
+    
+    if (!promo.name || !promo.type || !promo.value || promo.products.length === 0) {
+        showToast('Harap isi semua field yang diperlukan', 'error');
+        return;
+    }
+    
+    promos.push(promo);
+    localStorage.setItem('pos_promos', JSON.stringify(promos));
+    loadPromos();
+    $('#promoModal').hide();
+    
+    showToast('Promo berhasil ditambahkan', 'success');
+});
+
+$('#startOpname').click(function() {
+    startStockOpname();
+});
+
+$(document).on('change', '.physical-stock', function() {
+    const productId = $(this).data('id');
+    const physicalStock = parseInt($(this).val()) || 0;
+    const product = products.find(p => p.id === productId);
+    
+    if (product) {
+        const difference = physicalStock - product.stock;
+        $(`.difference-cell[data-id="${productId}"]`).text(difference);
+    }
+});
+
+$('#saveOpname').click(function() {
+    const opnameDate = $('#opnameDate').val();
+    const opnameData = [];
+    
+    $('.physical-stock').each(function() {
+        const productId = $(this).data('id');
+        const physicalStock = parseInt($(this).val()) || 0;
+        const product = products.find(p => p.id === productId);
+        
+        if (product) {
+            opnameData.push({
+                productId: productId,
+                productName: product.name,
+                systemStock: product.stock,
+                physicalStock: physicalStock,
+                difference: physicalStock - product.stock,
+                date: opnameDate
+            });
+            
+            // Update product stock
+            const productIndex = products.findIndex(p => p.id === productId);
+            if (productIndex !== -1) {
+                products[productIndex].stock = physicalStock;
+            }
+        }
+    });
+    
+    // Save stock opname record
+    stockOpname.unshift({
+        id: 'SO' + moment().format('YYYYMMDDHHmmss'),
+        date: opnameDate,
+        items: opnameData,
+        createdBy: currentCashier
+    });
+    
+    localStorage.setItem('pos_stock_opname', JSON.stringify(stockOpname));
+    saveProducts();
+    
+    showToast('Stock opname berhasil disimpan', 'success');
+    $('#opnameResults').hide();
+});
         }
         
         // Format currency
@@ -2367,6 +2802,43 @@
                 $('.tab-content').removeClass('active');
                 $('#customerTab').addClass('active');
             });
+
+            // Tambahkan di $(document).ready()
+$('#toggleReturn').click(function() {
+    $('.return-section').toggle();
+    if ($('.return-section').is(':visible')) {
+        $(this).html('<i class="fas fa-times"></i> Batal Retur');
+        $(this).removeClass('btn-warning').addClass('btn-danger');
+    } else {
+        $(this).html('<i class="fas fa-undo"></i> Proses Retur');
+        $(this).removeClass('btn-danger').addClass('btn-warning');
+        $('#returnReason').val('');
+    }
+});
+
+// Modifikasi completePayment untuk handle retur
+$('#completePayment').click(function() {
+    const isReturn = $('.return-section').is(':visible');
+    
+    if (isReturn && !$('#returnReason').val()) {
+        showToast('Harap isi alasan retur', 'error');
+        return;
+    }
+    
+    // ... (kode sebelumnya tetap sama)
+    
+    // Jika retur
+    if (isReturn) {
+        transaction.return = {
+            reason: $('#returnReason').val(),
+            action: $('#returnAction').val(),
+            processedBy: currentCashier,
+            processedAt: new Date()
+        };
+    }
+    
+    // ... (kode setelahnya tetap sama)
+});
             
             // Complete payment
             $('#completePayment').click(function() {
@@ -2746,6 +3218,29 @@
                     }
                 });
             });
+
+            // Tambahkan fungsi baru
+function updateDashboard() {
+    const today = moment().startOf('day');
+    const todayTransactions = transactions.filter(t => 
+        moment(t.date).isSameOrAfter(today)
+    );
+    
+    const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
+    const lowStockItems = products.filter(p => p.stock <= 5).length;
+    const todayReturns = transactions.filter(t => 
+        moment(t.date).isSameOrAfter(today) && t.return
+    ).length;
+    
+    $('#todaySales').text(formatCurrency(todaySales));
+    $('#todayTransactions').text(todayTransactions.length);
+    $('#lowStockItems').text(lowStockItems);
+    $('#todayReturns').text(todayReturns);
+}
+
+// Panggil fungsi ini setelah login berhasil dan setelah transaksi selesai
+// Contoh: setelah $('#mainApp').fadeIn();
+updateDashboard();
             
             // Add customer
             $('#addCustomer').click(function() {
