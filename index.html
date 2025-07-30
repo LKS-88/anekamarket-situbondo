@@ -1381,6 +1381,9 @@
             
        /* Tambahkan media query berikut untuk perbaikan mobile */
         @media (max-width: 576px) {
+             html {
+                font-size: 90%; /* Sedikit mengecilkan ukuran font dasar untuk layar kecil */
+            }
             .dashboard-cards {
                 grid-template-columns: 1fr;
                 gap: 10px;
@@ -1426,11 +1429,15 @@
             .fab {
                 width: 48px;
                 height: 48px;
-                font-size: 1.2rem;
+                font-size: 1.2rem; /* Menyesuaikan ikon di dalam FAB */
             }
-            
+        
+            #adminAccess {
+                bottom: 15px; /* Menyesuaikan posisi agar tidak terlalu mepet */
+            }
+        
             #shiftAccess {
-                bottom: 70px;
+                bottom: 75px; /* Memberi jarak lebih antara dua tombol FAB */
             }
         }
     </style>
@@ -2396,40 +2403,7 @@
         saveData(STORAGE_KEYS.PRODUCTS, products);
     }
 }
-
-        
-        function loadData() {
-            products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || [];
-            categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES)) || [];
-            customers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) || [];
-            cashiers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CASHIERS)) || [];
-            transactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS)) || [];
-            settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || {};
-            heldSales = JSON.parse(localStorage.getItem(STORAGE_KEYS.HELD_SALES)) || [];
-            stockInRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.STOCK_IN)) || [];
-            currentCashier = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER)) || null;
-            currentShift = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_SHIFT)) || null;
-            shiftHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHIFT_HISTORY)) || [];
-        }
-                   
-            if (categories.length === 0) {
-                categories = [
-                    { id: 'C001', name: 'Makanan Ringan', description: '' },
-                    { id: 'C002', name: 'Minuman Dingin', description: '' },
-                ];
-                saveData(STORAGE_KEYS.CATEGORIES, categories);
-            }
-
-            if (products.length === 0) {
-                products = [
-                    { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: 'C001', costPrice: 7500, price: 10000, stock: 50 },
-                    { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: 'C002', costPrice: 3500, price: 5000, stock: 100 },
-                    { id: 'P003', barcode: '8886008101068', name: 'Pocari Sweat 500ml', categoryId: 'C002', costPrice: 5000, price: 7000, stock: 3 },
-                ];
-                saveData(STORAGE_KEYS.PRODUCTS, products);
-            }
-        }
-        
+       
         // --- UI UPDATE FUNCTIONS ---
         function updateAllUI() {
             updateCurrentDate();
@@ -4003,86 +3977,46 @@
             // --- Admin Report Handlers ---
             $('#exportReportPDF').click(exportReportPDF);
             
-           $('#exportReportExcel').click(function() {
-                    const dateRange = $('#reportDateRange').val();
-                    let startDate, endDate;
-                
-                    if (dateRange) {
-                        const dates = dateRange.split(' - ');
-                        startDate = moment(dates[0], 'DD/MM/YYYY').startOf('day');
-                        endDate = moment(dates[1], 'DD/MM/YYYY').endOf('day');
-                    }
-                
-                    const filteredTransactions = transactions.filter(t => {
-                        if (!dateRange) return true;
-                        return moment(t.date).isBetween(startDate, endDate, undefined, '[]');
-                    });
-                
-                    if (filteredTransactions.length === 0) {
-                        showToast('Tidak ada data transaksi untuk diekspor', 'warning');
-                        return;
-                    }
-                
-                    // Format data untuk Excel
-                    const reportData = filteredTransactions.map(t => {
-                        const itemsList = t.items.map(i => `${i.name} (${i.quantity}x)`).join(', ');
-                        return {
-                            'ID Transaksi': t.id,
-                            'Tanggal': moment(t.date).format('DD/MM/YYYY HH:mm'),
-                            'Pelanggan': t.customer?.name || 'Walk-in',
-                            'Item': itemsList,
-                            'Subtotal': t.subtotal,
-                            'Diskon': t.discount,
-                            'Pajak': t.tax,
-                            'Total': t.total,
-                            'Metode Pembayaran': t.paymentMethod.charAt(0).toUpperCase() + t.paymentMethod.slice(1),
-                            'Kasir': t.cashier.name
-                        };
-                    });
-                
-                    try {
-                        const worksheet = XLSX.utils.json_to_sheet(reportData);
-                        const workbook = XLSX.utils.book_new();
-                        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Penjualan");
-                
-                        // Atur lebar kolom otomatis
-                        const wscols = [
-                            {wch: 15}, // ID Transaksi
-                            {wch: 20}, // Tanggal
-                            {wch: 20}, // Pelanggan
-                            {wch: 40}, // Item
-                            {wch: 15}, // Subtotal
-                            {wch: 15}, // Diskon
-                            {wch: 15}, // Pajak
-                            {wch: 15}, // Total
-                            {wch: 15}, // Metode Pembayaran
-                            {wch: 20}  // Kasir
-                        ];
-                        worksheet['!cols'] = wscols;
-                
-                        XLSX.writeFile(workbook, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
-                        showToast("Excel berhasil diekspor", "success");
-                    } catch (error) {
-                        showToast("Gagal mengekspor ke Excel", "error");
-                        console.error("Excel export error:", error);
-                    }
-                });
-                
-                const reportData = filteredTransactions.map(t => ({
-                    ID: t.id,
-                    Tanggal: moment(t.date).format('L LTS'),
-                    Pelanggan: t.customer?.name || 'Walk-in',
-                    'Total Item': t.items.reduce((sum, item) => sum + item.quantity, 0),
-                    Subtotal: t.subtotal,
-                    Diskon: t.discount,
-                    Pajak: t.tax,
-                    Total: t.total,
-                    'Metode Pembayaran': t.paymentMethod,
-                    Kasir: t.cashier.name
-                }));
-                
-                exportToExcel(reportData, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
-            });
+          $('#exportReportExcel').click(function() {
+    const dateRange = $('#reportDateRange').val();
+    let startDate, endDate;
+
+    if (dateRange) {
+        const dates = dateRange.split(' - ');
+        startDate = moment(dates[0], 'DD/MM/YYYY').startOf('day');
+        endDate = moment(dates[1], 'DD/MM/YYYY').endOf('day');
+    }
+
+    const filteredTransactions = transactions.filter(t => {
+        if (!dateRange) return true; // Ambil semua jika rentang tanggal tidak dipilih
+        return moment(t.date).isBetween(startDate, endDate, undefined, '[]');
+    });
+
+    if (filteredTransactions.length === 0) {
+        showToast('Tidak ada data transaksi untuk diekspor', 'warning');
+        return;
+    }
+
+    // Format data untuk Excel
+    const reportData = filteredTransactions.map(t => {
+        const itemsList = t.items.map(i => `${i.name} (${i.quantity}x)`).join(', ');
+        return {
+            'ID Transaksi': t.id,
+            'Tanggal': moment(t.date).format('DD/MM/YYYY HH:mm'),
+            'Pelanggan': t.customer?.name || 'Walk-in',
+            'Item': itemsList,
+            'Subtotal': t.subtotal,
+            'Diskon': t.discount,
+            'Pajak': t.tax,
+            'Total': t.total,
+            'Metode Pembayaran': t.paymentMethod.charAt(0).toUpperCase() + t.paymentMethod.slice(1),
+            'Kasir': t.cashier.name
+        };
+    });
+
+    // Menggunakan helper function yang sudah ada
+    exportToExcel(reportData, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
+});
             
             $('#exportReportPrint').click(function() {
                 window.print();
