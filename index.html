@@ -696,8 +696,11 @@
             font-size: .8rem;
         }
 
-        .float-right {
-            float: right;
+           .buttons {
+            display: flex;
+            justify-content: space-between; /* Atau flex-end jika hanya ada satu tombol di kanan */
+            align-items: center;
+            margin-top: 20px;
         }
 
         .ml-2 {
@@ -1544,8 +1547,8 @@
 
                     <div class="tab-content" id="customerTab">
                         <div class="form-group">
-                            <label for="customerType">Tipe Pelanggan</label>
-                            <select id="customerType" class="form-control">
+                           <label for="customerTypeModal">Tipe Pelanggan</label>
+                            <select id="customerTypeModal" class="form-control">
                                 <option value="walkin">Pelanggan Biasa</option>
                                 <option value="member">Member</option>
                             </select>
@@ -1577,10 +1580,14 @@
                                 <input type="email" id="customerEmail" class="form-control" placeholder="Masukkan email">
                             </div>
                         </div>
-                        <div class="buttons">
-                            <button id="backToCart" class="btn btn-warning">Kembali ke Keranjang</button>
-                            <button id="nextToPayment" class="btn btn-primary float-right">Lanjut ke Pembayaran</button>
-                        </div>
+                       <div class="buttons">
+                        <button id="backToCart" class="btn btn-warning">Kembali ke Keranjang</button>
+                        <button id="nextToPayment" class="btn btn-primary">Lanjut ke Pembayaran</button>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button id="backToCustomer" class="btn btn-warning">Kembali ke Pelanggan</button>
+                        <button id="completePayment" class="btn btn-success"><i class="fas fa-print"></i> Selesaikan & Cetak</button>
                     </div>
 
                     <div class="tab-content" id="paymentTab">
@@ -2207,7 +2214,32 @@
         moment.locale('id');
 
         // Admin password (hidden from public)
-        const ADMIN_PASSWORD = "Geraiku.12345";
+       // Ganti konstanta password dengan hash-nya
+// Hash sederhana dari "Geraiku.12345" (ini hanya contoh, jangan gunakan di produksi)
+const ADMIN_PASSWORD_HASH = "19450817"; 
+
+// Fungsi hash sederhana untuk demonstrasi
+function simpleHash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash.toString();
+}
+
+// ... di dalam event handler
+$('.verify-admin-password').click(function() {
+    if (simpleHash($("#adminPassword").val()) === ADMIN_PASSWORD_HASH) {
+        $("#adminPasswordModal").hide();
+        $("#adminModal").css("display", "flex");
+        loadAdminData(); // Anda perlu membuat fungsi ini atau memuat data yang relevan
+        showToast("Berhasil masuk sebagai admin", "success");
+    } else {
+        showToast("Password admin salah", "error");
+    }
+});
         
         // Local storage keys
         const STORAGE_KEYS = {
