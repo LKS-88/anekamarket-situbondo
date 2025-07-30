@@ -2404,6 +2404,96 @@
 
         // --- FUNGSI-FUNGSI HELPER (Pembantu) ---
 
+        // [TAMBAHKAN BLOK INI] - Kumpulan fungsi yang hilang
+        function handleVerifyAdminPassword() {
+            const password = $('#adminPassword').val();
+            if (password === ADMIN_PASSWORD) {
+                $('#adminPasswordModal').hide();
+                $('#adminModal').css('display', 'flex'); // Gunakan flex untuk centering
+                loadAdminData(); // Muat semua data untuk panel admin
+                showToast('Berhasil masuk sebagai admin', 'success');
+                $('#adminPassword').val(''); // Kosongkan field password demi keamanan
+                $('#adminPasswordError').hide();
+            } else {
+                $('#adminPasswordError').text('Password admin salah!').show();
+                showToast('Password admin salah!', 'error');
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const passwordInput = $('#adminPassword');
+            const type = passwordInput.attr('type') === 'password' ? 'text' : 'password';
+            passwordInput.attr('type', type);
+            $(this).toggleClass('fa-eye fa-eye-slash');
+        }
+
+        function handleSearchMember() {
+            const memberId = $('#memberId').val().trim();
+            if (!memberId) {
+                showToast('Masukkan ID Member', 'warning');
+                return;
+            }
+            const member = customers.find(c => c.id === memberId && c.type === 'member');
+            if (member) {
+                $('#customerName').val(member.name);
+                $('#customerPhone').val(member.phone);
+                $('#customerEmail').val(member.email || '');
+                showToast('Member ditemukan', 'success');
+            } else {
+                showToast('Member tidak ditemukan', 'error');
+            }
+        }
+        
+        function handleUpdateCartQuantity() {
+            const productId = $(this).data('id');
+            const newQuantity = parseInt($(this).val()) || 1;
+            const item = currentCart.items.find(item => item.product.id === productId);
+
+            if (item) {
+                if (newQuantity > item.product.stock) {
+                    showToast('Jumlah melebihi stok yang tersedia', 'error');
+                    $(this).val(item.quantity); // Kembalikan ke jumlah sebelumnya
+                    return;
+                }
+                item.quantity = newQuantity;
+                updateCart();
+            }
+        }
+
+        function handleRemoveFromCart() {
+            const productId = $(this).data('id');
+            const product = products.find(p => p.id === productId);
+            currentCart.items = currentCart.items.filter(item => item.product.id !== productId);
+            updateCart();
+            if (product) {
+                showToast(`${product.name} dihapus dari keranjang`, 'info');
+            }
+        }
+
+        function handleViewTransaction() {
+            const transactionId = $(this).data('id');
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (transaction) {
+                // Gunakan div khusus di dalam modal detail, bukan template utama
+                generateReceipt(transaction, '#transactionDetailReceipt'); 
+                $('#transactionDetailModal .modal-title').text(`Detail Transaksi #${transaction.id}`);
+                $('#transactionDetailModal').css('display', 'flex');
+            }
+        }
+
+        function handlePrintTransaction() {
+            const transactionId = $(this).data('id');
+            const transaction = transactions.find(t => t.id === transactionId);
+            if(transaction){
+                const receiptContainer = $('#receiptTemplate');
+                generateReceipt(transaction, '#receiptTemplate > .receipt');
+                receiptContainer.show();
+                window.print();
+                receiptContainer.hide();
+            }
+        }
+        // [AKHIR BLOK YANG DITAMBAHKAN]
+        
         // Fungsi format mata uang
         function formatCurrency(amount) {
             return 'Rp ' + (amount || 0).toLocaleString('id-ID');
