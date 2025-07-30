@@ -1379,32 +1379,19 @@
                 grid-template-columns: 1fr;
             }
             
-       /* Tambahkan media query berikut untuk perbaikan mobile */
+      /* Tambahkan di bagian media query untuk mobile */
         @media (max-width: 576px) {
-             html {
-                font-size: 90%; /* Sedikit mengecilkan ukuran font dasar untuk layar kecil */
-            }
-            .dashboard-cards {
-                grid-template-columns: 1fr;
-                gap: 10px;
-            }
-            
             .dashboard-card {
-                padding: 15px;
-                flex-direction: column;
-                text-align: center;
+                padding: 10px;
             }
             
             .dashboard-card-icon {
-                margin-bottom: 10px;
+                font-size: 1.8rem;
+                padding: 10px;
             }
             
-            .header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .header-info p {
-                font-size: 0.8rem;
+            .dashboard-card-value {
+                font-size: 1.2rem;
             }
             
             .cart-item {
@@ -1413,31 +1400,47 @@
             }
             
             .cart-item-qty {
-                margin-top: 10px;
+                margin-top: 8px;
                 width: 100%;
             }
             
             .payment-method {
                 padding: 5px;
+                font-size: 0.9rem;
             }
             
             .modal-content {
                 width: 95%;
                 max-width: 95%;
+                padding: 10px;
             }
             
             .fab {
                 width: 48px;
                 height: 48px;
-                font-size: 1.2rem; /* Menyesuaikan ikon di dalam FAB */
+                font-size: 1.2rem;
+                bottom: 15px;
             }
-        
+            
             #adminAccess {
-                bottom: 15px; /* Menyesuaikan posisi agar tidak terlalu mepet */
+                bottom: 70px;
             }
-        
+            
             #shiftAccess {
-                bottom: 75px; /* Memberi jarak lebih antara dua tombol FAB */
+                bottom: 125px;
+            }
+            
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .header-info p {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 8px 10px;
+                font-size: 0.85rem;
             }
         }
     </style>
@@ -2345,35 +2348,56 @@
             }).format(amount || 0);
         }
 
-        function exportToExcel(data, filename) {
-            try {
-                const worksheet = XLSX.utils.json_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
-                XLSX.writeFile(workbook, filename || "export.xlsx");
-                showToast("Excel berhasil diekspor", "success");
-            } catch (error) {
-                showToast("Gagal mengekspor ke Excel", "error");
-                console.error("Excel export error:", error);
-            }
-        }
+       // Perbaiki fungsi exportToExcel()
+function exportToExcel(data, filename) {
+    try {
+        // Buat worksheet dari data
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        
+        // Buat workbook dan tambahkan worksheet
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan");
+        
+        // Ekspor ke file Excel
+        XLSX.writeFile(workbook, filename || "laporan_penjualan.xlsx");
+        showToast("Excel berhasil diekspor", "success");
+    } catch (error) {
+        console.error("Error saat mengekspor ke Excel:", error);
+        showToast("Gagal mengekspor ke Excel", "error");
+    }
+}
 
         // --- DATA SAVING & LOADING ---
         function saveData(key, data) {
             localStorage.setItem(key, JSON.stringify(data));
         }
 
-         function initializeDefaultData() {
-    loadData(); // Pertama, coba muat data yang ada
-
-    // Kemudian, cek dan buat data default jika tidak ada
-    if (cashiers.length === 0) {
-        cashiers = [
-            { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
-            { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
-        ];
-        saveData(STORAGE_KEYS.CASHIERS, cashiers);
-    }
+         // Tambahkan di bagian awal script (sebelum initializeDefaultData())
+        function loadData() {
+            products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || [];
+            categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES)) || [];
+            customers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) || [];
+            cashiers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CASHIERS)) || [];
+            transactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS)) || [];
+            settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || {};
+            heldSales = JSON.parse(localStorage.getItem(STORAGE_KEYS.HELD_SALES)) || [];
+            stockInRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.STOCK_IN)) || [];
+            currentShift = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_SHIFT));
+            shiftHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHIFT_HISTORY)) || [];
+            currentCashier = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER));
+        }
+        
+        // Perbaiki fungsi initializeDefaultData()
+        function initializeDefaultData() {
+            loadData();
+        
+            if (cashiers.length === 0) {
+                cashiers = [
+                    { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
+                    { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
+                ];
+                saveData(STORAGE_KEYS.CASHIERS, cashiers);
+            }
 
     if (Object.keys(settings).length === 0) {
         settings = {
@@ -2385,6 +2409,24 @@
         };
         saveData(STORAGE_KEYS.SETTINGS, settings);
     }
+
+    if (categories.length === 0) {
+        categories = [
+            { id: 'C001', name: 'Makanan Ringan', description: '' },
+            { id: 'C002', name: 'Minuman Dingin', description: '' },
+        ];
+        saveData(STORAGE_KEYS.CATEGORIES, categories);
+    }
+
+    if (products.length === 0) {
+        products = [
+            { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: 'C001', costPrice: 7500, price: 10000, stock: 50 },
+            { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: 'C002', costPrice: 3500, price: 5000, stock: 100 },
+            { id: 'P003', barcode: '8886008101068', name: 'Pocari Sweat 500ml', categoryId: 'C002', costPrice: 5000, price: 7000, stock: 3 },
+        ];
+        saveData(STORAGE_KEYS.PRODUCTS, products);
+    }
+}
 
     if (categories.length === 0) {
         categories = [
@@ -2595,54 +2637,63 @@
             }
         }
 
-        function completePayment() {
-            if (!currentShift || !currentShift.isActive) {
-                showToast('Shift belum dimulai. Harap mulai shift terlebih dahulu.', 'error');
-                return;
-            }
-            
-            const paymentAmount = parseFloat($('#paymentAmount').val()) || 0;
-            if (paymentAmount < currentCart.total) {
-                showToast('Jumlah pembayaran kurang dari total.', 'error');
-                return;
-            }
+        // Perbaiki fungsi completePayment()
+function completePayment() {
+    if (!currentShift || !currentShift.isActive) {
+        showToast('Shift belum dimulai. Harap mulai shift terlebih dahulu.', 'error');
+        return;
+    }
+    
+    const paymentAmount = parseFloat($('#paymentAmount').val()) || 0;
+    if (paymentAmount < currentCart.total) {
+        showToast('Jumlah pembayaran kurang dari total.', 'error');
+        return;
+    }
 
-            const transaction = {
-                id: 'T' + moment().format('YYYYMMDDHHmmss'),
-                date: new Date(),
-                ...currentCart, // Spread all cart properties
-                paymentMethod: $('input[name="paymentMethod"]:checked').val(),
-                paymentAmount: paymentAmount,
-                change: paymentAmount - currentCart.total,
-                cashier: {id: currentCashier.id, name: currentCashier.name},
-                shiftId: currentShift.startTime // Link transaction to shift
-            };
+    const transaction = {
+        id: 'T' + moment().format('YYYYMMDDHHmmss'),
+        date: new Date(),
+        items: [...currentCart.items],
+        customer: currentCart.customer ? {...currentCart.customer} : null,
+        discount: currentCart.discount,
+        tax: currentCart.tax,
+        subtotal: currentCart.subtotal,
+        total: currentCart.total,
+        totalCost: currentCart.totalCost,
+        profit: currentCart.profit,
+        paymentMethod: $('input[name="paymentMethod"]:checked').val(),
+        paymentAmount: paymentAmount,
+        change: paymentAmount - currentCart.total,
+        cashier: {id: currentCashier.id, name: currentCashier.name},
+        shiftId: currentShift.id
+    };
 
-            // Update product stock
-            transaction.items.forEach(item => {
-                const product = products.find(p => p.id === item.productId);
-                if (product) {
-                    product.stock -= item.quantity;
-                }
-            });
-
-            transactions.unshift(transaction);
-            saveData(STORAGE_KEYS.TRANSACTIONS, transactions);
-            saveData(STORAGE_KEYS.PRODUCTS, products);
-
-            generateReceipt(transaction);
-            setTimeout(() => window.print(), 500);
-
-            resetCart();
-            updateAllUI();
-            showToast('Transaksi berhasil!', 'success');
-            $('.tab').removeClass('active');
-            $('[data-tab="cart"]').addClass('active');
-            $('.tab-content').removeClass('active');
-            $('#cartTab').addClass('active');
+    // Update product stock
+    transaction.items.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        if (product) {
+            product.stock -= item.quantity;
         }
+    });
 
-       function generateReceipt(transaction) {
+    transactions.unshift(transaction);
+    saveData(STORAGE_KEYS.TRANSACTIONS, transactions);
+    saveData(STORAGE_KEYS.PRODUCTS, products);
+
+    generateReceipt(transaction);
+    setTimeout(() => window.print(), 500);
+
+    resetCart();
+    updateAllUI();
+    showToast('Transaksi berhasil!', 'success');
+    $('.tab').removeClass('active');
+    $('[data-tab="cart"]').addClass('active');
+    $('.tab-content').removeClass('active');
+    $('#cartTab').addClass('active');
+}
+
+      // Perbaiki fungsi generateReceipt()
+function generateReceipt(transaction) {
     let receiptHTML = `
         <div class="receipt">
             <div class="receipt-header" style="text-align: center; margin-bottom: 10px;">
@@ -2671,12 +2722,17 @@
                 <div class="receipt-item" style="display: flex; justify-content: space-between;">
                     <span>Subtotal</span>
                     <span>${formatCurrency(transaction.subtotal)}</span>
-                </div>
-                ${transaction.discount > 0 ? `
+                </div>`;
+    
+    if (transaction.discount > 0) {
+        receiptHTML += `
                 <div class="receipt-item" style="display: flex; justify-content: space-between;">
                     <span>Diskon</span>
                     <span>-${formatCurrency(transaction.discount)}</span>
-                </div>` : ''}
+                </div>`;
+    }
+    
+    receiptHTML += `
                 <div class="receipt-item" style="display: flex; justify-content: space-between;">
                     <span>Pajak</span>
                     <span>${formatCurrency(transaction.tax)}</span>
@@ -2997,42 +3053,42 @@
             $('#stockInTotalCost').text(formatCurrency(totalCost));
         }
 
-        function saveStockIn() {
-            if (currentStockInItems.length === 0) {
-                showToast('Tidak ada item untuk disimpan.', 'error'); 
-                return;
-            }
-            
-            const record = {
-                id: 'SI' + Date.now(),
-                date: $('#stockInDate').val(),
-                ref: $('#stockInRef').val(),
-                supplier: $('#stockInSupplier').val(),
-                items: currentStockInItems,
-                totalCost: currentStockInItems.reduce((sum, item) => sum + (item.quantity * item.purchasePrice), 0)
-            };
+        // Perbaiki fungsi saveStockIn()
+function saveStockIn() {
+    if (currentStockInItems.length === 0) {
+        showToast('Tidak ada item untuk disimpan.', 'error'); 
+        return;
+    }
+    
+    const record = {
+        id: 'SI' + moment().format('YYYYMMDDHHmmss'),
+        date: $('#stockInDate').val(),
+        ref: $('#stockInRef').val(),
+        supplier: $('#stockInSupplier').val(),
+        items: [...currentStockInItems],
+        totalCost: currentStockInItems.reduce((sum, item) => sum + (item.quantity * item.purchasePrice), 0)
+    };
 
-            // Update product stock and cost price
-            record.items.forEach(item => {
-                const product = products.find(p => p.id === item.productId);
-                if(product) {
-                    product.stock += item.quantity;
-                    // Optional: update cost price based on new purchase
-                    product.costPrice = item.purchasePrice;
-                }
-            });
-
-            stockInRecords.unshift(record);
-            saveData(STORAGE_KEYS.STOCK_IN, stockInRecords);
-            saveData(STORAGE_KEYS.PRODUCTS, products);
-            
-            loadAdminStockIn();
-            loadAdminProducts();
-            loadProducts();
-            
-            $('#stockInModal').hide();
-            showToast('Stok masuk berhasil dicatat.', 'success');
+    // Update product stock and cost price
+    record.items.forEach(item => {
+        const product = products.find(p => p.id === item.productId);
+        if(product) {
+            product.stock += item.quantity;
+            product.costPrice = item.purchasePrice;
         }
+    });
+
+    stockInRecords.unshift(record);
+    saveData(STORAGE_KEYS.STOCK_IN, stockInRecords);
+    saveData(STORAGE_KEYS.PRODUCTS, products);
+    
+    loadAdminStockIn();
+    loadAdminProducts();
+    loadProducts();
+    
+    $('#stockInModal').hide();
+    showToast('Stok masuk berhasil dicatat.', 'success');
+}
 
         // --- CATEGORY MANAGEMENT ---
         function loadAdminCategories() {
@@ -3154,7 +3210,8 @@
             });
         }
 
-       function saveCustomer() {
+      // Perbaiki fungsi saveCustomer()
+function saveCustomer() {
     const customerData = {
         type: $('#customerTypeModal').val(),
         name: $('#customerNameModal').val().trim(),
@@ -3187,7 +3244,6 @@
     $('#customerModal').hide();
     showToast('Pelanggan berhasil ditambahkan.', 'success');
 }
-
         function editCustomer(id) {
             const customer = customers.find(c => c.id === id);
             if (!customer) return;
@@ -3266,40 +3322,41 @@
             });
         }
 
-        function saveCashier() {
-            const cashierData = {
-                name: $('#cashierModalName').val().trim(),
-                pin: $('#cashierModalPin').val(),
-                status: $('#cashierModalStatus').val()
+       // Perbaiki fungsi saveCashier()
+function saveCashier() {
+    const cashierData = {
+        name: $('#cashierModalName').val().trim(),
+        pin: $('#cashierModalPin').val(),
+        status: $('#cashierModalStatus').val()
+    };
+    
+    if (!cashierData.name || !cashierData.pin || cashierData.pin.length !== 4) {
+        showToast('Nama dan PIN (4 digit) harus diisi.', 'error');
+        return;
+    }
+    
+    const id = $('#cashierModalId').val();
+    if (id) {
+        // Update existing cashier
+        const index = cashiers.findIndex(c => c.id === id);
+        if (index !== -1) {
+            cashiers[index] = {
+                ...cashiers[index],
+                ...cashierData
             };
-            
-            if (!cashierData.name || !cashierData.pin || cashierData.pin.length !== 4) {
-                showToast('Nama dan PIN (4 digit) harus diisi.', 'error');
-                return;
-            }
-            
-            const id = $('#cashierModalId').val();
-            if (id) {
-                // Update existing cashier
-                const index = cashiers.findIndex(c => c.id === id);
-                if (index !== -1) {
-                    cashiers[index] = {
-                        ...cashiers[index],
-                        ...cashierData
-                    };
-                }
-            } else {
-                // Add new cashier
-                cashierData.id = 'K' + (cashiers.length + 1).toString().padStart(3, '0');
-                cashierData.lastLogin = null;
-                cashiers.push(cashierData);
-            }
-            
-            saveData(STORAGE_KEYS.CASHIERS, cashiers);
-            loadAdminCashiers();
-            $('#cashierModal').hide();
-            showToast('Kasir berhasil disimpan.', 'success');
         }
+    } else {
+        // Add new cashier
+        cashierData.id = 'K' + (cashiers.length + 1).toString().padStart(3, '0');
+        cashierData.lastLogin = null;
+        cashiers.push(cashierData);
+    }
+    
+    saveData(STORAGE_KEYS.CASHIERS, cashiers);
+    loadAdminCashiers();
+    $('#cashierModal').hide();
+    showToast('Kasir berhasil disimpan.', 'success');
+}
 
         function editCashier(id) {
             const cashier = cashiers.find(c => c.id === id);
@@ -3592,17 +3649,45 @@
                             // Update UI
                             updateAllUI();
                             loadAdminData();
-                            
-                            showToast('Data berhasil diimpor', 'success');
-                        }
-                    });
-                } catch (error) {
-                    showToast('Gagal memproses file. Format tidak valid.', 'error');
-                    console.error('Import error:', error);
-                }
-            };
-            reader.readAsText(file);
+                           // Perbaiki fungsi loadAdminData()
+function loadAdminData() {
+    loadAdminProducts();
+    loadAdminCategories();
+    loadAdminCustomers();
+    loadAdminCashiers();
+    loadAdminTransactions();
+    loadAdminStockIn();
+    loadSalesReport();
+    
+    // Inisialisasi date picker untuk laporan
+    $('#reportDateRange').daterangepicker({
+        opens: 'left',
+        locale: {
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Pilih',
+            cancelLabel: 'Batal',
+            daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            firstDay: 1
         }
+    }, function(start, end) {
+        loadSalesReport(start, end);
+    });
+    
+    $('#transactionDateRange').daterangepicker({
+        opens: 'left',
+        locale: {
+            format: 'DD/MM/YYYY',
+            applyLabel: 'Pilih',
+            cancelLabel: 'Batal',
+            daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+            monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+            firstDay: 1
+        }
+    }, function(start, end) {
+        loadAdminTransactions(start, end);
+    });
+}
 
         // --- EVENT HANDLERS ---
             function viewStockIn(id) {
