@@ -1331,7 +1331,9 @@
     }
 
     // Initialize
-    initializeData();
+    $(document).ready(function() {
+      initializeData();
+    });
 
     // Event Listeners
     $('#loginForm').submit(function(e) {
@@ -1827,8 +1829,10 @@
     });
 
     // Initialize admin tabs
-    loadAdminProducts();
-    updateCategoryDropdowns();
+    function loadAdminData() {
+      loadAdminProducts();
+      updateCategoryDropdowns();
+    }
 
     // Theme Toggle
     function loadTheme() {
