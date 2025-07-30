@@ -839,9 +839,11 @@
             margin-top: 20px;
         }
 
-        @media print {
+      @media print {
             body * {
                 visibility: hidden;
+                margin: 0;
+                padding: 0;
             }
             .receipt, .receipt * {
                 visibility: visible;
@@ -850,24 +852,23 @@
                 position: absolute;
                 left: 0;
                 top: 0;
-                width: 100%;
+                width: 80mm; /* Lebar struk standar */
                 max-width: 100%;
-                box-shadow: none;
-                padding: 20px;
                 margin: 0;
+                padding: 10px;
                 font-size: 14px;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
-            }
-            .no-print {
-                display: none !important;
+                box-shadow: none;
+                border: none;
+                page-break-after: avoid;
+                page-break-inside: avoid;
             }
             @page {
                 size: auto;
                 margin: 0;
             }
         }
-
         @media (max-width: 768px) {
             .main-content {
                 flex-direction: column;
@@ -2593,45 +2594,69 @@
             $('#cartTab').addClass('active');
         }
 
-        function generateReceipt(transaction) {
-            let receiptHTML = `
-                <div class="receipt">
-                    <div class="receipt-header">
-                        <div class="receipt-title">${settings.storeName}</div>
-                        <div class="receipt-address">${settings.storeAddress}</div>
-                        <div class="receipt-phone">${settings.storePhone}</div>
-                        <div class="receipt-date">${moment(transaction.date).format('LLL')}</div>
-                        <div class="receipt-id">ID: ${transaction.id}</div>
-                    </div>
-                    <div class="receipt-items">`;
-            
-            transaction.items.forEach(item => {
-                receiptHTML += `
-                    <div class="receipt-item">
-                        <span>${item.name} (${item.quantity}x)</span>
-                        <span>${formatCurrency(item.price * item.quantity)}</span>
-                    </div>`;
-            });
+       function generateReceipt(transaction) {
+    let receiptHTML = `
+        <div class="receipt">
+            <div class="receipt-header" style="text-align: center; margin-bottom: 10px;">
+                <div class="receipt-title" style="font-weight: bold; font-size: 1.2em;">${settings.storeName}</div>
+                <div class="receipt-address">${settings.storeAddress}</div>
+                ${settings.storePhone ? `<div class="receipt-phone">Telp: ${settings.storePhone}</div>` : ''}
+                <div class="receipt-date" style="margin: 5px 0;">${moment(transaction.date).format('DD/MM/YYYY HH:mm')}</div>
+                <div class="receipt-id">No: ${transaction.id}</div>
+                <hr style="border-top: 1px dashed #000; margin: 5px 0;">
+            </div>
+            <div class="receipt-items" style="margin-bottom: 10px;">`;
+    
+    transaction.items.forEach(item => {
+        receiptHTML += `
+            <div class="receipt-item" style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                <div style="flex: 3;">${item.name}</div>
+                <div style="flex: 1; text-align: right;">${item.quantity}x</div>
+                <div style="flex: 2; text-align: right;">${formatCurrency(item.price * item.quantity)}</div>
+            </div>`;
+    });
 
-            receiptHTML += `
+    receiptHTML += `
+            </div>
+            <hr style="border-top: 1px dashed #000; margin: 5px 0;">
+            <div class="receipt-total" style="margin-top: 5px;">
+                <div class="receipt-item" style="display: flex; justify-content: space-between;">
+                    <span>Subtotal</span>
+                    <span>${formatCurrency(transaction.subtotal)}</span>
                 </div>
-                <div class="receipt-total">
-                    <div class="receipt-item"><span>Subtotal</span><span>${formatCurrency(transaction.subtotal)}</span></div>
-                    ${transaction.discount > 0 ? `<div class="receipt-item"><span>Diskon</span><span>-${formatCurrency(transaction.discount)}</span></div>` : ''}
-                    <div class="receipt-item"><span>Pajak</span><span>${formatCurrency(transaction.tax)}</span></div>
-                    <div class="receipt-item" style="font-weight:bold; font-size: 1.1em;"><span>TOTAL</span><span>${formatCurrency(transaction.total)}</span></div>
-                    <div class="receipt-item"><span>${transaction.paymentMethod.toUpperCase()}</span><span>${formatCurrency(transaction.paymentAmount)}</span></div>
-                    <div class="receipt-item"><span>Kembali</span><span>${formatCurrency(transaction.change)}</span></div>
+                ${transaction.discount > 0 ? `
+                <div class="receipt-item" style="display: flex; justify-content: space-between;">
+                    <span>Diskon</span>
+                    <span>-${formatCurrency(transaction.discount)}</span>
+                </div>` : ''}
+                <div class="receipt-item" style="display: flex; justify-content: space-between;">
+                    <span>Pajak</span>
+                    <span>${formatCurrency(transaction.tax)}</span>
                 </div>
-                <div class="receipt-footer">
-                    <div>${settings.receiptFooter}</div>
-                    <div>Kasir: ${transaction.cashier.name}</div>
+                <div class="receipt-item" style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 5px;">
+                    <span>TOTAL</span>
+                    <span>${formatCurrency(transaction.total)}</span>
                 </div>
-                </div>`;
-            
-            $('#receiptTemplate').html(receiptHTML);
-            $('#transactionDetailReceipt').html(receiptHTML);
-        }
+                <div class="receipt-item" style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <span>${transaction.paymentMethod.toUpperCase()}</span>
+                    <span>${formatCurrency(transaction.paymentAmount)}</span>
+                </div>
+                <div class="receipt-item" style="display: flex; justify-content: space-between;">
+                    <span>Kembali</span>
+                    <span>${formatCurrency(transaction.change)}</span>
+                </div>
+            </div>
+            <hr style="border-top: 1px dashed #000; margin: 10px 0 5px;">
+            <div class="receipt-footer" style="text-align: center; font-size: 0.8em;">
+                <div>${settings.receiptFooter}</div>
+                <div style="margin-top: 5px;">Kasir: ${transaction.cashier.name}</div>
+                <div style="margin-top: 10px;">Terima kasih telah berbelanja</div>
+            </div>
+        </div>`;
+    
+    $('#receiptTemplate').html(receiptHTML);
+    $('#transactionDetailReceipt').html(receiptHTML);
+}
 
         // --- SHIFT MANAGEMENT ---
         function updateShiftStatus() {
@@ -3095,14 +3120,17 @@
                 return;
             }
             
-            customerData.id = 'CU' + Date.now();
-            customers.push(customerData);
-            saveData(STORAGE_KEYS.CUSTOMERS, customers);
-            
-            loadAdminCustomers();
-            $('#customerModal').hide();
-            showToast('Pelanggan berhasil ditambahkan.', 'success');
+           function generateMemberId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude confusing chars
+            let result = '';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return 'M' + result; // Awali dengan M untuk member
         }
+
+    // Di fungsi saveCustomer:
+    customerData.id = generateMemberId();
 
         function editCustomer(id) {
             const customer = customers.find(c => c.id === id);
@@ -3360,26 +3388,77 @@
             });
         }
 
-        function exportReportPDF() {
-            const element = document.createElement('div');
-            element.innerHTML = `
-                <h2 style="text-align: center;">Laporan Penjualan</h2>
-                <p style="text-align: center;">${$('#reportDateRange').val() || 'Semua Data'}</p>
-                <div style="display: flex; justify-content: space-between; margin: 20px 0;">
-                    <div>
-                        <p>Total Pendapatan: ${$('#reportTotalRevenue').text()}</p>
-                        <p>Total Laba: ${$('#reportTotalProfit').text()}</p>
-                    </div>
-                    <div>
-                        <p>Total Transaksi: ${$('#reportTotalTransactions').text()}</p>
-                        <p>Produk Terlaris: ${$('#reportBestSeller').text()}</p>
-                    </div>
+           function exportReportPDF() {
+        const element = document.createElement('div');
+        element.style.padding = '20px';
+        element.style.fontFamily = "'Poppins', sans-serif";
+        
+        element.innerHTML = `
+            <h2 style="text-align: center; margin-bottom: 5px;">${settings.storeName}</h2>
+            <h3 style="text-align: center; margin-top: 0; color: #555;">Laporan Penjualan</h3>
+            <p style="text-align: center; margin-bottom: 20px;">${$('#reportDateRange').val() || 'Semua Data'}</p>
+            <div style="display: flex; justify-content: space-between; margin: 20px 0; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <p><strong>Total Pendapatan:</strong> ${$('#reportTotalRevenue').text()}</p>
+                    <p><strong>Total Laba:</strong> ${$('#reportTotalProfit').text()}</p>
                 </div>
-                <div style="height: 300px;">
-                    <canvas id="chartForExport"></canvas>
+                <div style="flex: 1; min-width: 200px;">
+                    <p><strong>Total Transaksi:</strong> ${$('#reportTotalTransactions').text()}</p>
+                    <p><strong>Produk Terlaris:</strong> ${$('#reportBestSeller').text()}</p>
                 </div>
-                <p style="text-align: right; margin-top: 30px;">Dicetak pada: ${moment().format('LLLL')}</p>
-            `;
+            </div>
+            <div style="height: 300px; margin: 20px 0;">
+                <canvas id="chartForExport" width="600" height="300"></canvas>
+            </div>
+            <p style="text-align: right; margin-top: 30px; font-size: 0.8em;">Dicetak pada: ${moment().format('LLLL')}</p>
+        `;
+    
+    // Clone chart dengan ukuran yang tepat
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = 600;
+    tempCanvas.height = 300;
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Render chart ke canvas baru
+    const chartCanvas = $('#salesChart')[0];
+    const chartData = salesChart.data;
+    const tempChart = new Chart(tempCtx, {
+        type: 'bar',
+        data: chartData,
+        options: { 
+            responsive: false,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    const opt = {
+        margin: 15,
+        filename: `Laporan_Penjualan_${moment().format('YYYYMMDD')}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            allowTaint: true
+        },
+        jsPDF: { 
+            unit: 'mm', 
+            format: 'a4', 
+            orientation: 'portrait',
+            compress: true
+        }
+    };
+    
+    html2pdf().set(opt).from(element).save();
+    showToast('Laporan berhasil diekspor ke PDF', 'success');
+}
             
             // Clone the chart for export
             const tempCanvas = document.createElement('canvas');
@@ -3505,8 +3584,66 @@
         }
 
         // --- EVENT HANDLERS ---
+            function viewStockIn(id) {
+            const record = stockInRecords.find(r => r.id === id);
+            if (!record) return;
+        
+            let itemsHtml = '';
+            record.items.forEach(item => {
+                itemsHtml += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>${item.quantity}</td>
+                        <td>${formatCurrency(item.purchasePrice)}</td>
+                        <td>${formatCurrency(item.quantity * item.purchasePrice)}</td>
+                    </tr>
+                `;
+            });
+        
+            $('#stockInModalTitle').text('Detail Stok Masuk');
+            $('#stockInModalBody').html(`
+                <div class="row" style="display:flex; gap: 20px; margin-bottom: 15px;">
+                    <div style="flex:1;">
+                        <p><strong>Tanggal:</strong> ${moment(record.date).format('LL')}</p>
+                    </div>
+                    <div style="flex:1;">
+                        <p><strong>No. Nota:</strong> ${record.ref}</p>
+                    </div>
+                    <div style="flex:1;">
+                        <p><strong>Pemasok:</strong> ${record.supplier}</p>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Produk</th>
+                                <th>Jumlah</th>
+                                <th>Harga Beli</th>
+                                <th>Subtotal</th>
+                            </tr>
+                        </thead>
+                        <tbody>${itemsHtml}</tbody>
+                    </table>
+                </div>
+                <div class="cart-summary">
+                    <div class="summary-row total-row">
+                        <span class="summary-label">Total Biaya:</span>
+                        <span class="summary-value">${formatCurrency(record.totalCost)}</span>
+                    </div>
+                </div>
+            `);
+            $('#stockInModalFooter').html(`
+                <button class="btn btn-secondary close-stock-in-modal">Tutup</button>
+            `);
+            $('#stockInModal').css('display', 'flex');
+        }
         $(document).ready(function() {
             initializeDefaultData();
+            
+             $(document).on('click', '.view-stock-in', function() {
+             viewStockIn($(this).data('id'));
+            });
             
             // Check for logged in user
             if (!currentCashier) {
@@ -3817,12 +3954,69 @@
             // --- Admin Report Handlers ---
             $('#exportReportPDF').click(exportReportPDF);
             
-            $('#exportReportExcel').click(function() {
-                const dateRange = $('#reportDateRange').val();
-                const filteredTransactions = transactions.filter(t => {
-                    if (!dateRange) return true;
-                    const dates = dateRange.split(' - ');
-                    return moment(t.date).isBetween(moment(dates[0], 'DD/MM/YYYY'), moment(dates[1], 'DD/MM/YYYY'), undefined, '[]');
+           $('#exportReportExcel').click(function() {
+                    const dateRange = $('#reportDateRange').val();
+                    let startDate, endDate;
+                    
+                    if (dateRange) {
+                        const dates = dateRange.split(' - ');
+                        startDate = moment(dates[0], 'DD/MM/YYYY').startOf('day');
+                        endDate = moment(dates[1], 'DD/MM/YYYY').endOf('day');
+                    }
+                    
+                    const filteredTransactions = transactions.filter(t => {
+                        if (!dateRange) return true;
+                        return moment(t.date).isBetween(startDate, endDate, undefined, '[]');
+                    });
+                    
+                    if (filteredTransactions.length === 0) {
+                        showToast('Tidak ada data transaksi untuk diekspor', 'warning');
+                        return;
+                    }
+                    
+                    // Format data untuk Excel
+                    const reportData = filteredTransactions.map(t => {
+                        const itemsList = t.items.map(i => `${i.name} (${i.quantity}x)`).join(', ');
+                        return {
+                            'ID Transaksi': t.id,
+                            'Tanggal': moment(t.date).format('DD/MM/YYYY HH:mm'),
+                            'Pelanggan': t.customer?.name || 'Walk-in',
+                            'Item': itemsList,
+                            'Subtotal': t.subtotal,
+                            'Diskon': t.discount,
+                            'Pajak': t.tax,
+                            'Total': t.total,
+                            'Metode Pembayaran': t.paymentMethod.charAt(0).toUpperCase() + t.paymentMethod.slice(1),
+                            'Kasir': t.cashier.name
+                        };
+                    });
+                    
+                    try {
+                        const worksheet = XLSX.utils.json_to_sheet(reportData);
+                        const workbook = XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Penjualan");
+                        
+                        // Auto-size columns
+                        const wscols = [
+                            {wch: 15}, // ID Transaksi
+                            {wch: 20}, // Tanggal
+                            {wch: 20}, // Pelanggan
+                            {wch: 40}, // Item
+                            {wch: 15}, // Subtotal
+                            {wch: 15}, // Diskon
+                            {wch: 15}, // Pajak
+                            {wch: 15}, // Total
+                            {wch: 15}, // Metode Pembayaran
+                            {wch: 20}  // Kasir
+                        ];
+                        worksheet['!cols'] = wscols;
+                        
+                        XLSX.writeFile(workbook, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
+                        showToast("Excel berhasil diekspor", "success");
+                    } catch (error) {
+                        showToast("Gagal mengekspor ke Excel", "error");
+                        console.error("Excel export error:", error);
+                    }
                 });
                 
                 const reportData = filteredTransactions.map(t => ({
