@@ -52,984 +52,91 @@
             margin: 0 auto;
             padding: 20px;
         }
-        .header {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            padding: 15px 20px;
-            border-radius: var(--rounded-lg);
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 20px;
             margin-bottom: 20px;
+            padding: 0 20px;
+        }
+        .dashboard-card {
+            background: white;
+            border-radius: var(--rounded-lg);
+            padding: 20px;
             box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s;
+        }
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+        }
+        .dashboard-card-icon {
+            font-size: 2.5rem;
+            padding: 15px;
+            border-radius: 50%;
+            color: white;
+        }
+        .icon-sales { background-color: var(--success-color); }
+        .icon-profit { background-color: var(--profit-color); }
+        .icon-transactions { background-color: var(--info-color); }
+        .icon-low-stock { background-color: var(--warning-color); }
+        .dashboard-card-content .dashboard-card-label {
+            font-size: 0.9rem;
+            color: var(--gray-color);
+            margin-bottom: 5px;
+        }
+        .dashboard-card-content .dashboard-card-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        #heldSalesList {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .held-sale-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all .3s ease;
-        }
-        .header h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-        .header-info {
-            text-align: right;
-        }
-        .header-info p {
-            margin: 2px 0;
-            font-size: .9rem;
-        }
-        .main-content {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            transition: all .3s ease;
-        }
-        .left-panel {
-            flex: 1;
-            min-width: 300px;
-            background: #fff;
-            border-radius: var(--rounded-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: all .3s ease;
-        }
-        .right-panel {
-            flex: 2;
-            min-width: 400px;
-            background: #fff;
-            border-radius: var(--rounded-lg);
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            transition: all .3s ease;
-        }
-        .panel-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            border-bottom: 2px solid var(--accent-color);
-            padding-bottom: 5px;
-            font-weight: 600;
-        }
-        .form-group {
-            margin-bottom: 15px;
-            position: relative;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #555;
-        }
-        .form-control {
-            width: 100%;
-            padding: 10px 15px;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: var(--rounded-sm);
-            font-size: 1rem;
-            transition: all .3s;
-        }
-        .form-control:focus {
-            border-color: var(--accent-color);
-            outline: 0;
-            box-shadow: 0 0 0 2px rgba(67,97,238,.2);
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: var(--primary-color);
-            color: #fff;
-            border: none;
-            border-radius: var(--rounded-sm);
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all .3s;
-            text-align: center;
-            font-weight: 500;
-        }
-        .btn:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        .btn:active {
-            transform: translateY(0);
-        }
-        .btn-block {
-            display: block;
-            width: 100%;
-        }
-        .btn-success {
-            background-color: var(--success-color);
-        }
-        .btn-success:hover {
-            background-color: #0d9b6c;
-        }
-        .btn-danger {
-            background-color: var(--danger-color);
-        }
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
-        .btn-warning {
-            background-color: var(--warning-color);
-        }
-        .btn-warning:hover {
-            background-color: #e69007;
-        }
-        .btn-info {
-            background-color: var(--info-color);
-        }
-        .btn-info:hover {
-            background-color: #2563eb;
-        }
-        .btn-secondary {
-            background-color: var(--gray-color);
-        }
-        .btn-secondary:hover {
-            background-color: #4b5563;
-        }
-        .btn-sm {
-            padding: 5px 10px;
-            font-size: .85rem;
-        }
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .btn-outline:hover {
+            border-radius: var(--rounded);
+            margin-bottom: 10px;
             background-color: var(--primary-light);
         }
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: var(--rounded-sm);
-            box-shadow: var(--shadow-sm);
-            margin-bottom: 20px;
-        }
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 0;
-        }
-        .table td, .table th {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
-        .table th {
-            background-color: #f1f3f5;
-            font-weight: 500;
-            color: #555;
-            position: sticky;
-            top: 0;
-        }
-        .table tr:hover {
-            background-color: #f8f9fa;
-        }
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: .75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-        .badge-success {
-            background-color: var(--success-light);
-            color: #065f46;
-        }
-        .badge-danger {
-            background-color: var(--danger-light);
-            color: #b91c1c;
-        }
-        .badge-warning {
-            background-color: var(--warning-light);
-            color: #92400e;
-        }
-        .badge-info {
-            background-color: var(--info-light);
-            color: #1e40af;
-        }
-        .badge-primary {
-            background-color: #eef2ff;
-            color: var(--primary-color);
-        }
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .search-box input {
-            padding-left: 40px;
-        }
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-        .cart-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-            transition: all .2s ease;
-        }
-        .cart-item:hover {
-            background-color: #f9f9f9;
-        }
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-        .cart-item-info {
-            flex: 1;
-        }
-        .cart-item-name {
-            font-weight: 500;
-            margin-bottom: 3px;
-        }
-        .cart-item-price {
-            color: #666;
-            font-size: .9rem;
-        }
-        .cart-item-qty {
-            display: flex;
-            align-items: center;
-        }
-        .cart-item-qty button {
-            width: 25px;
-            height: 25px;
-            border: 1px solid #ddd;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            border-radius: 3px;
-            transition: all .2s;
-        }
-        .cart-item-qty button:hover {
-            background-color: #e9ecef;
-        }
-        .cart-item-qty input {
-            width: 40px;
+        .barcode-container, .qrcode-container {
             text-align: center;
-            margin: 0 5px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-            padding: 3px;
-        }
-        .cart-summary {
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px dashed #ddd;
-        }
-        .summary-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .summary-label {
-            font-weight: 500;
-        }
-        .summary-value {
-            font-weight: 500;
-        }
-        .total-row {
-            font-size: 1.1rem;
-            color: var(--primary-color);
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-        }
-        .payment-methods {
-            margin-top: 20px;
-        }
-        .payment-method {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 5px;
-            transition: all .2s;
-        }
-        .payment-method:hover {
-            background-color: #f8f9fa;
-        }
-        .payment-method input {
-            margin-right: 10px;
-        }
-        .tabs {
-            display: flex;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            border-bottom: 2px solid transparent;
-            transition: all .3s;
-        }
-        .tab.active {
-            border-bottom: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn .3s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .tab-content.active {
-            display: block;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,.5);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn .3s ease;
-        }
-        .modal-content {
-            background-color: #fff;
-            border-radius: var(--rounded-lg);
-            width: 90%;
-            max-width: 800px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-            animation: modalFadeIn .3s;
-        }
-        @keyframes modalFadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .admin-modal .modal-content {
-            max-width: 95%;
-            width: 95%;
-        }
-        .modal-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .modal-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-        .modal-close {
-            background: 0 0;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: #999;
-            transition: all .2s;
-        }
-        .modal-close:hover {
-            color: #333;
-            transform: rotate(90deg);
-        }
-        .modal-body {
             padding: 20px;
         }
-        .modal-footer {
-            padding: 15px 20px;
-            border-top: 1px solid #eee;
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-        .login-container {
-            max-width: 400px;
-            margin: 50px auto;
-            background: #fff;
-            border-radius: var(--rounded-xl);
-            padding: 40px;
-            box-shadow: var(--shadow-lg);
-            animation: slideUp .4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        .login-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 8px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-        }
-        @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-        .login-title {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--primary-color);
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-        .form-floating {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        .form-floating input {
-            width: 100%;
-            padding: 15px;
+        .barcode-container svg, .qrcode-container img {
+            background: white;
+            padding: 10px;
             border: 1px solid #ddd;
-            border-radius: var(--rounded-sm);
-            font-size: 1rem;
-            transition: all .3s;
         }
-        .form-floating input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 2px rgba(67,97,238,.2);
-        }
-        .form-floating label {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            color: #999;
-            transition: all .3s;
-            pointer-events: none;
-            background-color: #fff;
-            padding: 0 5px;
-        }
-        .form-floating input:focus + label,
-        .form-floating input:not(:placeholder-shown) + label {
-            top: -10px;
-            left: 10px;
-            font-size: .8rem;
-            color: var(--primary-color);
-            font-weight: 500;
-        }
-        .login-logo {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .login-logo i {
-            font-size: 3rem;
-            color: var(--primary-color);
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        .receipt {
-            background-color: #fff;
-            padding: 20px;
-            font-family: 'Courier New', monospace;
-            max-width: 300px;
-            margin: 0 auto;
-            box-shadow: var(--shadow-sm);
-            position: relative;
-            font-size: 14px;
-        }
-        .receipt::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: url(https://raw.githubusercontent.com/LenteraKarya/transaksi/main/watermak-struk.png);
-            background-repeat: no-repeat;
-            background-position: center;
-            background-size: 60%;
-            opacity: .1;
-            pointer-events: none;
-            z-index: 0;
-        }
-        .receipt > * {
-            position: relative;
-            z-index: 1;
-        }
-        .receipt-header {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        .receipt-title {
-            font-weight: 700;
-            font-size: 1.2rem;
-            margin-bottom: 5px;
-        }
-        .receipt-address {
-            font-size: .8rem;
-            margin-bottom: 5px;
-        }
-        .receipt-date {
-            font-size: .8rem;
-            margin-bottom: 10px;
-        }
-        .receipt-items {
-            margin-bottom: 15px;
-        }
-        .receipt-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: .9rem;
-        }
-        .receipt-total {
-            border-top: 1px dashed #000;
-            padding-top: 10px;
-            margin-top: 10px;
-            font-weight: 700;
-        }
-        .receipt-footer {
-            text-align: center;
-            margin-top: 15px;
-            font-size: .8rem;
-        }
-        .float-right {
-            float: right;
-        }
-        .ml-2 {
-            margin-left: 10px;
-        }
-        .mt-2 {
-            margin-top: 10px;
-        }
-        .mt-3 {
-            margin-top: 15px;
-        }
-        .mt-4 {
-            margin-top: 20px;
-        }
-        .mb-3 {
-            margin-bottom: 15px;
-        }
-        .admin-password-modal {
-            max-width: 400px;
-        }
-        .admin-password-modal .modal-content {
-            max-width: 400px;
-        }
-        .password-input-container {
-            position: relative;
-        }
-        .password-toggle {
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: #999;
-            transition: all .2s;
-        }
-        .password-toggle:hover {
-            color: #333;
-        }
-        .error-message {
-            color: var(--danger-color);
-            font-size: .8rem;
-            margin-top: 5px;
-            display: none;
-        }
-        .spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid hsla(0,0%,100%,.3);
-            border-radius: 50%;
-            border-top-color: #fff;
-            animation: spin 1s ease-in-out infinite;
-            margin-right: 10px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background-color: #333;
-            color: #fff;
-            border-radius: var(--rounded-sm);
-            box-shadow: var(--shadow-md);
-            z-index: 1100;
-            display: flex;
-            align-items: center;
-            transform: translateX(200%);
-            transition: transform .3s ease;
-        }
-        .toast.show {
-            transform: translateX(0);
-        }
-        .toast.success {
-            background-color: var(--success-color);
-        }
-        .toast.error {
-            background-color: var(--danger-color);
-        }
-        .toast.warning {
-            background-color: var(--warning-color);
-        }
-        .toast.info {
-            background-color: var(--info-color);
-        }
-        .toast i {
-            margin-right: 10px;
-        }
-        .confirmation-dialog {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,.5);
-            z-index: 1200;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn .3s ease;
-        }
-        .confirmation-content {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: var(--rounded-lg);
-            max-width: 400px;
-            width: 90%;
-            box-shadow: var(--shadow-lg);
-            text-align: center;
-        }
-        .confirmation-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 20px;
-        }
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            .receipt, .receipt * {
-                visibility: visible;
-            }
-            .receipt {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                max-width: 100%;
-                box-shadow: none;
-                padding: 20px;
-                margin: 0;
-                font-size: 14px;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            @page {
-                size: auto;
-                margin: 0;
-            }
-            .no-print {
-                display: none !important;
-            }
+        #shiftModal .modal-content {
+            max-width: 500px;
         }
         @media (max-width: 768px) {
-            .main-content {
-                flex-direction: column;
-            }
-            .left-panel, .right-panel {
-                min-width: 100%;
-            }
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .header-info {
-                text-align: center;
-                margin-top: 10px;
-            }
-            .modal-content {
-                width: 95%;
-            }
-            .admin-modal .modal-content {
-                width: 100%;
-                max-width: 100%;
-                height: 100%;
-                max-height: 100%;
-                border-radius: 0;
-            }
-            .login-container {
-                padding: 30px 20px;
-                margin: 20px auto;
-            }
-            .tabs {
-                overflow-x: auto;
-                white-space: nowrap;
-                padding-bottom: 5px;
-            }
-            .tab {
-                padding: 10px 15px;
-            }
-            .receipt {
-                max-width: 100%;
-                padding: 15px;
-                font-size: 12px;
+            .dashboard-cards {
+                grid-template-columns: 1fr;
             }
         }
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-        .tooltip {
-            position: relative;
-            display: inline-block;
-        }
-        .tooltip .tooltiptext {
-            visibility: hidden;
-            width: 120px;
-            background-color: #333;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity .3s;
-            font-size: .8rem;
-        }
-        .tooltip .tooltiptext::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: #333 transparent transparent;
-        }
-        .tooltip:hover .tooltiptext {
-            visibility: visible;
-            opacity: 1;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 30px;
-            color: #666;
-        }
-        .empty-state i {
-            font-size: 3rem;
-            color: #ddd;
-            margin-bottom: 15px;
-        }
-        .data-backup {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        .backup-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-        .sales-report {
-            margin-top: 20px;
-        }
-        .report-summary {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .report-card {
-            flex: 1;
-            min-width: 200px;
-            background: #fff;
-            border-radius: var(--rounded-sm);
-            padding: 15px;
-            box-shadow: var(--shadow-sm);
-        }
-        .report-card-title {
-            font-size: .9rem;
-            color: #666;
-            margin-bottom: 10px;
-        }
-        .report-card-value {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        .fab {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background-color: var(--primary-color);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-md);
-            cursor: pointer;
-            transition: all .3s;
-            z-index: 100;
-        }
-        .fab:hover {
-            background-color: var(--secondary-color);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-lg);
-        }
-        .fab i {
-            font-size: 1.5rem;
-        }
-        .input-group {
-            display: flex;
-            margin-bottom: 15px;
-        }
-        .input-group input {
-            flex: 1;
-            border-top-right-radius: 0;
-            border-bottom-right-radius: 0;
-        }
-        .input-group button {
-            border-top-left-radius: 0;
-            border-bottom-left-radius: 0;
-        }
-        .fade-in {
-            animation: fadeIn .3s ease;
-        }
-        .slide-up {
-            animation: slideUp .3s ease;
-        }
-        .print-btn {
-            background-color: var(--gray-color);
-        }
-        .print-btn:hover {
-            background-color: #4b5563;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        .status-active {
-            background-color: var(--success-color);
-        }
-        .status-inactive {
-            background-color: var(--danger-color);
-        }
-        .qr-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .qr-container canvas {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            background: #fff;
-        }
-        .barcode-container {
-            text-align: center;
-            margin: 20px 0;
-        }
-        .barcode-container svg {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ddd;
-            padding: 10px;
-            background: #fff;
-        }
-        .product-brand-unit {
-            font-size: .8rem;
-            color: #666;
-            margin-top: 3px;
-        }
-        .stock-opname-container {
-            margin-top: 20px;
-            border: 1px solid #eee;
-            border-radius: var(--rounded);
-            padding: 15px;
-        }
-        .stock-opname-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #eee;
-        }
-        .stock-opname-item:last-child {
-            border-bottom: none;
-        }
-        .stock-opname-actions {
-            display: flex;
-            gap: 10px;
-        }
-        .return-reason {
-            margin-top: 15px;
-        }
-        .return-reason textarea {
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: var(--rounded-sm);
-            padding: 10px;
-        }
-        .promo-card {
-            background-color: var(--primary-light);
-            border-radius: var(--rounded);
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        .promo-card-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        .promo-card-title {
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-        .promo-card-dates {
-            font-size: .8rem;
-            color: var(--gray-color);
-        }
-        .promo-card-products {
-            margin-top: 10px;
-            font-size: .9rem;
-        }
+        :root{--primary-color:#4361ee;--primary-light:#eef2ff;--secondary-color:#3f37c9;--accent-color:#4895ef;--dark-color:#1a1a2e;--light-color:#f8f9fa;--success-color:#10b981;--success-light:#d1fae5;--danger-color:#ef4444;--danger-light:#fee2e2;--warning-color:#f59e0b;--warning-light:#fef3c7;--info-color:#3b82f6;--info-light:#dbeafe;--gray-color:#6b7280;--gray-light:#f3f4f6;--shadow-sm:0 1px 2px 0 rgba(0,0,0,.05);--shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);--shadow-md:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);--shadow-lg:0 20px 25px -5px rgba(0,0,0,.1),0 10px 10px -5px rgba(0,0,0,.04);--rounded-sm:.25rem;--rounded:.5rem;--rounded-lg:.75rem;--rounded-xl:1rem}*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}body{background-color:#f5f7fa;color:#333;line-height:1.6}.container{max-width:100%;margin:0 auto;padding:20px}.header{background:linear-gradient(135deg,var(--primary-color),var(--secondary-color));color:#fff;padding:15px 20px;border-radius:var(--rounded-lg);margin-bottom:20px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;transition:all .3s ease}.header h1{font-size:1.8rem;font-weight:600}.header-info{text-align:right}.header-info p{margin:2px 0;font-size:.9rem}.main-content{display:flex;flex-wrap:wrap;gap:20px;transition:all .3s ease}.left-panel{flex:1;min-width:300px;background:#fff;border-radius:var(--rounded-lg);padding:20px;box-shadow:var(--shadow-sm);transition:all .3s ease}.right-panel{flex:2;min-width:400px;background:#fff;border-radius:var(--rounded-lg);padding:20px;box-shadow:var(--shadow-sm);transition:all .3s ease}.panel-title{font-size:1.2rem;margin-bottom:15px;color:var(--dark-color);border-bottom:2px solid var(--accent-color);padding-bottom:5px;font-weight:600}.form-group{margin-bottom:15px;position:relative}.form-group label{display:block;margin-bottom:5px;font-weight:500;color:#555}.form-control{width:100%;padding:10px 15px;border:1px solid #ddd;border-radius:var(--rounded-sm);font-size:1rem;transition:all .3s}.form-control:focus{border-color:var(--accent-color);outline:0;box-shadow:0 0 0 2px rgba(67,97,238,.2)}.btn{display:inline-block;padding:10px 20px;background-color:var(--primary-color);color:#fff;border:none;border-radius:var(--rounded-sm);cursor:pointer;font-size:1rem;transition:all .3s;text-align:center;font-weight:500}.btn:hover{background-color:var(--secondary-color);transform:translateY(-2px);box-shadow:var(--shadow)}.btn:active{transform:translateY(0)}.btn-block{display:block;width:100%}.btn-success{background-color:var(--success-color)}.btn-success:hover{background-color:#0d9b6c}.btn-danger{background-color:var(--danger-color)}.btn-danger:hover{background-color:#dc2626}.btn-warning{background-color:var(--warning-color)}.btn-warning:hover{background-color:#e69007}.btn-info{background-color:var(--info-color)}.btn-info:hover{background-color:#2563eb}.btn-secondary{background-color:var(--gray-color)}.btn-secondary:hover{background-color:#4b5563}.btn-sm{padding:5px 10px;font-size:.85rem}.btn-outline{background-color:transparent;border:1px solid var(--primary-color);color:var(--primary-color)}.btn-outline:hover{background-color:var(--primary-light)}.table-responsive{overflow-x:auto;border-radius:var(--rounded-sm);box-shadow:var(--shadow-sm);margin-bottom:20px}.table{width:100%;border-collapse:collapse;margin-bottom:0}.table td,.table th{padding:12px 15px;text-align:left;border-bottom:1px solid #ddd}.table th{background-color:#f1f3f5;font-weight:500;color:#555;position:sticky;top:0}.table tr:hover{background-color:#f8f9fa}.badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:.75rem;font-weight:500;text-transform:uppercase}.badge-success{background-color:var(--success-light);color:#065f46}.badge-danger{background-color:var(--danger-light);color:#b91c1c}.badge-warning{background-color:var(--warning-light);color:#92400e}.badge-info{background-color:var(--info-light);color:#1e40af}.badge-primary{background-color:#eef2ff;color:var(--primary-color)}.search-box{position:relative;margin-bottom:20px}.search-box input{padding-left:40px}.search-box i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:#999}.cart-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;transition:all .2s ease}.cart-item:hover{background-color:#f9f9f9}.cart-item:last-child{border-bottom:none}.cart-item-info{flex:1}.cart-item-name{font-weight:500;margin-bottom:3px}.cart-item-price{color:#666;font-size:.9rem}.cart-item-qty{display:flex;align-items:center}.cart-item-qty button{width:25px;height:25px;border:1px solid #ddd;background-color:#f8f9fa;cursor:pointer;border-radius:3px;transition:all .2s}.cart-item-qty button:hover{background-color:#e9ecef}.cart-item-qty input{width:40px;text-align:center;margin:0 5px;border:1px solid #ddd;border-radius:3px;padding:3px}.cart-summary{margin-top:20px;padding-top:15px;border-top:2px dashed #ddd}.summary-row{display:flex;justify-content:space-between;margin-bottom:10px}.summary-label{font-weight:500}.summary-value{font-weight:500}.total-row{font-size:1.1rem;color:var(--primary-color);margin-top:10px;padding-top:10px;border-top:1px solid #ddd}.payment-methods{margin-top:20px}.payment-method{display:flex;align-items:center;margin-bottom:10px;cursor:pointer;padding:8px;border-radius:5px;transition:all .2s}.payment-method:hover{background-color:#f8f9fa}.payment-method input{margin-right:10px}.tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:20px}.tab{padding:10px 20px;cursor:pointer;border-bottom:2px solid transparent;transition:all .3s}.tab.active{border-bottom:2px solid var(--primary-color);color:var(--primary-color);font-weight:500}.tab-content{display:none;animation:fadeIn .3s ease}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.tab-content.active{display:block}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1000;justify-content:center;align-items:center;animation:fadeIn .3s ease}.modal-content{background-color:#fff;border-radius:var(--rounded-lg);width:90%;max-width:800px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:modalFadeIn .3s}@keyframes modalFadeIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}.admin-modal .modal-content{max-width:95%;width:95%}.modal-header{padding:15px 20px;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}.modal-title{font-size:1.2rem;font-weight:600}.modal-close{background:0 0;border:none;font-size:1.5rem;cursor:pointer;color:#999;transition:all .2s}.modal-close:hover{color:#333;transform:rotate(90deg)}.modal-body{padding:20px}.modal-footer{padding:15px 20px;border-top:1px solid #eee;display:flex;justify-content:flex-end;gap:10px}.login-container{max-width:400px;margin:50px auto;background:#fff;border-radius:var(--rounded-xl);padding:40px;box-shadow:var(--shadow-lg);animation:slideUp .4s ease;position:relative;overflow:hidden}.login-container::before{content:'';position:absolute;top:0;left:0;width:100%;height:8px;background:linear-gradient(90deg,var(--primary-color),var(--secondary-color))}@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}.login-title{text-align:center;margin-bottom:30px;color:var(--primary-color);font-size:1.8rem;font-weight:600}.form-floating{position:relative;margin-bottom:20px}.form-floating input{width:100%;padding:15px;border:1px solid #ddd;border-radius:var(--rounded-sm);font-size:1rem;transition:all .3s}.form-floating input:focus{border-color:var(--primary-color);box-shadow:0 0 0 2px rgba(67,97,238,.2)}.form-floating label{position:absolute;top:15px;left:15px;color:#999;transition:all .3s;pointer-events:none;background-color:#fff;padding:0 5px}.form-floating input:focus+label,.form-floating input:not(:placeholder-shown)+label{top:-10px;left:10px;font-size:.8rem;color:var(--primary-color);font-weight:500}.login-logo{text-align:center;margin-bottom:20px}.login-logo i{font-size:3rem;color:var(--primary-color);animation:pulse 2s infinite}@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.1)}100%{transform:scale(1)}}.receipt{background-color:#fff;padding:20px;font-family:'Courier New',monospace;max-width:300px;margin:0 auto;box-shadow:var(--shadow-sm);position:relative;font-size:14px}.receipt::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background-image:url(https://raw.githubusercontent.com/LenteraKarya/transaksi/main/watermak-struk.png);background-repeat:no-repeat;background-position:center;background-size:60%;opacity:.1;pointer-events:none;z-index:0}.receipt>*{position:relative;z-index:1}.receipt-header{text-align:center;margin-bottom:15px}.receipt-title{font-weight:700;font-size:1.2rem;margin-bottom:5px}.receipt-address{font-size:.8rem;margin-bottom:5px}.receipt-date{font-size:.8rem;margin-bottom:10px}.receipt-items{margin-bottom:15px}.receipt-item{display:flex;justify-content:space-between;margin-bottom:5px;font-size:.9rem}.receipt-total{border-top:1px dashed #000;padding-top:10px;margin-top:10px;font-weight:700}.receipt-footer{text-align:center;margin-top:15px;font-size:.8rem}.float-right{float:right}.ml-2{margin-left:10px}.mt-2{margin-top:10px}.mt-3{margin-top:15px}.mt-4{margin-top:20px}.mb-3{margin-bottom:15px}.admin-password-modal{max-width:400px}.admin-password-modal .modal-content{max-width:400px}.password-input-container{position:relative}.password-toggle{position:absolute;right:10px;top:50%;transform:translateY(-50%);cursor:pointer;color:#999;transition:all .2s}.password-toggle:hover{color:#333}.error-message{color:var(--danger-color);font-size:.8rem;margin-top:5px;display:none}.spinner{display:inline-block;width:20px;height:20px;border:3px solid hsla(0,0%,100%,.3);border-radius:50%;border-top-color:#fff;animation:spin 1s ease-in-out infinite;margin-right:10px}@keyframes spin{to{transform:rotate(360deg)}}.toast{position:fixed;top:20px;right:20px;padding:15px 20px;background-color:#333;color:#fff;border-radius:var(--rounded-sm);box-shadow:var(--shadow-md);z-index:1100;display:flex;align-items:center;transform:translateX(200%);transition:transform .3s ease}.toast.show{transform:translateX(0)}.toast.success{background-color:var(--success-color)}.toast.error{background-color:var(--danger-color)}.toast.warning{background-color:var(--warning-color)}.toast.info{background-color:var(--info-color)}.toast i{margin-right:10px}.confirmation-dialog{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1200;display:flex;justify-content:center;align-items:center;animation:fadeIn .3s ease}.confirmation-content{background-color:#fff;padding:20px;border-radius:var(--rounded-lg);max-width:400px;width:90%;box-shadow:var(--shadow-lg);text-align:center}.confirmation-buttons{display:flex;justify-content:center;gap:10px;margin-top:20px}@media print{body *{visibility:hidden}.receipt,.receipt *{visibility:visible}.receipt{position:absolute;left:0;top:0;width:100%;max-width:100%;box-shadow:none;padding:20px;margin:0;font-size:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}.no-print{display:none!important}@page{size:auto;margin:0}}@media (max-width:768px){.main-content{flex-direction:column}.left-panel,.right-panel{min-width:100%}.header{flex-direction:column;text-align:center}.header-info{text-align:center;margin-top:10px}.modal-content{width:95%}.admin-modal .modal-content{width:100%;max-width:100%;height:100%;max-height:100%;border-radius:0}.login-container{padding:30px 20px;margin:20px auto}.tabs{overflow-x:auto;white-space:nowrap;padding-bottom:5px}.tab{padding:10px 15px}#adminAccess{bottom:10px;right:10px;padding:8px 12px;font-size:.8rem}.receipt{max-width:100%;padding:15px;font-size:12px}}::-webkit-scrollbar{width:8px;height:8px}::-webkit-scrollbar-track{background:#f1f1f1;border-radius:10px}::-webkit-scrollbar-thumb{background:#888;border-radius:10px}::-webkit-scrollbar-thumb:hover{background:#555}.tooltip{position:relative;display:inline-block}.tooltip .tooltiptext{visibility:hidden;width:120px;background-color:#333;color:#fff;text-align:center;border-radius:6px;padding:5px;position:absolute;z-index:1;bottom:125%;left:50%;transform:translateX(-50%);opacity:0;transition:opacity .3s;font-size:.8rem}.tooltip .tooltiptext::after{content:"";position:absolute;top:100%;left:50%;margin-left:-5px;border-width:5px;border-style:solid;border-color:#333 transparent transparent}.tooltip:hover .tooltiptext{visibility:visible;opacity:1}.empty-state{text-align:center;padding:30px;color:#666}.empty-state i{font-size:3rem;color:#ddd;margin-bottom:15px}.data-backup{margin-top:30px;padding-top:20px;border-top:1px solid #eee}.backup-actions{display:flex;gap:10px;margin-top:15px;flex-wrap:wrap}.sales-report{margin-top:20px}.report-summary{display:flex;flex-wrap:wrap;gap:15px;margin-bottom:20px}.report-card{flex:1;min-width:200px;background:#fff;border-radius:var(--rounded-sm);padding:15px;box-shadow:var(--shadow-sm)}.report-card-title{font-size:.9rem;color:#666;margin-bottom:10px}.report-card-value{font-size:1.5rem;font-weight:600;color:var(--primary-color)}.fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;border-radius:50%;background-color:var(--primary-color);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-md);cursor:pointer;transition:all .3s;z-index:100}.fab:hover{background-color:var(--secondary-color);transform:translateY(-3px);box-shadow:var(--shadow-lg)}.fab i{font-size:1.5rem}.input-group{display:flex;margin-bottom:15px}.input-group input{flex:1;border-top-right-radius:0;border-bottom-right-radius:0}.input-group button{border-top-left-radius:0;border-bottom-left-radius:0}.fade-in{animation:fadeIn .3s ease}.slide-up{animation:slideUp .3s ease}.print-btn{background-color:var(--gray-color)}.print-btn:hover{background-color:#4b5563}.status-indicator{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px}.status-active{background-color:var(--success-color)}.status-inactive{background-color:var(--danger-color)}.qr-container{text-align:center;margin:20px 0}.qr-container canvas{max-width:100%;height:auto;border:1px solid #ddd;padding:10px;background:#fff}.barcode-container{text-align:center;margin:20px 0}.barcode-container svg{max-width:100%;height:auto;border:1px solid #ddd;padding:10px;background:#fff}.product-brand-unit{font-size:.8rem;color:#666;margin-top:3px}.stock-opname-container{margin-top:20px;border:1px solid #eee;border-radius:var(--rounded);padding:15px}.stock-opname-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.stock-opname-item:last-child{border-bottom:none}.stock-opname-actions{display:flex;gap:10px}.return-reason{margin-top:15px}.return-reason textarea{width:100%;border:1px solid #ddd;border-radius:var(--rounded-sm);padding:10px}.promo-card{background-color:var(--primary-light);border-radius:var(--rounded);padding:15px;margin-bottom:15px}.promo-card-header{display:flex;justify-content:space-between;margin-bottom:10px}.promo-card-title{font-weight:600;color:var(--primary-color)}.promo-card-dates{font-size:.8rem;color:var(--gray-color)}.promo-card-products{margin-top:10px;font-size:.9rem}
     </style>
 </head>
 <body>
-    <!-- Toast Notification -->
     <div id="toast" class="toast">
         <i class="fas fa-info-circle"></i>
         <span id="toast-message">Notification message</span>
     </div>
-    <!-- Confirmation Dialog -->
     <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
         <div class="confirmation-content">
             <h4 id="confirmationMessage">Apakah Anda yakin?</h4>
@@ -1039,7 +146,6 @@
             </div>
         </div>
     </div>
-    <!-- Login Modal -->
     <div id="loginModal" class="modal" style="display: flex;">
         <div class="login-container">
             <div class="login-logo">
@@ -1063,7 +169,6 @@
             </form>
         </div>
     </div>
-    <!-- Main App -->
     <div id="mainApp" style="display: none;">
         <div class="dashboard-cards">
             <div class="dashboard-card">
@@ -1261,6 +366,7 @@
             </div>
         </div>
     </div>
+
     <!-- Modals -->
     <div id="receiptTemplate" style="display: none;"></div>
     <div id="adminPasswordModal" class="modal admin-password-modal">
@@ -1457,6 +563,7 @@
             </div>
         </div>
     </div>
+
     <!-- Product Modal -->
     <div id="productModal" class="modal">
         <div class="modal-content">
@@ -1497,141 +604,8 @@
             </div>
         </div>
     </div>
-    <!-- Category Modal -->
-    <div id="categoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Tambah Kategori</h3>
-                <button class="modal-close">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="categoryName">Nama Kategori</label>
-                    <input type="text" id="categoryName" class="form-control" placeholder="Masukkan nama kategori" required>
-                </div>
-                <div class="form-group">
-                    <label for="categoryDescription">Deskripsi</label>
-                    <textarea id="categoryDescription" class="form-control" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-category-modal">Batal</button>
-                <button class="btn btn-success save-category">Simpan</button>
-            </div>
-        </div>
-    </div>
-    <!-- Edit Category Modal -->
-    <div id="editCategoryModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Kategori</h3>
-                <button class="modal-close">×</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="editCategoryId">
-                <div class="form-group">
-                    <label for="editCategoryName">Nama Kategori</label>
-                    <input type="text" id="editCategoryName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCategoryDescription">Deskripsi</label>
-                    <textarea id="editCategoryDescription" class="form-control" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-edit-category-modal">Batal</button>
-                <button class="btn btn-success update-category">Update</button>
-            </div>
-        </div>
-    </div>
-    <!-- Customer Modal -->
-    <div id="customerModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Tambah Pelanggan</h3>
-                <button class="modal-close">×</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="customerTypeModal">Tipe Pelanggan</label>
-                    <select id="customerTypeModal" class="form-control">
-                        <option value="walkin">Pelanggan Biasa</option>
-                        <option value="member">Member</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="customerNameModal">Nama Lengkap</label>
-                    <input type="text" id="customerNameModal" class="form-control" placeholder="Masukkan nama lengkap" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerPhoneModal">No. Telepon</label>
-                    <input type="tel" id="customerPhoneModal" class="form-control" placeholder="Masukkan nomor telepon" required>
-                </div>
-                <div class="form-group">
-                    <label for="customerEmailModal">Email</label>
-                    <input type="email" id="customerEmailModal" class="form-control" placeholder="Masukkan email">
-                </div>
-                <div class="form-group">
-                    <label for="customerAddressModal">Alamat</label>
-                    <textarea id="customerAddressModal" class="form-control" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-customer-modal">Batal</button>
-                <button class="btn btn-success save-customer">Simpan</button>
-            </div>
-        </div>
-    </div>
-    <!-- Edit Customer Modal -->
-    <div id="editCustomerModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">Edit Pelanggan</h3>
-                <button class="modal-close">×</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" id="editCustomerId">
-                <div class="form-group">
-                    <label for="editCustomerType">Tipe Pelanggan</label>
-                    <select id="editCustomerType" class="form-control">
-                        <option value="walkin">Pelanggan Biasa</option>
-                        <option value="member">Member</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="editCustomerName">Nama Lengkap</label>
-                    <input type="text" id="editCustomerName" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCustomerPhone">No. Telepon</label>
-                    <input type="tel" id="editCustomerPhone" class="form-control" required>
-                </div>
-                <div class="form-group">
-                    <label for="editCustomerEmail">Email</label>
-                    <input type="email" id="editCustomerEmail" class="form-control">
-                </div>
-                <div class="form-group">
-                    <label for="editCustomerAddress">Alamat</label>
-                    <textarea id="editCustomerAddress" class="form-control" rows="3"></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary close-edit-customer-modal">Batal</button>
-                <button class="btn btn-success update-customer">Update</button>
-            </div>
-        </div>
-    </div>
-    <!-- Other modals -->
-    <div id="shiftModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title" id="shiftModalTitle"></h3>
-                <button class="modal-close">&times;</button>
-            </div>
-            <div class="modal-body" id="shiftModalBody"></div>
-            <div class="modal-footer" id="shiftModalFooter"></div>
-        </div>
-    </div>
+
+    <!-- Stock In Modal -->
     <div id="stockInModal" class="modal">
         <div class="modal-content" style="max-width: 900px;">
             <div class="modal-header">
@@ -1686,6 +660,18 @@
             </div>
         </div>
     </div>
+
+    <!-- Other modals -->
+    <div id="shiftModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="shiftModalTitle"></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="shiftModalBody"></div>
+            <div class="modal-footer" id="shiftModalFooter"></div>
+        </div>
+    </div>
     <div id="codeGeneratorModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1719,12 +705,14 @@
             </div>
         </div>
     </div>
+
     <div id="adminAccess" class="fab" title="Akses Admin" style="bottom: 20px;">
         <i class="fas fa-lock"></i>
     </div>
     <div id="shiftAccess" class="fab" title="Manajemen Shift" style="bottom: 90px; background-color: var(--warning-color);">
         <i class="fas fa-clock"></i>
     </div>
+
     <!-- Scripts -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
@@ -1736,8 +724,9 @@
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
     <script>
+        // Inisialisasi global
         moment.locale('id');
-        const ADMIN_PASSWORD = "Geraiku.12345";
+        const ADMIN_PASSWORD = "Geraiku.12345"; // Tidak boleh diubah lokal
         const STORAGE_KEYS = {
             PRODUCTS: 'pos_premium_products',
             CATEGORIES: 'pos_premium_categories',
@@ -1750,11 +739,17 @@
             STOCK_IN: 'pos_premium_stock_in',
             CURRENT_SHIFT: 'pos_premium_current_shift',
         };
+
+        // Data
         let products = [], categories = [], customers = [], cashiers = [], transactions = [], settings = {}, heldSales = [], stockInRecords = [], currentShift = null;
         let currentCashier = null;
         let salesChart = null;
         let currentStockInItems = [];
-        // --- Functions ---
+
+        // Variabel keranjang
+        let currentCart = { items: [], customer: null, discount: 0, tax: 0, subtotal: 0, total: 0, totalCost: 0, profit: 0 };
+
+        // --- Fungsi ---
         function showToast(message, type = 'info', duration = 3000) {
             const t = $("#toast");
             const s = $("#toast-message");
@@ -1763,6 +758,7 @@
             t.addClass("show");
             setTimeout(() => t.removeClass("show"), duration);
         }
+
         function showConfirmation(message, callback, btnText = "Ya, Lanjutkan") {
             const t = $("#confirmationMessage");
             const o = $("#confirmationDialog");
@@ -1774,32 +770,19 @@
             n.off("click").on("click", () => { o.hide(); callback && callback(true); });
             a.off("click").on("click", () => { o.hide(); callback && callback(false); });
         }
+
         function formatCurrency(amount) {
             return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount || 0);
         }
-        function exportToExcel(data, filename) {
-            try {
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Data");
-                XLSX.writeFile(wb, filename || "export.xlsx");
-                showToast("Excel berhasil diekspor", "success");
-            } catch (e) {
-                showToast("Gagal ekspor Excel", "error");
-            }
-        }
-        function exportToPDF(elementId, filename) {
-            const element = document.getElementById(elementId);
-            html2pdf().from(element).save(filename || 'laporan.pdf');
-            showToast("PDF berhasil diekspor", "success");
-        }
+
         function saveData(key, data) {
             try {
                 localStorage.setItem(key, JSON.stringify(data));
             } catch (e) {
-                showToast("Storage penuh atau error.", "error");
+                showToast("Gagal menyimpan data.", "error");
             }
         }
+
         function loadData() {
             try {
                 products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || [];
@@ -1816,6 +799,7 @@
                 showToast("Gagal memuat data.", "error");
             }
         }
+
         function initializeDefaultData() {
             loadData();
             if (cashiers.length === 0) {
@@ -1849,6 +833,7 @@
                 saveData(STORAGE_KEYS.PRODUCTS, products);
             }
         }
+
         function updateAllUI() {
             updateCurrentDate();
             updateDashboard();
@@ -1860,9 +845,11 @@
             $('#storeName').text(settings.storeName);
             $('#storeAddress').text(settings.storeAddress);
         }
+
         function updateCurrentDate() {
             $('#currentDate').text(moment().format('dddd, D MMMM YYYY, HH:mm'));
         }
+
         function updateDashboard() {
             const today = moment().startOf('day');
             const todayTransactions = transactions.filter(t => moment(t.date).isSameOrAfter(today));
@@ -1874,6 +861,7 @@
             $('#todayTransactions').text(todayTransactions.length);
             $('#lowStockItems').text(lowStockItems);
         }
+
         function updateCart() {
             currentCart.subtotal = currentCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             currentCart.totalCost = currentCart.items.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0);
@@ -1906,6 +894,7 @@
             $('#cartTax, #paymentTax').text(formatCurrency(currentCart.tax));
             $('#cartTotal, #paymentTotal').text(formatCurrency(currentCart.total));
         }
+
         function resetCart() {
             currentCart = { items: [], customer: null, discount: 0, tax: 0, subtotal: 0, total: 0, totalCost: 0, profit: 0 };
             updateCart();
@@ -1913,6 +902,7 @@
             $('#memberId, #customerName, #customerPhone, #customerEmail').val('');
             $('#paymentAmount').val('');
         }
+
         function loadProducts(searchTerm = '', categoryId = 'all') {
             let filteredProducts = products;
             if (searchTerm) {
@@ -1940,6 +930,7 @@
                 });
             }
         }
+
         // --- Hold & Resume ---
         function holdSale() {
             if (currentCart.items.length === 0) {
@@ -1953,6 +944,7 @@
             updateHeldSalesList();
             showToast(`Transaksi ditahan: ${saleName}`, 'success');
         }
+
         function resumeSale(index) {
             const sale = heldSales[index];
             if (currentCart.items.length > 0) {
@@ -1966,6 +958,7 @@
             updateHeldSalesList();
             showToast('Transaksi dilanjutkan.', 'info');
         }
+
         function deleteHeldSale(index) {
             const name = heldSales[index].name;
             showConfirmation(`Hapus "${name}"?`, confirmed => {
@@ -1977,6 +970,7 @@
                 }
             });
         }
+
         function updateHeldSalesList() {
             const list = $('#heldSalesList');
             list.empty();
@@ -1996,6 +990,7 @@
                 });
             }
         }
+
         // --- Shift ---
         function updateShiftStatus() {
             const badge = $('#shiftStatus');
@@ -2005,6 +1000,7 @@
                 badge.text('Belum Dimulai').removeClass('badge-success').addClass('badge-danger');
             }
         }
+
         function manageShift() {
             const modal = $('#shiftModal');
             if (currentShift && currentShift.isActive) {
@@ -2068,6 +1064,7 @@
             }
             modal.css('display', 'flex');
         }
+
         // --- Admin ---
         function loadAdminData() {
             loadAdminProducts();
@@ -2080,6 +1077,7 @@
             $('#settingStoreAddress').val(settings.storeAddress);
             $('#settingTaxRate').val(settings.taxRate);
         }
+
         function loadAdminProducts() {
             $('#adminProductsTable').empty();
             products.forEach(p => {
@@ -2099,6 +1097,7 @@
                 `);
             });
         }
+
         function saveProduct() {
             const productId = $('#productId').val();
             const data = {
@@ -2137,6 +1136,7 @@
             loadProducts();
             $('#productModal').hide();
         }
+
         function editProduct(id) {
             const p = products.find(p => p.id === id);
             $('#productModalTitle').text('Edit Produk');
@@ -2149,6 +1149,7 @@
             $('#productStock').val(p.stock).prop('disabled', true);
             $('#productModal').css('display', 'flex');
         }
+
         function deleteProduct(id) {
             showConfirmation('Hapus produk ini?', confirmed => {
                 if (confirmed) {
@@ -2160,6 +1161,7 @@
                 }
             });
         }
+
         // --- Categories ---
         function loadAdminCategories() {
             $('#adminCategoriesTable').empty();
@@ -2179,6 +1181,7 @@
                 `);
             });
         }
+
         function saveCategory() {
             const name = $('#categoryName').val().trim();
             if (!name) { showToast('Nama kategori harus diisi.', 'error'); return; }
@@ -2190,11 +1193,13 @@
             $('#categoryModal').hide();
             showToast('Kategori ditambahkan.', 'success');
         }
+
         function updateCategoryDropdowns() {
             const selects = $('#productCategory, #productCategoryModal');
             selects.empty().append('<option value="all">Semua Kategori</option>');
             categories.forEach(c => selects.append(`<option value="${c.id}">${c.name}</option>`));
         }
+
         // --- Customers ---
         function loadAdminCustomers() {
             $('#adminCustomersTable').empty();
@@ -2214,6 +1219,7 @@
                 `);
             });
         }
+
         function saveCustomer() {
             const data = {
                 id: 'CUST' + Date.now(),
@@ -2230,6 +1236,7 @@
             $('#customerModal').hide();
             showToast('Pelanggan ditambahkan.', 'success');
         }
+
         // --- Reports ---
         function loadSalesReport(startDate, endDate) {
             const filtered = transactions.filter(t => {
@@ -2262,21 +1269,32 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
         }
+
         // --- Export ---
+        function exportToPDF(elementId, filename) {
+            const element = document.getElementById(elementId);
+            html2pdf().from(element).save(filename || 'laporan.pdf');
+            showToast("PDF berhasil diekspor", "success");
+        }
         $('#exportReportPDF').click(() => exportToPDF('reportsTab', 'laporan_penjualan.pdf'));
-        $('#exportReportExcel').click(() => exportToExcel(transactions, 'transaksi.xlsx'));
+        $('#exportReportExcel').click(() => {
+            const ws = XLSX.utils.json_to_sheet(transactions);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Transaksi");
+            XLSX.writeFile(wb, 'transaksi.xlsx');
+            showToast("Excel berhasil diekspor", "success");
+        });
+
         // --- Settings ---
         $('#saveSettings').click(() => {
             settings.storeName = $('#settingStoreName').val();
             settings.storeAddress = $('#settingStoreAddress').val();
             settings.taxRate = parseInt($('#settingTaxRate').val()) || 10;
-            const newPass = $('#settingAdminPassword').val();
-            if (newPass) window.ADMIN_PASSWORD = newPass;
             saveData(STORAGE_KEYS.SETTINGS, settings);
-            saveData(STORAGE_KEYS.CURRENT_CASHIER, currentCashier);
             updateAllUI();
             showToast('Pengaturan disimpan.', 'success');
         });
+
         // --- Events ---
         $(document).ready(function() {
             initializeDefaultData();
@@ -2289,6 +1307,7 @@
                 $('#loggedInCashier').text(currentCashier.name);
                 updateAllUI();
             }
+
             // Login
             $('#loginForm').submit(e => {
                 e.preventDefault();
@@ -2308,6 +1327,7 @@
                     showToast('ID atau PIN salah.', 'error');
                 }
             });
+
             $('#logoutBtn').click(e => {
                 e.preventDefault();
                 showConfirmation('Logout?', confirmed => {
@@ -2318,11 +1338,14 @@
                     }
                 });
             });
+
             // Search & category
             $('#productSearch, #productCategory').on('input change', () => loadProducts($('#productSearch').val(), $('#productCategory').val()));
+
             // Add to cart
             $(document).on('click', '.add-to-cart', function() {
                 const p = products.find(p => p.id === $(this).data('id'));
+                if (!p) return;
                 const item = currentCart.items.find(i => i.productId === p.id);
                 if (item) {
                     if (item.quantity < p.stock) item.quantity++;
@@ -2334,10 +1357,12 @@
                 }
                 updateCart();
             });
+
             $(document).on('click', '.remove-from-cart', function() {
                 currentCart.items = currentCart.items.filter(i => i.productId !== $(this).data('id'));
                 updateCart();
             });
+
             $(document).on('change', '.cart-item-quantity', function() {
                 const item = currentCart.items.find(i => i.productId === $(this).data('id'));
                 const qty = parseInt($(this).val());
@@ -2349,15 +1374,18 @@
                 }
                 updateCart();
             });
+
             // Hold & resume
             $('#holdSaleBtn').click(holdSale);
             $(document).on('click', '.resume-sale', function() { resumeSale($(this).data('index')); });
             $(document).on('click', '.delete-held-sale', function() { deleteHeldSale($(this).data('index')); });
+
             // Tabs
             $('.tab').click(function() {
                 $(this).addClass('active').siblings().removeClass('active');
                 $('#' + $(this).data('tab') + 'Tab').addClass('active').siblings('.tab-content').removeClass('active');
             });
+
             // Navigation
             $('#nextToCustomer').click(() => $('[data-tab="customer"]').click());
             $('#backToCart').click(() => $('[data-tab="cart"]').click());
@@ -2371,6 +1399,7 @@
                 $('[data-tab="payment"]').click();
             });
             $('#backToCustomer').click(() => $('[data-tab="customer"]').click());
+
             // Complete payment
             $('#completePayment').click(() => {
                 if (!currentShift || !currentShift.isActive) {
@@ -2404,6 +1433,7 @@
                 showToast('Transaksi berhasil!', 'success');
                 $('[data-tab="cart"]').click();
             });
+
             // Admin
             $('#adminAccess').click(() => $('#adminPasswordModal').css('display', 'flex'));
             $('.verify-admin-password').click(() => {
@@ -2416,8 +1446,12 @@
                     showToast('Password salah.', 'error');
                 }
             });
+
             // Close modals
-            $('.modal-close, .close-admin-password-modal, .close-shift-modal').click(() => $('.modal').hide());
+            $(document).on('click', '.modal-close, .close-admin-password-modal, .close-shift-modal', () => $('.modal').hide());
+            $(document).on('click', '.close-product-modal', () => $('#productModal').hide());
+            $(document).on('click', '.close-admin-modal', () => $('#adminModal').hide());
+
             // Product
             $('#addProduct').click(() => {
                 $('#productModalTitle').text('Tambah Produk');
@@ -2428,12 +1462,14 @@
             $('#saveProductBtn').click(saveProduct);
             $(document).on('click', '.edit-product', function() { editProduct($(this).data('id')); });
             $(document).on('click', '.delete-product', function() { deleteProduct($(this).data('id')); });
+
             // Category
             $('#addCategory').click(() => {
                 $('#categoryName, #categoryDescription').val('');
                 $('#categoryModal').css('display', 'flex');
             });
             $('.save-category').click(saveCategory);
+
             // Customer
             $('#addCustomer').click(() => {
                 $('#customerNameModal, #customerPhoneModal, #customerEmailModal, #customerAddressModal').val('');
@@ -2441,13 +1477,16 @@
                 $('#customerModal').css('display', 'flex');
             });
             $('.save-customer').click(saveCustomer);
+
             // Date pickers
             $('#reportDateRange, #transactionDateRange').daterangepicker({
                 opens: 'left',
                 locale: { format: 'DD/MM/YYYY', applyLabel: 'Pilih', cancelLabel: 'Batal' }
             }).on('apply.daterangepicker', (e, p) => loadSalesReport(p.startDate, p.endDate));
+
             // Shift
             $('#shiftAccess').click(manageShift);
+
             // Export
             $('#exportData').click(() => {
                 const data = { products, categories, customers, transactions, stockInRecords };
@@ -2458,7 +1497,25 @@
                 a.download = 'pos_backup.json';
                 a.click();
             });
+
+            // Customer type toggle
+            $('#customerType').change(function() {
+                const val = $(this).val();
+                $('#memberFields, #customerFields').hide();
+                if (val === 'member') $('#memberFields').show();
+                else $('#customerFields').show();
+            }).change();
+
+            // Set interval update
+            setInterval(() => {
+                updateCurrentDate();
+                updateDashboard();
+            }, 60000);
+
+            // Inisialisasi awal
+            updateAllUI();
         });
+
         // --- Receipt Generator ---
         function generateReceipt(transaction) {
             const receipt = `
