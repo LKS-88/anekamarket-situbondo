@@ -1378,6 +1378,60 @@
             .dashboard-cards {
                 grid-template-columns: 1fr;
             }
+            
+       /* Tambahkan media query berikut untuk perbaikan mobile */
+        @media (max-width: 576px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            
+            .dashboard-card {
+                padding: 15px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .dashboard-card-icon {
+                margin-bottom: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .header-info p {
+                font-size: 0.8rem;
+            }
+            
+            .cart-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .cart-item-qty {
+                margin-top: 10px;
+                width: 100%;
+            }
+            
+            .payment-method {
+                padding: 5px;
+            }
+            
+            .modal-content {
+                width: 95%;
+                max-width: 95%;
+            }
+            
+            .fab {
+                width: 48px;
+                height: 48px;
+                font-size: 1.2rem;
+            }
+            
+            #shiftAccess {
+                bottom: 70px;
+            }
         }
     </style>
 </head>
@@ -2302,6 +2356,18 @@
             localStorage.setItem(key, JSON.stringify(data));
         }
 
+         function initializeDefaultData() {
+            loadData();
+
+            if (cashiers.length === 0) {
+                cashiers = [
+                    { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
+                    { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
+                ];
+                saveData(STORAGE_KEYS.CASHIERS, cashiers);
+            }
+
+        
         function loadData() {
             products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) || [];
             categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES)) || [];
@@ -2316,18 +2382,7 @@
             shiftHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHIFT_HISTORY)) || [];
         }
 
-        function initializeDefaultData() {
-            loadData();
-
-            if (cashiers.length === 0) {
-                cashiers = [
-                    { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
-                    { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
-                ];
-                saveData(STORAGE_KEYS.CASHIERS, cashiers);
-            }
-
-            if (Object.keys(settings).length === 0) {
+                   if (Object.keys(settings).length === 0) {
                 settings = {
                     storeName: "Toko Geraiku",
                     storeAddress: "Jl. Digital Raya No. 1",
@@ -3106,31 +3161,39 @@
             });
         }
 
-        function saveCustomer() {
-            const customerData = {
-                type: $('#customerTypeModal').val(),
-                name: $('#customerNameModal').val().trim(),
-                phone: $('#customerPhoneModal').val().trim(),
-                email: $('#customerEmailModal').val().trim(),
-                address: $('#customerAddressModal').val().trim()
-            };
-            
-            if (!customerData.name) {
-                showToast('Nama pelanggan harus diisi.', 'error');
-                return;
-            }
-            
-           function generateMemberId() {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // Exclude confusing chars
-            let result = '';
-            for (let i = 0; i < 6; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return 'M' + result; // Awali dengan M untuk member
+       function saveCustomer() {
+    const customerData = {
+        type: $('#customerTypeModal').val(),
+        name: $('#customerNameModal').val().trim(),
+        phone: $('#customerPhoneModal').val().trim(),
+        email: $('#customerEmailModal').val().trim(),
+        address: $('#customerAddressModal').val().trim()
+    };
+    
+    if (!customerData.name) {
+        showToast('Nama pelanggan harus diisi.', 'error');
+        return;
+    }
+    
+    // Generate ID member
+    function generateMemberId() {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < 6; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
         }
-
-    // Di fungsi saveCustomer:
+        return 'M' + result;
+    }
+    
     customerData.id = generateMemberId();
+    
+    customers.push(customerData);
+    saveData(STORAGE_KEYS.CUSTOMERS, customers);
+    
+    loadAdminCustomers();
+    $('#customerModal').hide();
+    showToast('Pelanggan berhasil ditambahkan.', 'success');
+}
 
         function editCustomer(id) {
             const customer = customers.find(c => c.id === id);
@@ -3389,98 +3452,63 @@
         }
 
            function exportReportPDF() {
-        const element = document.createElement('div');
-        element.style.padding = '20px';
-        element.style.fontFamily = "'Poppins', sans-serif";
+            const element = document.createElement('div');
+            element.style.padding = '20px';
+            element.style.fontFamily = "'Poppins', sans-serif";
+            
+            element.innerHTML = `
+                <h2 style="text-align: center; margin-bottom: 5px;">${settings.storeName}</h2>
+                <h3 style="text-align: center; margin-top: 0; color: #555;">Laporan Penjualan</h3>
+                <p style="text-align: center; margin-bottom: 20px;">${$('#reportDateRange').val() || 'Semua Data'}</p>
+                <div style="display: flex; justify-content: space-between; margin: 20px 0; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <p><strong>Total Pendapatan:</strong> ${$('#reportTotalRevenue').text()}</p>
+                        <p><strong>Total Laba:</strong> ${$('#reportTotalProfit').text()}</p>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <p><strong>Total Transaksi:</strong> ${$('#reportTotalTransactions').text()}</p>
+                        <p><strong>Produk Terlaris:</strong> ${$('#reportBestSeller').text()}</p>
+                    </div>
+                </div>
+                <div style="height: 300px; margin: 20px 0;">
+                    <canvas id="chartForExport" width="600" height="300"></canvas>
+                </div>
+                <p style="text-align: right; margin-top: 30px; font-size: 0.8em;">Dicetak pada: ${moment().format('LLLL')}</p>
+            `;
         
-        element.innerHTML = `
-            <h2 style="text-align: center; margin-bottom: 5px;">${settings.storeName}</h2>
-            <h3 style="text-align: center; margin-top: 0; color: #555;">Laporan Penjualan</h3>
-            <p style="text-align: center; margin-bottom: 20px;">${$('#reportDateRange').val() || 'Semua Data'}</p>
-            <div style="display: flex; justify-content: space-between; margin: 20px 0; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 200px;">
-                    <p><strong>Total Pendapatan:</strong> ${$('#reportTotalRevenue').text()}</p>
-                    <p><strong>Total Laba:</strong> ${$('#reportTotalProfit').text()}</p>
-                </div>
-                <div style="flex: 1; min-width: 200px;">
-                    <p><strong>Total Transaksi:</strong> ${$('#reportTotalTransactions').text()}</p>
-                    <p><strong>Produk Terlaris:</strong> ${$('#reportBestSeller').text()}</p>
-                </div>
-            </div>
-            <div style="height: 300px; margin: 20px 0;">
-                <canvas id="chartForExport" width="600" height="300"></canvas>
-            </div>
-            <p style="text-align: right; margin-top: 30px; font-size: 0.8em;">Dicetak pada: ${moment().format('LLLL')}</p>
-        `;
-    
-    // Clone chart dengan ukuran yang tepat
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 600;
-    tempCanvas.height = 300;
-    const tempCtx = tempCanvas.getContext('2d');
-    tempCtx.fillStyle = 'white';
-    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Render chart ke canvas baru
-    const chartCanvas = $('#salesChart')[0];
-    const chartData = salesChart.data;
-    const tempChart = new Chart(tempCtx, {
-        type: 'bar',
-        data: chartData,
-        options: { 
-            responsive: false,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-    
-    const opt = {
-        margin: 15,
-        filename: `Laporan_Penjualan_${moment().format('YYYYMMDD')}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            logging: false,
-            useCORS: true,
-            allowTaint: true
-        },
-        jsPDF: { 
-            unit: 'mm', 
-            format: 'a4', 
-            orientation: 'portrait',
-            compress: true
-        }
-    };
-    
-    html2pdf().set(opt).from(element).save();
-    showToast('Laporan berhasil diekspor ke PDF', 'success');
-}
-            
-            // Clone the chart for export
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = $('#salesChart').width();
-            tempCanvas.height = $('#salesChart').height();
-            tempCtx.drawImage($('#salesChart')[0], 0, 0);
-            
-            const img = new Image();
-            img.src = tempCanvas.toDataURL('image/png');
-            element.querySelector('#chartForExport').replaceWith(img);
-            
             const opt = {
                 margin: 10,
                 filename: `Laporan_Penjualan_${moment().format('YYYYMMDD')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                html2canvas: { 
+                    scale: 2,
+                    useCORS: true,
+                    allowTaint: true
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a4', 
+                    orientation: 'portrait'
+                }
             };
             
-            html2pdf().set(opt).from(element).save();
-            showToast('Laporan berhasil diekspor ke PDF', 'success');
+            // Clone chart untuk ekspor
+            setTimeout(() => {
+                const chartCanvas = document.createElement('canvas');
+                chartCanvas.width = 600;
+                chartCanvas.height = 300;
+                const chartCtx = chartCanvas.getContext('2d');
+                chartCtx.fillStyle = 'white';
+                chartCtx.fillRect(0, 0, chartCanvas.width, chartCanvas.height);
+                chartCtx.drawImage($('#salesChart')[0], 0, 0, 600, 300);
+                
+                const img = new Image();
+                img.src = chartCanvas.toDataURL('image/png');
+                document.querySelector('#chartForExport').replaceWith(img);
+                
+                html2pdf().set(opt).from(element).save();
+                showToast('Laporan berhasil diekspor ke PDF', 'success');
+            }, 500);
         }
 
         // --- SETTINGS ---
@@ -3657,25 +3685,33 @@
             }
 
             // --- Login/Logout ---
-            $('#loginForm').submit(function(e) {
-                e.preventDefault();
-                const id = $('#cashierId').val();
-                const pin = $('#cashierPin').val();
-                const cashier = cashiers.find(c => c.id === id && c.pin === pin && c.status === 'active');
+           $('#loginForm').submit(function(e) {
+            e.preventDefault();
+            const id = $('#cashierId').val();
+            const pin = $('#cashierPin').val();
+            
+            // Pastikan cashiers sudah terload
+            const cashier = cashiers.find(c => c.id === id && c.pin === pin && c.status === 'active');
+            
+            if (cashier) {
+                // Update last login
+                cashier.lastLogin = new Date();
+                saveData(STORAGE_KEYS.CASHIERS, cashiers);
                 
-                if (cashier) {
-                    // Update last login
-                    cashier.lastLogin = new Date();
-                    saveData(STORAGE_KEYS.CASHIERS, cashiers);
-                    
-                    currentCashier = cashier;
-                    saveData(STORAGE_KEYS.CURRENT_CASHIER, currentCashier);
-                    
-                    $('#loginModal').fadeOut(() => {
-                        $('#mainApp').fadeIn();
-                        $('#loggedInCashier').text(currentCashier.name);
-                        updateAllUI();
-                    });
+                currentCashier = cashier;
+                saveData(STORAGE_KEYS.CURRENT_CASHIER, currentCashier);
+                
+                $('#loginModal').fadeOut(() => {
+                    $('#mainApp').fadeIn();
+                    $('#loggedInCashier').text(currentCashier.name);
+                    updateAllUI();
+                });
+                
+                showToast(`Selamat datang, ${cashier.name}!`, 'success');
+            } else {
+                showToast('ID Kasir atau PIN salah.', 'error');
+            }
+        });
                     
                     showToast(`Selamat datang, ${cashier.name}!`, 'success');
                 } else {
