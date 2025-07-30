@@ -247,6 +247,12 @@
             background-color: var(--info-light);
             color: #1e40af;
         }
+            .error-message {
+            color: var(--danger-color);
+            font-size: .8rem;
+            margin-top: 5px;
+            display: none;
+        }
         .badge-primary {
             background-color: #eef2ff;
             color: var(--primary-color);
@@ -2258,34 +2264,29 @@
         function initializeDefaultData() {
             loadData();
             
-           function initializeDefaultCashiers() {
-    if (cashiers.length === 0) {
-        cashiers = [
-            { 
-                id: 'K001', 
-                name: 'Admin', 
-                pin: '1234', 
-                status: 'active',
-                email: 'admin@geraiku.com',
-                phone: '081234567890',
-                role: 'admin'
-            },
-            { 
-                id: 'K002', 
-                name: 'Kasir 1', 
-                pin: '1111', 
-                status: 'active',
-                email: 'kasir1@geraiku.com',
-                phone: '081234567891',
-                role: 'cashier'
-            }
-        ];
-        saveData(STORAGE_KEYS.CASHIERS, cashiers);
-    }
+           if (cashiers.length === 0) {
+    cashiers = [
+        { 
+            id: 'K001', 
+            name: 'Admin', 
+            pin: '1234', 
+            status: 'active',
+            email: 'admin@geraiku.com',
+            phone: '081234567890',
+            role: 'admin'
+        },
+        { 
+            id: 'K002', 
+            name: 'Kasir 1', 
+            pin: '1111', 
+            status: 'active',
+            email: 'kasir1@geraiku.com',
+            phone: '081234567891',
+            role: 'cashier'
+        }
+    ];
+    saveData(STORAGE_KEYS.CASHIERS, cashiers);
 }
-
-// Panggil fungsi ini di dalam initializeDefaultData()
-initializeDefaultCashiers();
             
             if (Object.keys(settings).length === 0) {
                 settings = {
@@ -3620,53 +3621,70 @@ initializeDefaultCashiers();
     const id = $('#cashierId').val().trim();
     const pin = $('#cashierPin').val().trim();
     
-    // Validasi input
-    if (!id || !pin) {
-        showToast('ID dan PIN harus diisi', 'error');
+    // Clear previous errors
+    $('#cashierIdError, #cashierPinError').hide();
+    
+    // Validate inputs
+    let isValid = true;
+    
+    if (!id) {
+        $('#cashierIdError').text('ID Kasir harus diisi').show();
+        isValid = false;
+    }
+    
+    if (!pin) {
+        $('#cashierPinError').text('PIN harus diisi').show();
+        isValid = false;
+    } else if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+        $('#cashierPinError').text('PIN harus 4 digit angka').show();
+        isValid = false;
+    }
+    
+    if (!isValid) return;
+    
+    // Find cashier
+    const cashier = cashiers.find(c => c.id === id);
+    
+    if (!cashier) {
+        showToast('ID Kasir tidak ditemukan', 'error');
         return;
     }
     
-    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
-        showToast('PIN harus 4 digit angka', 'error');
+    if (cashier.pin !== pin) {
+        showToast('PIN salah', 'error');
         return;
     }
     
-    // Cari kasir
-    const cashier = cashiers.find(c => 
-        c.id === id && 
-        c.pin === pin && 
-        c.status === 'active'
-    );
-    
-    if (cashier) {
-        // Simpan data kasir yang login
-        currentCashier = {
-            id: cashier.id,
-            name: cashier.name,
-            role: cashier.role
-        };
-        
-        saveData(STORAGE_KEYS.CURRENT_CASHIER, currentCashier);
-        
-        // Update UI
-        $('#loginModal').fadeOut(300, function() {
-            $('#mainApp').fadeIn(300);
-            $('#loggedInCashier').text(cashier.name);
-            updateAllUI();
-            
-            // Cek shift untuk kasir
-            if (cashier.role === 'cashier' && (!currentShift || !currentShift.isActive)) {
-                setTimeout(() => {
-                    showToast('Harap mulai shift terlebih dahulu', 'warning');
-                    manageShift();
-                }, 500);
-            }
-        });
-        
-        showToast(`Selamat datang, ${cashier.name}!`, 'success');
-    } else {
-        showToast('ID Kasir atau PIN salah', 'error');
+    if (cashier.status !== 'active') {
+        showToast('Akun kasir tidak aktif', 'error');
+        return;
     }
+    
+    // Save logged in cashier
+    currentCashier = {
+        id: cashier.id,
+        name: cashier.name,
+        role: cashier.role || 'cashier' // Default role if not specified
+    };
+    
+    saveData(STORAGE_KEYS.CURRENT_CASHIER, currentCashier);
+    
+    // Update UI
+    $('#loginModal').fadeOut(300, function() {
+        $('#mainApp').fadeIn(300);
+        $('#loggedInCashier').text(cashier.name);
+        updateAllUI();
+        
+        // Check shift for cashier
+        if (currentCashier.role === 'cashier' && (!currentShift || !currentShift.isActive)) {
+            setTimeout(() => {
+                showToast('Harap mulai shift terlebih dahulu', 'warning');
+                manageShift();
+            }, 500);
+        }
+    });
+    
+    showToast(`Selamat datang, ${cashier.name}!`, 'success');
 });
             
             $('#logoutBtn').click(e => {
