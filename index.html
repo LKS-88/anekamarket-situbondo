@@ -2357,15 +2357,45 @@
         }
 
          function initializeDefaultData() {
-            loadData();
+    loadData(); // Pertama, coba muat data yang ada
 
-            if (cashiers.length === 0) {
-                cashiers = [
-                    { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
-                    { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
-                ];
-                saveData(STORAGE_KEYS.CASHIERS, cashiers);
-            }
+    // Kemudian, cek dan buat data default jika tidak ada
+    if (cashiers.length === 0) {
+        cashiers = [
+            { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
+            { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
+        ];
+        saveData(STORAGE_KEYS.CASHIERS, cashiers);
+    }
+
+    if (Object.keys(settings).length === 0) {
+        settings = {
+            storeName: "Toko Geraiku",
+            storeAddress: "Jl. Digital Raya No. 1",
+            storePhone: "081234567890",
+            taxRate: 10,
+            receiptFooter: "Terima kasih telah berbelanja!"
+        };
+        saveData(STORAGE_KEYS.SETTINGS, settings);
+    }
+
+    if (categories.length === 0) {
+        categories = [
+            { id: 'C001', name: 'Makanan Ringan', description: '' },
+            { id: 'C002', name: 'Minuman Dingin', description: '' },
+        ];
+        saveData(STORAGE_KEYS.CATEGORIES, categories);
+    }
+
+    if (products.length === 0) {
+        products = [
+            { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: 'C001', costPrice: 7500, price: 10000, stock: 50 },
+            { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: 'C002', costPrice: 3500, price: 5000, stock: 100 },
+            { id: 'P003', barcode: '8886008101068', name: 'Pocari Sweat 500ml', categoryId: 'C002', costPrice: 5000, price: 7000, stock: 3 },
+        ];
+        saveData(STORAGE_KEYS.PRODUCTS, products);
+    }
+}
 
         
         function loadData() {
@@ -2381,18 +2411,7 @@
             currentShift = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_SHIFT)) || null;
             shiftHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHIFT_HISTORY)) || [];
         }
-
-                   if (Object.keys(settings).length === 0) {
-                settings = {
-                    storeName: "Toko Geraiku",
-                    storeAddress: "Jl. Digital Raya No. 1",
-                    storePhone: "081234567890",
-                    taxRate: 10,
-                    receiptFooter: "Terima kasih telah berbelanja!"
-                };
-                saveData(STORAGE_KEYS.SETTINGS, settings);
-            }
-
+                   
             if (categories.length === 0) {
                 categories = [
                     { id: 'C001', name: 'Makanan Ringan', description: '' },
@@ -3706,13 +3725,7 @@
                     $('#loggedInCashier').text(currentCashier.name);
                     updateAllUI();
                 });
-                
-                showToast(`Selamat datang, ${cashier.name}!`, 'success');
-            } else {
-                showToast('ID Kasir atau PIN salah.', 'error');
-            }
-        });
-                    
+                                   
                     showToast(`Selamat datang, ${cashier.name}!`, 'success');
                 } else {
                     showToast('ID Kasir atau PIN salah.', 'error');
@@ -3993,23 +4006,23 @@
            $('#exportReportExcel').click(function() {
                     const dateRange = $('#reportDateRange').val();
                     let startDate, endDate;
-                    
+                
                     if (dateRange) {
                         const dates = dateRange.split(' - ');
                         startDate = moment(dates[0], 'DD/MM/YYYY').startOf('day');
                         endDate = moment(dates[1], 'DD/MM/YYYY').endOf('day');
                     }
-                    
+                
                     const filteredTransactions = transactions.filter(t => {
                         if (!dateRange) return true;
                         return moment(t.date).isBetween(startDate, endDate, undefined, '[]');
                     });
-                    
+                
                     if (filteredTransactions.length === 0) {
                         showToast('Tidak ada data transaksi untuk diekspor', 'warning');
                         return;
                     }
-                    
+                
                     // Format data untuk Excel
                     const reportData = filteredTransactions.map(t => {
                         const itemsList = t.items.map(i => `${i.name} (${i.quantity}x)`).join(', ');
@@ -4026,13 +4039,13 @@
                             'Kasir': t.cashier.name
                         };
                     });
-                    
+                
                     try {
                         const worksheet = XLSX.utils.json_to_sheet(reportData);
                         const workbook = XLSX.utils.book_new();
                         XLSX.utils.book_append_sheet(workbook, worksheet, "Laporan Penjualan");
-                        
-                        // Auto-size columns
+                
+                        // Atur lebar kolom otomatis
                         const wscols = [
                             {wch: 15}, // ID Transaksi
                             {wch: 20}, // Tanggal
@@ -4046,7 +4059,7 @@
                             {wch: 20}  // Kasir
                         ];
                         worksheet['!cols'] = wscols;
-                        
+                
                         XLSX.writeFile(workbook, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
                         showToast("Excel berhasil diekspor", "success");
                     } catch (error) {
