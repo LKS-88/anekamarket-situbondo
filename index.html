@@ -406,12 +406,12 @@
           <h1 id="storeName">Toko Geraiku</h1>
           <p id="storeAddress">Jl. Digital Raya No. 1</p>
         </div>
-        <div class="header-info">
-          <p id="currentDate">Senin, 1 Januari 2023</p>
-          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em;">🌙</button></p>
-          <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
-        </div>
-      </div>
+       <div class="header-info">
+  <p id="currentDate">Senin, 1 Januari 2023</p>
+  <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em;">🌙</button></p>
+  <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
+  <p id="connectionStatus">🟢 Online</p>
+  </div>
 
       <div class="tabs">
         <div class="tab active" data-tab="cart">Keranjang</div>
@@ -675,37 +675,32 @@
     let html5QrCode = null;
 
     function init() {
-    // Tambahkan di dalam <script> setelah init()
-
-// Cek koneksi dan simpan status
+      // Auto backup setiap 24 jam
+function autoBackup() {
+  const last = localStorage.getItem('lastBackup');
+  const now = Date.now();
+  if (!last || now - last > 24 * 3600 * 1000) {
+    exportData();
+    localStorage.setItem('lastBackup', now);
+    showToast('💾 Backup otomatis berhasil', 'info');
+  }
+}
+setInterval(autoBackup, 30 * 60 * 1000); // Cek tiap 30 menit
+// Fungsi cek koneksi
 function checkConnection() {
   const isOnline = navigator.onLine;
   $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
   $('body').toggleClass('offline', !isOnline);
 }
 
-// Tambahkan status koneksi di UI
-$('.header-info').append('<p id="connectionStatus">🟢 Online</p>');
-
-// Event listener koneksi
-window.addEventListener('online', () => {
-  checkConnection();
-  showToast('Koneksi internet pulih. Menyinkronkan...', 'info');
-  syncPendingTransactions();
-});
-window.addEventListener('offline', checkConnection);
-
-// Panggil saat inisialisasi
-checkConnection();
-
-// Simpan transaksi sementara jika offline
+// Simpan transaksi offline
 function savePendingTransaction(transaction) {
   const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
   pending.push(transaction);
   localStorage.setItem('pendingTransactions', JSON.stringify(pending));
 }
 
-// Sinkronisasi saat online
+// Sinkronkan saat online
 function syncPendingTransactions() {
   const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
   if (pending.length === 0) return;
@@ -716,7 +711,7 @@ function syncPendingTransactions() {
 
   saveData('TRANSACTIONS', appState.transactions);
   localStorage.removeItem('pendingTransactions');
-  showToast(`Sinkronisasi ${pending.length} transaksi offline`, 'success');
+  showToast(`✅ ${pending.length} transaksi offline telah disinkronkan`, 'success');
 }
       
       loadData();
@@ -725,6 +720,18 @@ function syncPendingTransactions() {
       updateAllUI();
       initDateRangePicker();
       initChart();
+      
+      // Cek koneksi saat inisialisasi
+checkConnection();
+
+// Event listener koneksi
+window.addEventListener('online', () => {
+  checkConnection();
+  showToast('Internet kembali. Menyinkronkan...', 'info');
+  setTimeout(syncPendingTransactions, 1000);
+});
+
+window.addEventListener('offline', checkConnection);
       const savedCashier = localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER);
       if (savedCashier) {
         currentCashier = JSON.parse(savedCashier);
@@ -1016,34 +1023,42 @@ setInterval(autoBackup, 5 * 60 * 1000); // Cek tiap 5 menit
         showToast('Transaksi ditahan.');
       });
 
-      $('#checkoutBtn').on('click', function() {
-        if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
-        showConfirmation('Proses pembayaran?', (yes) => {
-          if (yes) {
-            const transaction = {
-              id: 'TRX' + Date.now(),
-              date: new Date(),
-              items: currentCart.items,
-              subtotal: currentCart.subtotal,
-              total: currentCart.total,
-              totalCost: currentCart.totalCost,
-              profit: currentCart.profit,
-              paymentMethod: 'cash',
-              paymentAmount: currentCart.total,
-              change: 0,
-              cashier: { id: currentCashier.id, name: currentCashier.name }
-            };
-            appState.transactions.unshift(transaction);
-            saveData('TRANSACTIONS', appState.transactions);
-            generateReceipt(transaction);
-            $('#transactionDetailModal').show();
-            resetCart();
-            updateAllUI();
-            showToast('Transaksi berhasil!', 'success');
-          }
-        });
-      });
+     $('#checkoutBtn').on('click', function() {
+  if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
 
+  showConfirmation('Proses pembayaran?', (yes) => {
+    if (yes) {
+      const transaction = {
+        id: 'TRX' + Date.now(),
+        date: new Date(),
+        items: currentCart.items,
+        subtotal: currentCart.subtotal,
+        total: currentCart.total,
+        totalCost: currentCart.totalCost,
+        profit: currentCart.profit,
+        paymentMethod: 'cash',
+        paymentAmount: currentCart.total,
+        change: 0,
+        cashier: { id: currentCashier.id, name: currentCashier.name }
+      };
+
+      // 🔥 Jika offline, simpan sementara
+      if (!navigator.onLine) {
+        savePendingTransaction(transaction);
+        showToast('📦 Transaksi disimpan offline. Akan disinkronkan saat online.', 'warning');
+      } else {
+        appState.transactions.unshift(transaction);
+        saveData('TRANSACTIONS', appState.transactions);
+      }
+
+      generateReceipt(transaction);
+      $('#transactionDetailModal').show();
+      resetCart();
+      updateAllUI();
+      showToast('✅ Transaksi berhasil!', 'success');
+    }
+  });
+});
       $('#stockInModal .close-modal, .close-stock-in-modal').on('click', function() {
         $('#stockInModal').hide();
       });
