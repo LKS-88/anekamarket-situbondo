@@ -7,11 +7,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="POS Geraiku">
+  <meta name="apple-mobile-web-app-title" content="POS ANEKAMARKET">
   <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="Logo-Anekamarketku.png" type="image/png">
-  <link rel="apple-touch-icon" href="Logo-Anekamarketku.png">
-  <title>Premium POS System - Geraiku</title>
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <title>POS ANEKAMARKET</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
@@ -379,7 +379,7 @@
       <div class="login-logo">
         <i class="fas fa-cash-register"></i>
       </div>
-      <h2 class="login-title">Premium POS - Geraiku</h2>
+      <h2 class="login-title">POS ANEKAMARKET</h2>
       <form id="loginForm">
         <div class="form-floating">
           <input type="text" id="cashierId" placeholder="ID Kasir" required>
@@ -406,12 +406,13 @@
           <h1 id="storeName">Toko Geraiku</h1>
           <p id="storeAddress">Jl. Digital Raya No. 1</p>
         </div>
-       <div class="header-info">
-  <p id="currentDate">Senin, 1 Januari 2023</p>
-  <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em;">🌙</button></p>
-  <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
-  <p id="connectionStatus">🟢 Online</p>
-  </div>
+        <div class="header-info">
+          <p id="currentDate">Senin, 1 Januari 2023</p>
+          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em;">🌙</button></p>
+          <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
+          <p id="connectionStatus">🟢 Online</p>
+        </div>
+      </div>
 
       <div class="tabs">
         <div class="tab active" data-tab="cart">Keranjang</div>
@@ -662,10 +663,10 @@
         receiptFooter: "Terima kasih atas kunjungan Anda!"
       },
       stockInRecords: [],
-      currentShift: null,
-      shiftHistory: [],
       heldSales: [],
-      stores: []
+      stores: [],
+      currentShift: null,
+      shiftHistory: []
     };
 
     let currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
@@ -675,63 +676,46 @@
     let html5QrCode = null;
 
     function init() {
-      // Auto backup setiap 24 jam
-function autoBackup() {
-  const last = localStorage.getItem('lastBackup');
-  const now = Date.now();
-  if (!last || now - last > 24 * 3600 * 1000) {
-    exportData();
-    localStorage.setItem('lastBackup', now);
-    showToast('💾 Backup otomatis berhasil', 'info');
-  }
-}
-setInterval(autoBackup, 30 * 60 * 1000); // Cek tiap 30 menit
-// Fungsi cek koneksi
-function checkConnection() {
-  const isOnline = navigator.onLine;
-  $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
-  $('body').toggleClass('offline', !isOnline);
-}
-
-// Simpan transaksi offline
-function savePendingTransaction(transaction) {
-  const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
-  pending.push(transaction);
-  localStorage.setItem('pendingTransactions', JSON.stringify(pending));
-}
-
-// Sinkronkan saat online
-function syncPendingTransactions() {
-  const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
-  if (pending.length === 0) return;
-
-  pending.forEach(trans => {
-    appState.transactions.unshift(trans);
-  });
-
-  saveData('TRANSACTIONS', appState.transactions);
-  localStorage.removeItem('pendingTransactions');
-  showToast(`✅ ${pending.length} transaksi offline telah disinkronkan`, 'success');
-}
-      
       loadData();
       initializeDefaultData();
       setupEventListeners();
       updateAllUI();
       initDateRangePicker();
       initChart();
-      
-      // Cek koneksi saat inisialisasi
-checkConnection();
 
-// Event listener koneksi
-window.addEventListener('online', () => {
-  checkConnection();
-  showToast('Internet kembali. Menyinkronkan...', 'info');
-  setTimeout(syncPendingTransactions, 1000);
-});
+      // Cek koneksi
+      function checkConnection() {
+        const isOnline = navigator.onLine;
+        $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
+      }
 
-window.addEventListener('offline', checkConnection);
+      // Simpan transaksi offline
+      function savePendingTransaction(transaction) {
+        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+        pending.push(transaction);
+        localStorage.setItem('pendingTransactions', JSON.stringify(pending));
+      }
+
+      // Sinkronkan saat online
+      function syncPendingTransactions() {
+        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+        if (pending.length === 0) return;
+        pending.forEach(trans => {
+          appState.transactions.unshift(trans);
+        });
+        saveData('TRANSACTIONS', appState.transactions);
+        localStorage.removeItem('pendingTransactions');
+        updateAllUI(); // 🔥 Update UI setelah sync
+        showToast(`✅ ${pending.length} transaksi offline disinkronkan`, 'success');
+      }
+
+      checkConnection();
+      window.addEventListener('online', () => {
+        checkConnection();
+        setTimeout(syncPendingTransactions, 1000);
+      });
+      window.addEventListener('offline', checkConnection);
+
       const savedCashier = localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER);
       if (savedCashier) {
         currentCashier = JSON.parse(savedCashier);
@@ -739,68 +723,26 @@ window.addEventListener('offline', checkConnection);
         $('#mainApp').show();
         updateAllUI();
       }
-      $('#checkoutBtn').on('click', function() {
-  if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
 
-  showConfirmation('Proses pembayaran?', (yes) => {
-    if (yes) {
-      const transaction = {
-        id: 'TRX' + Date.now(),
-        date: new Date(),
-        items: currentCart.items,
-        subtotal: currentCart.subtotal,
-        total: currentCart.total,
-        totalCost: currentCart.totalCost,
-        profit: currentCart.profit,
-        paymentMethod: 'cash',
-        paymentAmount: currentCart.total,
-        change: 0,
-        cashier: { id: currentCashier.id, name: currentCashier.name }
-      };
-
-      // 🔥 Jika offline, simpan sementara
-      if (!navigator.onLine) {
-        savePendingTransaction(transaction);
-        showToast('Transaksi disimpan offline. Akan disinkronkan saat online.', 'warning');
-      } else {
-        appState.transactions.unshift(transaction);
-        saveData('TRANSACTIONS', appState.transactions);
+      // Auto backup setiap 1 jam
+      function autoBackup() {
+        const now = Date.now();
+        const last = localStorage.getItem('lastBackupTime');
+        if (!last || now - last > 60 * 60 * 1000) {
+          exportData();
+          localStorage.setItem('lastBackupTime', now);
+          showToast('💾 Backup otomatis berhasil', 'info');
+        }
       }
+      setInterval(autoBackup, 5 * 60 * 1000);
 
-      generateReceipt(transaction);
-      $('#transactionDetailModal').show();
-      resetCart();
-      updateAllUI();
-      showToast('Transaksi berhasil!', 'success');
-    }
-  });
-});
-      // Register PWA
+      // Register Service Worker
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js').catch(e => console.error('SW failed:', e));
-      }
-      // Auto backup
-      setInterval(autoBackup, 60 * 60 * 1000);
-    }
-
-    function autoBackup() {
-      const last = localStorage.getItem('lastBackup');
-      const now = Date.now();
-      if (!last || now - last > 24 * 3600 * 1000) {
-        exportData();
-        localStorage.setItem('lastBackup', now);
+        navigator.serviceWorker.register('service-worker.js')
+          .then(() => console.log('SW registered'))
+          .catch(e => console.error('SW failed:', e));
       }
     }
-
-    function autoBackup() {
-  const now = Date.now();
-  const last = localStorage.getItem('lastBackupTime');
-  if (!last || now - last > 60 * 60 * 1000) {
-    exportData(); // Sudah ada fungsi ini
-    localStorage.setItem('lastBackupTime', now);
-  }
-}
-setInterval(autoBackup, 5 * 60 * 1000); // Cek tiap 5 menit
 
     function loadData() {
       Object.keys(STORAGE_KEYS).forEach(key => {
@@ -832,7 +774,7 @@ setInterval(autoBackup, 5 * 60 * 1000); // Cek tiap 5 menit
         ];
         saveData('STORES', appState.stores);
       }
-      if (Object.keys(appState.settings).length === 0 || !appState.settings.storeName) {
+      if (!appState.settings.storeName) {
         const defaultStore = appState.stores[0];
         appState.settings = {
           storeName: defaultStore.name,
