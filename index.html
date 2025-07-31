@@ -109,11 +109,15 @@
       border-radius: 4px;
     }
     .form-floating input:focus,
-    .form-floating input:not(:placeholder-shown) {
+    .form-floating input:not(:placeholder-shown),
+    .form-floating select:focus,
+    .form-floating select:not(:placeholder-shown) {
       padding-top: 20px;
     }
     .form-floating input:focus + label,
-    .form-floating input:not(:placeholder-shown) + label {
+    .form-floating input:not(:placeholder-shown) + label,
+    .form-floating select:focus + label,
+    .form-floating select:not(:placeholder-shown) + label {
       top: -10px;
       left: 10px;
       font-size: 0.8rem;
@@ -122,7 +126,9 @@
       color: var(--primary-color);
     }
     body.dark-mode .form-floating input:focus + label,
-    body.dark-mode .form-floating input:not(:placeholder-shown) + label {
+    body.dark-mode .form-floating input:not(:placeholder-shown) + label,
+    body.dark-mode .form-floating select:focus + label,
+    body.dark-mode .form-floating select:not(:placeholder-shown) + label {
       background: #1f1f1f;
     }
     .btn-block {
@@ -776,7 +782,7 @@
 
       // Simpan transaksi pending saat offline
       function savePendingTransaction(transaction) {
-        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]';
+        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
         pending.push(transaction);
         localStorage.setItem('pendingTransactions', JSON.stringify(pending));
       }
@@ -906,12 +912,12 @@
       sel.empty();
       sel.append('<option value="" selected disabled>Pilih Toko</option>');
       
-      if (appState.stores.length === 0) {
-        sel.append('<option value="" disabled>Tidak ada toko</option>');
-      } else {
+      if (appState.stores && appState.stores.length > 0) {
         appState.stores.forEach(store => {
           sel.append(`<option value="${store.id}">${store.name}</option>`);
         });
+      } else {
+        sel.append('<option value="" disabled>Tidak ada toko tersedia</option>');
       }
     }
 
