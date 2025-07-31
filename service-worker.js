@@ -1,11 +1,11 @@
 // service-worker.js
 
-const CACHE_NAME = 'pos-anekamarketku-v3'; // Naikkan versi
+const CACHE_NAME = 'pos-anekamarketku-v3';
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './Logo-Anekamarketku.png', // Simpan lokal!
+  './Logo-Anekamarketku.png',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://code.jquery.com/jquery-3.6.0.min.js',
@@ -19,7 +19,7 @@ const urlsToCache = [
   'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
 ];
 
-// ✅ Install: Cache semua resource penting
+// Install: Cache semua aset
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -28,7 +28,7 @@ self.addEventListener('install', event => {
   );
 });
 
-// ✅ Activate: Hapus cache lama
+// Activate: Hapus cache lama
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(cacheNames => {
@@ -38,29 +38,33 @@ self.addEventListener('activate', event => {
       );
     })
   );
-  return self.clients.claim();
+  self.clients.claim();
 });
 
-// ✅ Fetch: Gunakan cache jika offline
+// Fetch: Gunakan cache jika offline
 self.addEventListener('fetch', event => {
-  const isResource = event.request.destination === 'script' ||
-                     event.request.destination === 'style' ||
-                     event.request.destination === 'font' ||
-                     event.request.destination === 'image';
+  const isResource = ['script', 'style', 'font', 'image'].includes(event.request.destination);
 
   if (isResource) {
     event.respondWith(
       caches.match(event.request)
         .then(response => {
-          return response || fetch(event.request).catch(() => caches.match(event.request));
+          return response || fetch(event.request)
+            .then(fetchRes => {
+              // Simpan ke cache jika berhasil
+              const responseClone = fetchRes.clone();
+              caches.open(CACHE_NAME)
+                .then(cache => cache.put(event.request, responseClone));
+              return fetchRes;
+            })
+            .catch(() => caches.match(event.request)); // fallback
         })
     );
-  } else {
-    // Untuk HTML, prioritaskan jaringan, fallback ke cache
-    if (event.request.mode === 'navigate') {
-      event.respondWith(
-        fetch(event.request).catch(() => caches.match('./index.html'))
-      );
-    }
+  } else if (event.request.mode === 'navigate') {
+    // Untuk navigasi HTML
+    event.respondWith(
+      fetch(event.request)
+        .catch(() => caches.match('./index.html'))
+    );
   }
 });
