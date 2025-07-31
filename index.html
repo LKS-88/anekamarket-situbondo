@@ -57,7 +57,7 @@
     body.dark-mode .login-title,
     body.dark-mode .form-floating input,
     body.dark-mode .form-floating label {
-      color: #333 !important;
+      color: #e0e0e0 !important;
     }
     * {
       box-sizing: border-box;
@@ -78,6 +78,10 @@
       border-radius: var(--rounded);
       box-shadow: var(--shadow);
       text-align: center;
+    }
+    body.dark-mode .login-container {
+      background: #1f1f1f;
+      color: #e0e0e0;
     }
     .login-logo {
       font-size: 3rem;
@@ -102,6 +106,12 @@
       background-color: white;
       color: #333;
     }
+    body.dark-mode .form-floating input,
+    body.dark-mode .form-control {
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      border-color: #444;
+    }
     .form-floating label {
       position: absolute;
       left: 15px;
@@ -113,6 +123,10 @@
       background-color: white;
       padding: 0 5px;
       border-radius: 4px;
+    }
+    body.dark-mode .form-floating label {
+      background-color: #2c2c2c;
+      color: #aaa;
     }
     .form-floating input:focus,
     .form-floating input:not(:placeholder-shown),
@@ -135,7 +149,7 @@
     body.dark-mode .form-floating input:not(:placeholder-shown) + label,
     body.dark-mode .form-floating select:focus + label,
     body.dark-mode .form-floating select:not(:placeholder-shown) + label {
-      background: #1f1f1f;
+      background: #2c2c2c;
     }
     .btn-block {
       width: 100%;
@@ -168,10 +182,16 @@
       border-bottom: 1px solid #eee;
       flex-wrap: wrap;
     }
+    body.dark-mode .header {
+      border-bottom-color: #444;
+    }
     .header-info {
       text-align: right;
       font-size: 0.9rem;
       color: #555;
+    }
+    body.dark-mode .header-info {
+      color: #aaa;
     }
     .header-info a {
       color: var(--primary-color);
@@ -191,6 +211,10 @@
       font-size: 0.9rem;
       transition: all 0.2s;
       white-space: nowrap;
+    }
+    body.dark-mode .tab {
+      background: #2c2c2c;
+      color: #e0e0e0;
     }
     .tab.active {
       background: var(--primary-color);
@@ -218,6 +242,9 @@
       display: flex;
       align-items: center;
     }
+    body.dark-mode .dashboard-card {
+      background: #1f1f1f;
+    }
     .dashboard-card-icon {
       width: 50px;
       height: 50px;
@@ -237,6 +264,9 @@
       font-size: 0.9rem;
       color: var(--gray-color);
     }
+    body.dark-mode .dashboard-card-content .dashboard-card-label {
+      color: #aaa;
+    }
     .dashboard-card-content .dashboard-card-value {
       font-size: 1.5rem;
       font-weight: 600;
@@ -245,19 +275,32 @@
       width: 100%;
       border-collapse: collapse;
     }
+    body.dark-mode .table {
+      color: #e0e0e0;
+    }
     .table th, .table td {
       padding: 12px;
       text-align: left;
       border-bottom: 1px solid #eee;
     }
+    body.dark-mode .table th,
+    body.dark-mode .table td {
+      border-bottom-color: #444;
+    }
     .table th {
       background: #f8f9fa;
       font-weight: 500;
+    }
+    body.dark-mode .table th {
+      background: #2c2c2c;
     }
     .empty-state {
       text-align: center;
       padding: 20px;
       color: #999;
+    }
+    body.dark-mode .empty-state {
+      color: #666;
     }
     .toast {
       position: fixed;
@@ -302,6 +345,10 @@
       overflow-y: auto;
       box-shadow: var(--shadow);
     }
+    body.dark-mode .modal-content {
+      background-color: #1f1f1f;
+      color: #e0e0e0;
+    }
     @keyframes fadeIn {
       from { opacity: 0; }
       to { opacity: 1; }
@@ -312,6 +359,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+    }
+    body.dark-mode .modal-header {
+      border-bottom-color: #444;
     }
     .modal-title {
       font-size: 1.2rem;
@@ -328,6 +378,9 @@
     .modal-close:hover {
       color: #333;
     }
+    body.dark-mode .modal-close:hover {
+      color: #e0e0e0;
+    }
     .modal-body {
       padding: 20px;
     }
@@ -338,6 +391,9 @@
       justify-content: flex-end;
       gap: 10px;
     }
+    body.dark-mode .modal-footer {
+      border-top-color: #444;
+    }
     .receipt {
       max-width: 100%;
       padding: 15px;
@@ -345,6 +401,11 @@
       line-height: 1.4;
       background: white;
       border: 1px dashed #ccc;
+    }
+    body.dark-mode .receipt {
+      background: #1f1f1f;
+      color: #333;
+      border-color: #666;
     }
     .receipt-header {
       text-align: center;
@@ -386,10 +447,16 @@
         border-radius: var(--rounded);
         box-shadow: var(--shadow);
     }
+    body.dark-mode .report-card {
+        background: #1f1f1f;
+    }
     .report-card-title {
         font-size: 0.9rem;
         color: var(--gray-color);
         margin-bottom: 5px;
+    }
+    body.dark-mode .report-card-title {
+        color: #aaa;
     }
     .report-card-value {
         font-size: 1.5rem;
@@ -1394,6 +1461,9 @@
       
       // Update settings form
       updateSettingsForm();
+      
+      // Isi dropdown kategori produk
+      updateCategoryDropdowns();
     }
 
     /**
@@ -1544,16 +1614,23 @@
     /**
      * Memperbarui tabel transaksi admin
      */
-    function updateAdminTransactionsTable() {
+    function updateAdminTransactionsTable(startDate, endDate) {
       const tbody = $('#adminTransactionsTable');
       tbody.empty();
       
-      if (appState.transactions.length === 0) {
+      let transactionsToShow = [...appState.transactions];
+      
+      if (startDate && endDate) {
+        transactionsToShow = appState.transactions.filter(t => 
+          moment(t.date).isBetween(startDate, endDate, null, '[]'));
+      }
+      
+      if (transactionsToShow.length === 0) {
         tbody.append('<tr><td colspan="6" class="empty-state">Tidak ada transaksi</td></tr>');
         return;
       }
       
-      appState.transactions.forEach(trans => {
+      transactionsToShow.forEach(trans => {
         tbody.append(`
           <tr>
             <td>${trans.id}</td>
@@ -2502,7 +2579,7 @@
         el.html('<div class="empty-state">Keranjang kosong</div>');
       } else {
         const table = $('<table class="table"></table>');
-        table.append('<thead><tr><th>Produk</th><th>Jml</th><th>Harga</th><th>Aksi</th></tr></thead>');
+        table.append('<thead><tr><th>Produk</th><th>Jml</th><th>Harga</th><th>Subtotal</th><th>Aksi</th></tr></thead>');
         
         const tbody = $('<tbody></tbody>');
         currentCart.items.forEach((item, index) => {
@@ -2510,6 +2587,7 @@
             <tr>
               <td>${item.name}</td>
               <td>${item.quantity}</td>
+              <td>${formatCurrency(item.price)}</td>
               <td>${formatCurrency(item.price * item.quantity)}</td>
               <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">&times;</button></td>
             </tr>`);
