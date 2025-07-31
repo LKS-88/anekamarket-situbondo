@@ -1456,16 +1456,16 @@
     </style>
 </head>
 <body>
-    <div id="toast" class="toast">
+  <div id="toast" class="toast">
         <i class="fas fa-info-circle"></i>
         <span id="toast-message">Notification message</span>
     </div>
 
-    <div id="confirmationDialog" class="confirmation-dialog" style="display: none;">
+    <div id="confirmationDialog" class="confirmation-dialog">
         <div class="confirmation-content">
             <h4 id="confirmationMessage">Apakah Anda yakin?</h4>
             <div class="confirmation-buttons">
-                 <button id="confirmCancel" class="btn btn-secondary">Batal</button>
+                <button id="confirmCancel" class="btn btn-secondary">Batal</button>
                 <button id="confirmOk" class="btn btn-danger">Ya, Lanjutkan</button>
             </div>
         </div>
@@ -1473,25 +1473,18 @@
 
     <div id="loginModal" class="modal" style="display: flex;">
         <div class="login-container">
-            <div class="login-logo">
-                <i class="fas 
-fa-cash-register"></i>
-            </div>
+            <div class="login-logo"><i class="fas fa-cash-register"></i></div>
             <h2 class="login-title">Premium POS - Geraiku</h2>
             <form id="loginForm">
                 <div class="form-floating">
                     <input type="text" id="cashierId" placeholder="ID Kasir" required>
-                     <label for="cashierId">ID Kasir</label>
-                    <div class="error-message" id="cashierIdError"></div>
+                    <label for="cashierId">ID Kasir</label>
                 </div>
                 <div class="form-floating">
                     <input type="password" id="cashierPin" placeholder="PIN" required maxlength="4" inputmode="numeric">
-                     <label for="cashierPin">PIN</label>
-                    <div class="error-message" id="cashierPinError"></div>
+                    <label for="cashierPin">PIN</label>
                 </div>
-                <button type="submit" class="btn btn-block" id="loginBtn">
-                    <span id="loginBtnText">Login</span>
-               </button>
+                <button type="submit" class="btn btn-block" id="loginBtn">Login</button>
             </form>
         </div>
     </div>
@@ -1501,29 +1494,29 @@ fa-cash-register"></i>
             <div class="dashboard-card">
                 <div class="dashboard-card-icon icon-sales"><i class="fas fa-dollar-sign"></i></div>
                 <div class="dashboard-card-content">
-                     <div class="dashboard-card-label">Penjualan Hari Ini</div>
+                    <div class="dashboard-card-label">Penjualan Hari Ini</div>
                     <div class="dashboard-card-value" id="todaySales">Rp 0</div>
                 </div>
             </div>
             <div class="dashboard-card">
                 <div class="dashboard-card-icon icon-profit"><i class="fas fa-chart-line"></i></div>
-                 <div class="dashboard-card-content">
+                <div class="dashboard-card-content">
                     <div class="dashboard-card-label">Laba Hari Ini</div>
                     <div class="dashboard-card-value" id="todayProfit">Rp 0</div>
                 </div>
             </div>
-             <div class="dashboard-card">
+            <div class="dashboard-card">
                 <div class="dashboard-card-icon icon-transactions"><i class="fas fa-shopping-cart"></i></div>
                 <div class="dashboard-card-content">
                     <div class="dashboard-card-label">Transaksi Hari Ini</div>
                     <div class="dashboard-card-value" id="todayTransactions">0</div>
-                 </div>
+                </div>
             </div>
             <div class="dashboard-card">
                 <div class="dashboard-card-icon icon-low-stock"><i class="fas fa-box-open"></i></div>
                 <div class="dashboard-card-content">
                     <div class="dashboard-card-label">Stok Rendah</div>
-                     <div class="dashboard-card-value" id="lowStockItems">0</div>
+                    <div class="dashboard-card-value" id="lowStockItems">0</div>
                 </div>
             </div>
         </div>
@@ -1531,215 +1524,313 @@ fa-cash-register"></i>
         <div class="container">
             <div class="header">
                 <div>
-                     <h1 id="storeName">Premium POS System</h1>
-                    <p id="storeAddress">Jl.
-Contoh No. 123, Kota Contoh</p>
+                    <h1 id="storeName">Premium POS System</h1>
+                    <p id="storeAddress">Jl. Contoh No. 123, Kota Contoh</p>
                 </div>
                 <div class="header-info">
                     <p id="currentDate">Senin, 1 Januari 2023</p>
-                    <p>Kasir: <span id="loggedInCashier">John Doe</span> |
- <a href="#" id="logoutBtn" style="color: white; text-decoration: none;">Logout</a></p>
+                    <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn" style="color: white; text-decoration: none;">Logout</a></p>
                     <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span></p>
                 </div>
             </div>
 
             <div class="main-content">
                 <div class="left-panel">
-                     <h2 class="panel-title">Produk</h2>
-                    
+                    <h2 class="panel-title">Produk</h2>
                     <div class="search-box">
                         <i class="fas fa-search"></i>
-                         <input type="text" id="productSearch" class="form-control" placeholder="Cari produk (nama/barcode)...">
+                        <input type="text" id="productSearch" class="form-control" placeholder="Cari produk (nama/barcode)...">
                     </div>
-
                     <div class="form-group">
                         <label for="productCategory">Kategori</label>
                         <select id="productCategory" class="form-control">
-                             <option value="all">Semua Kategori</option>
+                            <option value="all">Semua Kategori</option>
                         </select>
                     </div>
-
-                    <div id="productList" class="table-responsive" style="max-height: 50vh;
-overflow-y: auto;">
+                    <div id="productList" class="table-responsive" style="max-height: 50vh; overflow-y: auto;">
                         <table class="table">
                             <thead>
                                 <tr>
-                                     <th>Nama</th>
+                                    <th>Nama</th>
                                     <th>Harga</th>
                                     <th>Stok</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
-                             <tbody id="productListBody"></tbody>
+                            <tbody id="productListBody"></tbody>
                         </table>
                     </div>
                 </div>
 
                 <div class="right-panel">
-                     <h2 class="panel-title">Transaksi</h2>
-                    
+                    <h2 class="panel-title">Transaksi</h2>
                     <div class="tabs">
                         <div class="tab active" data-tab="cart">Keranjang</div>
-                         <div class="tab" data-tab="customer">Pelanggan</div>
+                        <div class="tab" data-tab="customer">Pelanggan</div>
                         <div class="tab" data-tab="payment">Pembayaran</div>
                     </div>
 
                     <div class="tab-content active" id="cartTab">
-                         <div id="cartItems"></div>
-                        
+                        <div id="cartItems">
+                            <div class="empty-state"><i class="fas fa-shopping-cart"></i><p>Keranjang belanja kosong</p></div>
+                        </div>
                         <div class="cart-summary">
                             <div class="summary-row">
-                                 <span class="summary-label">Subtotal:</span>
+                                <span class="summary-label">Subtotal:</span>
                                 <span class="summary-value" id="cartSubtotal">Rp 0</span>
                             </div>
-                             <div class="summary-row">
+                            <div class="summary-row">
                                 <span class="summary-label">Diskon:</span>
                                 <span class="summary-value" id="cartDiscount">Rp 0</span>
-                             </div>
+                            </div>
                             <div class="summary-row">
                                 <span class="summary-label">Pajak:</span>
-                                <span class="summary-value" 
-id="cartTax">Rp 0</span>
+                                <span class="summary-value" id="cartTax">Rp 0</span>
                             </div>
                             <div class="summary-row total-row">
                                 <span class="summary-label">Total:</span>
-                                 <span class="summary-value" id="cartTotal">Rp 0</span>
+                                <span class="summary-value" id="cartTotal">Rp 0</span>
                             </div>
                         </div>
-
-                         <div class="action-buttons">
+                        <div class="action-buttons">
                             <button id="holdSaleBtn" class="btn btn-warning"><i class="fas fa-pause"></i> Tahan</button>
                             <button id="nextToCustomer" class="btn btn-primary" style="flex-grow: 1;">Lanjut <i class="fas fa-arrow-right"></i></button>
                         </div>
-                         
                         <div id="heldSalesSection">
                             <h4 class="mt-4">Transaksi Ditahan</h4>
-                             <div id="heldSalesList">
-                                <div class="empty-state">
-                                    <p>Tidak ada transaksi yang ditahan.</p>
-                                 </div>
+                            <div id="heldSalesList">
+                                <div class="empty-state"><p>Tidak ada transaksi yang ditahan.</p></div>
                             </div>
                         </div>
                     </div>
 
-                     <div class="tab-content" id="customerTab">
+                    <div class="tab-content" id="customerTab">
                         <div class="form-group">
                             <label for="customerType">Tipe Pelanggan</label>
                             <select id="customerType" class="form-control">
-                                 <option value="walkin">Pelanggan Biasa</option>
+                                <option value="walkin">Pelanggan Biasa</option>
                                 <option value="member">Member</option>
                             </select>
-                         </div>
+                        </div>
                         <div id="memberFields" style="display:none">
                             <div class="form-group">
                                 <label for="memberId">ID Member</label>
-                                 <div class="input-group">
+                                <div class="input-group">
                                     <input type="text" id="memberId" class="form-control" placeholder="Masukkan ID Member">
-                                     <button id="searchMember" class="btn btn-info">Cari</button>
+                                    <button id="searchMember" class="btn btn-info">Cari</button>
                                 </div>
                             </div>
-                             <div class="form-group">
+                            <div class="form-group">
                                 <label for="memberDiscount">Diskon Member (%)</label>
                                 <input type="number" id="memberDiscount" class="form-control" value="10" min="0" max="100">
-                             </div>
+                            </div>
                         </div>
-                        <div id="customerFields" style="display:none">
-                            <div class="form-group">
-                                 <label for="customerName">Nama Pelanggan</label>
-                                <input type="text" id="customerName" class="form-control" placeholder="Masukkan nama pelanggan">
-                            </div>
-                             <div class="form-group">
-                                <label for="customerPhone">No.
-Telepon</label>
-                                <input type="tel" id="customerPhone" class="form-control" placeholder="Masukkan nomor telepon">
-                            </div>
-                            <div class="form-group">
-                                 <label for="customerEmail">Email (opsional)</label>
-                                <input type="email" id="customerEmail" class="form-control" placeholder="Masukkan email">
-                            </div>
-                         </div>
-                        <div class="buttons">
-                            <button id="backToCart" class="btn btn-warning">Kembali ke Keranjang</button>
-                             <button id="nextToPayment" class="btn btn-primary float-right">Lanjut ke Pembayaran</button>
+                         <div id="customerInfoDisplay" class="mb-3"></div>
+                        <div class="action-buttons">
+                            <button id="backToCart" class="btn btn-secondary">Kembali</button>
+                            <button id="nextToPayment" class="btn btn-primary float-right">Lanjut ke Pembayaran</button>
                         </div>
                     </div>
 
                     <div class="tab-content" id="paymentTab">
-                         <div class="cart-summary">
-                            <div class="summary-row">
-                                <span class="summary-label">Subtotal:</span>
-                                <span class="summary-value" id="paymentSubtotal">Rp 0</span>
-                             </div>
-                            <div class="summary-row">
-                                <span class="summary-label">Diskon:</span>
-                                 <span class="summary-value" id="paymentDiscount">Rp 0</span>
-                            </div>
-                            <div class="summary-row">
-                                 <span class="summary-label">Pajak:</span>
-                                <span class="summary-value" id="paymentTax">Rp 0</span>
-                            </div>
-                             <div class="summary-row total-row">
-                                <span class="summary-label">Total:</span>
+                        <div class="cart-summary">
+                            <div class="summary-row total-row">
+                                <span class="summary-label">Total Bayar:</span>
                                 <span class="summary-value" id="paymentTotal">Rp 0</span>
-                             </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label for="paymentAmount">Jumlah Pembayaran</label>
-                             <input type="number" id="paymentAmount" class="form-control" placeholder="Masukkan jumlah pembayaran">
+                            <input type="number" id="paymentAmount" class="form-control" placeholder="Masukkan jumlah pembayaran">
                         </div>
                         <div class="payment-methods">
                             <label>Metode Pembayaran:</label>
-                             <div class="payment-method">
-                                <input type="radio" id="cash" name="paymentMethod" value="cash" checked>
-                                <label for="cash">Tunai</label>
-                             </div>
-                            <div class="payment-method">
-                                <input type="radio" id="transfer" name="paymentMethod" value="transfer">
-                                 <label for="transfer">Transfer Bank</label>
-                            </div>
-                            <div class="payment-method">
-                                 <input type="radio" id="ewallet" name="paymentMethod" value="ewallet">
-                                <label for="ewallet">E-Wallet</label>
-                            </div>
-                             <div class="payment-method">
-                                <input type="radio" id="credit" name="paymentMethod" value="credit">
-                                <label for="credit">Kredit</label>
-                            </div>
-                         </div>
-                        <div class="buttons">
-                            <button id="backToCustomer" class="btn btn-warning">Kembali ke Pelanggan</button>
-                             <button id="completePayment" class="btn btn-success float-right"><i class="fas fa-print"></i> Selesaikan & Cetak</button>
+                            <div class="payment-method"><input type="radio" id="cash" name="paymentMethod" value="cash" checked> <label for="cash">Tunai</label></div>
+                            <div class="payment-method"><input type="radio" id="qris" name="paymentMethod" value="qris"> <label for="qris">QRIS</label></div>
+                            <div class="payment-method"><input type="radio" id="card" name="paymentMethod" value="card"> <label for="card">Kartu Debit/Kredit</label></div>
+                        </div>
+                        <div class="action-buttons">
+                            <button id="backToCustomer" class="btn btn-secondary">Kembali</button>
+                            <button id="completePayment" class="btn btn-success float-right"><i class="fas fa-check-circle"></i> Selesaikan & Cetak</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-     </div>
+    </div>
 
     <div id="receiptTemplate" style="display: none;"></div>
 
-    <div id="adminPasswordModal" class="modal admin-password-modal">
+    <div id="adminPasswordModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title">Akses Admin</h3>
-                <button class="modal-close">×</button>
+                <button class="modal-close close-modal">×</button>
             </div>
-             <div class="modal-body">
+            <div class="modal-body">
                 <div class="form-group">
                     <label for="adminPassword">Masukkan Password Admin</label>
                     <div class="password-input-container">
                         <input type="password" id="adminPassword" class="form-control" placeholder="Password Admin">
-                         <i class="fas fa-eye password-toggle" id="togglePassword"></i>
+                        <i class="fas fa-eye password-toggle"></i>
                     </div>
-                    <div class="error-message" id="adminPasswordError"></div>
                 </div>
             </div>
-             <div class="modal-footer">
-                <button class="btn btn-secondary close-admin-password-modal">Batal</button>
-                <button class="btn btn-primary verify-admin-password">Masuk</button>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Batal</button>
+                <button class="btn btn-primary" id="verifyAdminPassword">Masuk</button>
             </div>
         </div>
     </div>
+    
+    <div id="adminModal" class="modal admin-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Admin Dashboard</h3>
+                <button class="modal-close close-modal">&times;</button>
+            </div>
+            <div class="modal-body" style="max-height: 75vh; overflow-y: auto;">
+                <div class="tabs">
+                    <div class="tab admin-tab active" data-tab="reports">Laporan</div>
+                    <div class="tab admin-tab" data-tab="products">Produk</div>
+                    <div class="tab admin-tab" data-tab="stockIn">Stok Masuk</div>
+                    <div class="tab admin-tab" data-tab="categories">Kategori</div>
+                    <div class="tab admin-tab" data-tab="customers">Pelanggan</div>
+                    <div class="tab admin-tab" data-tab="transactions">Transaksi</div>
+                    <div class="tab admin-tab" data-tab="cashiers">Kasir</div>
+                    <div class="tab admin-tab" data-tab="settings">Pengaturan</div>
+                </div>
+                <div class="tab-content admin-tab-content active" id="reportsTab">
+                     <div class="form-group">
+                        <label for="reportDateRange">Rentang Tanggal</label>
+                        <input type="text" id="reportDateRange" class="form-control" placeholder="Pilih rentang tanggal">
+                    </div>
+                    <div class="report-summary">
+                        <div class="report-card"><div class="report-card-title">Total Pendapatan</div><div class="report-card-value" id="reportTotalRevenue">Rp 0</div></div>
+                        <div class="report-card"><div class="report-card-title">Total Laba</div><div class="report-card-value" id="reportTotalProfit" style="color: var(--profit-color);">Rp 0</div></div>
+                        <div class="report-card"><div class="report-card-title">Total Transaksi</div><div class="report-card-value" id="reportTotalTransactions">0</div></div>
+                        <div class="report-card"><div class="report-card-title">Produk Terlaris</div><div class="report-card-value" id="reportBestSeller">-</div></div>
+                    </div>
+                    <div><canvas id="salesChart" height="150"></canvas></div>
+                    <div class="mt-4"><button id="exportReportExcel" class="btn btn-success"><i class="fas fa-file-excel"></i> Ekspor ke Excel</button></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="productsTab">
+                    <button id="addProduct" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Tambah Produk</button>
+                    <div class="table-responsive"><table class="table"><thead><tr><th>Barcode</th><th>Nama</th><th>Modal</th><th>Harga Jual</th><th>Stok</th><th>Aksi</th></tr></thead><tbody id="adminProductsTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="stockInTab">
+                    <button id="addStockIn" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Catat Stok Masuk</button>
+                    <div class="table-responsive"><table class="table"><thead><tr><th>Tanggal</th><th>Nota</th><th>Pemasok</th><th>Total Biaya</th><th>Aksi</th></tr></thead><tbody id="adminStockInTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="categoriesTab">
+                     <button id="addCategory" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Tambah Kategori</button>
+                     <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Nama</th><th>Aksi</th></tr></thead><tbody id="adminCategoriesTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="customersTab">
+                    <button id="addCustomer" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Tambah Pelanggan</button>
+                    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Nama</th><th>Telepon</th><th>Tipe</th><th>Aksi</th></tr></thead><tbody id="adminCustomersTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="transactionsTab">
+                    <div class="form-group"><label for="transactionDateRange">Rentang Tanggal</label><input type="text" id="transactionDateRange" class="form-control" placeholder="Pilih rentang tanggal"></div>
+                    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Tanggal</th><th>Pelanggan</th><th>Total</th><th>Kasir</th><th>Aksi</th></tr></thead><tbody id="adminTransactionsTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="cashiersTab">
+                    <button id="addCashier" class="btn btn-success mb-3"><i class="fas fa-plus"></i> Tambah Kasir</button>
+                    <div class="table-responsive"><table class="table"><thead><tr><th>ID</th><th>Nama</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="adminCashiersTable"></tbody></table></div>
+                </div>
+                <div class="tab-content admin-tab-content" id="settingsTab">
+                    <div class="form-group"><label for="storeNameSetting">Nama Toko</label><input type="text" id="storeNameSetting" class="form-control"></div>
+                    <div class="form-group"><label for="storeAddressSetting">Alamat Toko</label><textarea id="storeAddressSetting" class="form-control" rows="3"></textarea></div>
+                    <div class="form-group"><label for="storePhoneSetting">Telepon Toko</label><input type="text" id="storePhoneSetting" class="form-control"></div>
+                    <div class="form-group"><label for="taxRateSetting">Persentase Pajak (%)</label><input type="number" id="taxRateSetting" class="form-control" min="0" max="100"></div>
+                    <div class="form-group"><label for="receiptFooterSetting">Catatan Kaki Struk</label><textarea id="receiptFooterSetting" class="form-control" rows="3"></textarea></div>
+                    <button id="saveSettings" class="btn btn-primary">Simpan Pengaturan</button>
+                    <div class="data-backup mt-4"><h5><i class="fas fa-database"></i> Backup & Restore Data</h5><p>Simpan atau pulihkan semua data aplikasi Anda.</p><div class="backup-actions"><button id="exportData" class="btn btn-info"><i class="fas fa-file-export"></i> Backup Data</button><button id="importDataBtn" class="btn btn-warning"><i class="fas fa-file-import"></i> Restore Data</button><input type="file" id="importFile" style="display: none;" accept=".json"></div></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary close-modal">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="productModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="productModalTitle">Produk</h3><button class="modal-close close-modal">&times;</button></div><div class="modal-body"><input type="hidden" id="productId"><div class="form-group"><label for="productBarcode">Barcode</label><input type="text" id="productBarcode" class="form-control"></div><div class="form-group"><label for="productName">Nama Produk</label><input type="text" id="productName" class="form-control"></div><div class="form-group"><label for="productCategoryModal">Kategori</label><select id="productCategoryModal" class="form-control"></select></div><div class="form-group"><label for="productCostPrice">Harga Modal</label><input type="number" id="productCostPrice" class="form-control"></div><div class="form-group"><label for="productPrice">Harga Jual</label><input type="number" id="productPrice" class="form-control"></div><div class="form-group"><label for="productStock">Stok Awal</label><input type="number" id="productStock" class="form-control"></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Batal</button><button class="btn btn-success" id="saveProductBtn">Simpan</button></div></div></div>
+    <div id="categoryModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="categoryModalTitle">Kategori</h3><button class="modal-close close-modal">×</button></div><div class="modal-body"><input type="hidden" id="categoryId"><div class="form-group"><label for="categoryName">Nama Kategori</label><input type="text" id="categoryName" class="form-control"></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Batal</button><button class="btn btn-success" id="saveCategoryBtn">Simpan</button></div></div></div>
+    <div id="customerModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="customerModalTitle">Pelanggan</h3><button class="modal-close close-modal">×</button></div><div class="modal-body"><input type="hidden" id="customerId"><div class="form-group"><label for="customerNameModal">Nama</label><input type="text" id="customerNameModal" class="form-control"></div><div class="form-group"><label for="customerPhoneModal">Telepon</label><input type="tel" id="customerPhoneModal" class="form-control"></div><div class="form-group"><label for="customerTypeModal">Tipe</label><select id="customerTypeModal" class="form-control"><option value="walkin">Biasa</option><option value="member">Member</option></select></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Batal</button><button class="btn btn-success" id="saveCustomerBtn">Simpan</button></div></div></div>
+    <div id="cashierModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="cashierModalTitle">Kasir</h3><button class="modal-close close-modal">×</button></div><div class="modal-body"><input type="hidden" id="cashierModalId"><div class="form-group"><label for="cashierModalName">Nama</label><input type="text" id="cashierModalName" class="form-control"></div><div class="form-group"><label for="cashierModalPin">PIN (4 digit)</label><input type="password" id="cashierModalPin" class="form-control" maxlength="4" inputmode="numeric"></div><div class="form-group"><label for="cashierModalStatus">Status</label><select id="cashierModalStatus" class="form-control"><option value="active">Aktif</option><option value="inactive">Nonaktif</option></select></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Batal</button><button class="btn btn-success" id="saveCashierBtn">Simpan</button></div></div></div>
+    <div id="transactionDetailModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title">Detail Transaksi</h3><button class="modal-close close-modal">×</button></div><div class="modal-body"><div class="receipt" id="transactionDetailReceipt"></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Tutup</button><button class="btn btn-primary" id="reprintReceiptBtn"><i class="fas fa-print"></i> Cetak Ulang</button></div></div></div>
+    <div id="shiftModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="shiftModalTitle"></h3><button class="modal-close close-modal">&times;</button></div><div class="modal-body" id="shiftModalBody"></div><div class="modal-footer" id="shiftModalFooter"></div></div></div>
+    <div id="stockInModal" class="modal admin-modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title" id="stockInModalTitle">Catat Stok Masuk</h3><button class="modal-close close-modal">&times;</button></div><div class="modal-body"><input type="hidden" id="stockInId"><div style="display:flex; gap: 20px;"><div style="flex:1;"><label>Tanggal</label><input type="date" id="stockInDate" class="form-control"></div><div style="flex:1;"><label>No. Nota</label><input type="text" id="stockInRef" class="form-control"></div><div style="flex:1;"><label>Pemasok</label><input type="text" id="stockInSupplier" class="form-control"></div></div><hr><div class="input-group"><input type="text" id="stockInProductSearch" class="form-control" placeholder="Cari produk (barcode/nama)..."><button class="btn btn-info" id="searchStockProductBtn"><i class="fas fa-search"></i></button></div><div class="table-responsive" style="max-height: 250px; overflow-y:auto;"><table class="table"><thead><tr><th>Produk</th><th>Jml</th><th>Harga Beli</th><th>Subtotal</th><th>Aksi</th></tr></thead><tbody id="stockInItemsTable"></tbody></table></div><div class="cart-summary"><div class="summary-row total-row"><span>Total Biaya:</span><span id="stockInTotalCost">Rp 0</span></div></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Batal</button><button class="btn btn-success" id="saveStockInBtn">Simpan</button></div></div></div>
+    <div id="codeGeneratorModal" class="modal"><div class="modal-content"><div class="modal-header"><h3 class="modal-title">Barcode & QR Code</h3><button class="modal-close close-modal">&times;</button></div><div class="modal-body text-center"><h4 id="codeGeneratorProductName"></h4><div class="barcode-container"><svg id="barcode"></svg></div><div class="qrcode-container" id="qrcode"></div></div><div class="modal-footer"><button class="btn btn-secondary close-modal">Tutup</button><button class="btn btn-primary" id="printCodesBtn"><i class="fas fa-print"></i> Cetak</button></div></div></div>
+
+    <div id="adminAccess" class="fab" title="Akses Admin" style="bottom: 20px;"><i class="fas fa-user-shield"></i></div>
+    <div id="shiftAccess" class="fab" title="Manajemen Shift" style="bottom: 90px; background-color: var(--warning-color);"><i class="fas fa-business-time"></i></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/id.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+
+    <script>
+         $(document).ready(function() {
+            // --- KONFIGURASI & STATE APLIKASI ---
+            const ADMIN_PASSWORD = "Geraiku.12345";
+            const STORAGE_KEYS = {
+                PRODUCTS: 'pos_premium_products',
+                CATEGORIES: 'pos_premium_categories',
+                CUSTOMERS: 'pos_premium_customers',
+                CASHIERS: 'pos_premium_cashiers',
+                TRANSACTIONS: 'pos_premium_transactions',
+                SETTINGS: 'pos_premium_settings',
+                CURRENT_CASHIER: 'pos_premium_current_cashier',
+                HELD_SALES: 'pos_premium_held_sales',
+                STOCK_IN: 'pos_premium_stock_in',
+                CURRENT_SHIFT: 'pos_premium_current_shift',
+                SHIFT_HISTORY: 'pos_premium_shift_history'
+            };
+
+            let appState = {
+                products: [], categories: [], customers: [], cashiers: [],
+                transactions: [], settings: {}, heldSales: [], stockInRecords: [],
+                currentShift: null, shiftHistory: [], currentCashier: null
+            };
+
+            let currentCart = {};
+            let salesChart = null;
+            let currentStockInItems = [];
+
+            // --- FUNGSI INTI ---
+            function showToast(message, type = 'info', duration = 3000) {
+                const toast = $("#toast");
+                toast.removeClass("success error warning info").addClass(type);
+                $("#toast-message").text(message);
+                toast.addClass("show");
+                setTimeout(() => toast.removeClass("show"), duration);
+            }
+
+            function showConfirmation(message, onConfirm) {
+                $('#confirmationMessage').text(message);
+                $('#confirmationDialog').css('display', 'flex');
+                $('#confirmOk').off('click').on('click', () => {
+                    $('#confirmationDialog').hide();
+                    onConfirm(true);
+                });
+                $('#confirmCancel').off('click').on('click', () => {
+                    $('#confirmationDialog').hide();
+                    onConfirm(false);
+                });
+            }
+
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount || 0);
+            }
+            
+            function openModal(modalId) { $(`#${modalId}`).css('display', 'flex'); }
+            function closeModal(modalId) { $(`#${modalId}`).hide(); }
     
     <div id="adminModal" class="modal admin-modal">
         <div class="modal-content">
@@ -2283,7 +2374,17 @@ background-color: var(--warning-color);">
 
     <script>
         // Immediately set locale for moment.js
-        moment.locale('id');
+      // --- INSIALISASI APLIKASI ---
+            moment.locale('id');
+            loadData();
+            initializeDefaultData();
+            
+            if (appState.currentCashier) {
+                $('#loginModal').hide();
+                $('#mainApp').show();
+                $('#loggedInCashier').text(appState.currentCashier.name);
+                updateAllUI();
+            }
 // Admin password (hidden from public)
         const ADMIN_PASSWORD = "Geraiku.12345";
 // Local storage keys
@@ -2374,127 +2475,160 @@ showToast("Gagal mengekspor ke Excel", "error");
 }
 
         // --- DATA SAVING & LOADING ---
-        function saveData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-}
-
-         // Tambahkan di bagian awal script (sebelum initializeDefaultData())
-        function loadData() {
-            products = JSON.parse(localStorage.getItem(STORAGE_KEYS.PRODUCTS)) ||
-[];
-            categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES)) || [];
-            customers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) || [];
-            cashiers = JSON.parse(localStorage.getItem(STORAGE_KEYS.CASHIERS)) || [];
-            transactions = JSON.parse(localStorage.getItem(STORAGE_KEYS.TRANSACTIONS)) ||
-[];
-            settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || {};
-            heldSales = JSON.parse(localStorage.getItem(STORAGE_KEYS.HELD_SALES)) || [];
-            stockInRecords = JSON.parse(localStorage.getItem(STORAGE_KEYS.STOCK_IN)) || [];
-            currentShift = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_SHIFT));
-shiftHistory = JSON.parse(localStorage.getItem(STORAGE_KEYS.SHIFT_HISTORY)) || [];
-            currentCashier = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER));
-        }
-        
-        // Perbaiki fungsi initializeDefaultData()
-        function initializeDefaultData() {
-            loadData();
-if (cashiers.length === 0) {
-                cashiers = [
-                    { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
-                    { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null },
-                 ];
-                saveData(STORAGE_KEYS.CASHIERS, cashiers);
+         // --- MANAJEMEN DATA ---
+            function saveData(key, data) {
+                try {
+                    localStorage.setItem(key, JSON.stringify(data));
+                } catch (e) {
+                    console.error("Gagal menyimpan data ke localStorage:", e);
+                    showToast("Error: Gagal menyimpan data. Penyimpanan mungkin penuh.", "error");
+                }
             }
 
-    if (Object.keys(settings).length === 0) {
-        settings = {
-            storeName: "Toko Geraiku",
-            storeAddress: "Jl. Digital Raya No. 1",
-            storePhone: "081234567890",
-            taxRate: 10,
-            receiptFooter: "Terima kasih telah berbelanja!"
-};
-        saveData(STORAGE_KEYS.SETTINGS, settings);
-    }
+            function loadData() {
+                for (const key in STORAGE_KEYS) {
+                    const storedData = localStorage.getItem(STORAGE_KEYS[key]);
+                    if (storedData) {
+                        try {
+                            const parsedData = JSON.parse(storedData);
+                            const stateKey = STORAGE_KEYS[key].replace('pos_premium_', '').replace(/_(\w)/g, (match, p1) => p1.toUpperCase());
+                            appState[stateKey] = parsedData;
+                        } catch (e) {
+                            console.error(`Gagal memuat data untuk key ${STORAGE_KEYS[key]}:`, e);
+                        }
+                    }
+                }
+            }
 
-    if (categories.length === 0) {
-        categories = [
-            { id: 'C001', name: 'Makanan Ringan', description: '' },
-            { id: 'C002', name: 'Minuman Dingin', description: '' },
-        ];
-saveData(STORAGE_KEYS.CATEGORIES, categories);
-    }
-
-    if (products.length === 0) {
-        products = [
-            { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: 'C001', costPrice: 7500, price: 10000, stock: 50 },
-            { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: 'C002', costPrice: 3500, price: 5000, stock: 100 },
-            { id: 'P003', barcode: '8886008101068', name: 'Pocari Sweat 500ml', categoryId: 'C002', 
-costPrice: 5000, price: 7000, stock: 3 },
-        ];
-        saveData(STORAGE_KEYS.PRODUCTS, products);
-}
-}
-
-    if (categories.length === 0) {
-        categories = [
-            { id: 'C001', name: 'Makanan Ringan', description: '' },
-            { id: 'C002', name: 'Minuman Dingin', description: '' },
-        ];
-saveData(STORAGE_KEYS.CATEGORIES, categories);
-    }
-
-    if (products.length === 0) {
-        products = [
-            { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: 'C001', costPrice: 7500, price: 10000, stock: 50 },
-            { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: 'C002', costPrice: 3500, price: 5000, stock: 100 },
-            { id: 'P003', barcode: '8886008101068', name: 'Pocari Sweat 500ml', categoryId: 'C002', 
-costPrice: 5000, price: 7000, stock: 3 },
-        ];
-        saveData(STORAGE_KEYS.PRODUCTS, products);
-}
-}
-       
-        // --- UI UPDATE FUNCTIONS ---
-        function updateAllUI() {
-            updateCurrentDate();
-updateDashboard();
-            loadProducts();
-            updateCategoryDropdowns();
-            updateCart();
-            updateHeldSalesList();
-            updateShiftStatus();
+            function initializeDefaultData() {
+                if (appState.cashiers.length === 0) {
+                    appState.cashiers = [
+                        { id: 'K001', name: 'Admin', pin: '1234', status: 'active' },
+                        { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active' },
+                    ];
+                    saveData(STORAGE_KEYS.CASHIERS, appState.cashiers);
+                }
+                if (Object.keys(appState.settings).length === 0) {
+                    appState.settings = {
+                        storeName: "Toko Geraiku",
+                        storeAddress: "Jl. Digital Raya No. 1",
+                        storePhone: "081234567890",
+                        taxRate: 11,
+                        receiptFooter: "Terima kasih telah berbelanja!"
+                    };
+                    saveData(STORAGE_KEYS.SETTINGS, appState.settings);
+                }
+                if (appState.categories.length === 0) {
+                    appState.categories = [ { id: 'C' + Date.now(), name: 'Umum' } ];
+                    saveData(STORAGE_KEYS.CATEGORIES, appState.categories);
+                }
+                if (appState.products.length === 0) {
+                    appState.products = [
+                        { id: 'P001', barcode: '8992761134015', name: 'Chitato Sapi Panggang', categoryId: appState.categories[0].id, costPrice: 7500, price: 10000, stock: 50 },
+                        { id: 'P002', barcode: '8996001300032', name: 'Coca-Cola 390ml', categoryId: appState.categories[0].id, costPrice: 3500, price: 5000, stock: 100 },
+                    ];
+                    saveData(STORAGE_KEYS.PRODUCTS, appState.products);
+                }
+            }
             
-            // Update settings display
-            $('#storeName').text(settings.storeName);
-$('#storeAddress').text(settings.storeAddress);
+            // --- FUNGSI UPDATE UI ---
+            function updateAllUI() {
+                const { settings, currentShift, heldSales } = appState;
+                $('#storeName').text(settings.storeName);
+                $('#storeAddress').text(settings.storeAddress);
+                $('#currentDate').text(moment().format('dddd, D MMMM YYYY, HH:mm'));
+                
+                // Update shift status badge
+                if (currentShift && currentShift.isActive) {
+                    $('#shiftStatus').text(`Aktif Sejak ${moment(currentShift.startTime).format('HH:mm')}`).removeClass('badge-danger').addClass('badge-success');
+                } else {
+                    $('#shiftStatus').text('Belum Dimulai').removeClass('badge-success').addClass('badge-danger');
+                }
+                
+                updateDashboard();
+                loadProducts();
+                updateCategoryDropdowns();
+                updateCart();
+                updateHeldSalesList();
+            }
             
-            // Update settings form
-            $('#storeNameSetting').val(settings.storeName);
-            $('#storeAddressSetting').val(settings.storeAddress);
-            $('#storePhoneSetting').val(settings.storePhone);
-            $('#taxRateSetting').val(settings.taxRate);
-$('#receiptFooterSetting').val(settings.receiptFooter);
-        }
+            function updateDashboard() {
+                const today = moment().startOf('day');
+                const todayTransactions = appState.transactions.filter(t => moment(t.date).isSameOrAfter(today));
+                
+                const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
+                const todayProfit = todayTransactions.reduce((sum, t) => sum + t.profit, 0);
+                const lowStockItems = appState.products.filter(p => p.stock > 0 && p.stock <= 5).length;
 
-        function updateCurrentDate() {
-            $('#currentDate').text(moment().format('dddd, D MMMM YYYY, HH:mm'));
-}
+                $('#todaySales').text(formatCurrency(todaySales));
+                $('#todayProfit').text(formatCurrency(todayProfit));
+                $('#todayTransactions').text(todayTransactions.length);
+                $('#lowStockItems').text(lowStockItems);
+            }
 
-        function updateDashboard() {
-            const today = moment().startOf('day');
-const todayTransactions = transactions.filter(t => moment(t.date).isSameOrAfter(today));
-            
-            const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
-const todayProfit = todayTransactions.reduce((sum, t) => sum + t.profit, 0);
-const lowStockItems = products.filter(p => p.stock <= 5 && p.stock > 0).length;
+            function loadProducts(searchTerm = '', categoryId = 'all') {
+                let filtered = appState.products;
+                if (searchTerm) {
+                    searchTerm = searchTerm.toLowerCase();
+                    filtered = filtered.filter(p => p.name.toLowerCase().includes(searchTerm) || (p.barcode && p.barcode.includes(searchTerm)));
+                }
+                if (categoryId !== 'all') {
+                    filtered = filtered.filter(p => p.categoryId === categoryId);
+                }
 
-            $('#todaySales').text(formatCurrency(todaySales));
-            $('#todayProfit').text(formatCurrency(todayProfit));
-            $('#todayTransactions').text(todayTransactions.length);
-            $('#lowStockItems').text(lowStockItems);
-}
+                const productListBody = $('#productListBody').empty();
+                if (filtered.length > 0) {
+                    filtered.forEach(p => {
+                        productListBody.append(`
+                            <tr>
+                                <td>${p.name}</td>
+                                <td>${formatCurrency(p.price)}</td>
+                                <td style="color:${p.stock <= 5 ? 'var(--danger-color)' : 'inherit'}">${p.stock}</td>
+                                <td><button class="btn btn-success btn-sm add-to-cart" data-id="${p.id}" ${p.stock <= 0 ? 'disabled' : ''}><i class="fas fa-cart-plus"></i></button></td>
+                            </tr>
+                        `);
+                    });
+                } else {
+                    productListBody.append('<tr><td colspan="4"><div class="empty-state"><p>Produk tidak ditemukan</p></div></td></tr>');
+                }
+            }
 
+            function updateCategoryDropdowns() {
+                const selects = $('#productCategory, #productCategoryModal');
+                selects.html('<option value="all">Semua Kategori</option>');
+                appState.categories.forEach(c => selects.append(`<option value="${c.id}">${c.name}</option>`));
+            }
+
+            // --- LOGIKA LOGIN & LOGOUT ---
+            function handleLogin(e) {
+                e.preventDefault();
+                const id = $('#cashierId').val();
+                const pin = $('#cashierPin').val();
+                const cashier = appState.cashiers.find(c => c.id === id && c.pin === pin && c.status === 'active');
+                
+                if (cashier) {
+                    appState.currentCashier = cashier;
+                    saveData(STORAGE_KEYS.CURRENT_CASHIER, cashier);
+                    $('#loginModal').fadeOut(() => {
+                        $('#mainApp').fadeIn();
+                        $('#loggedInCashier').text(cashier.name);
+                        updateAllUI();
+                    });
+                    showToast(`Selamat datang, ${cashier.name}!`, 'success');
+                } else {
+                    showToast('ID Kasir atau PIN salah.', 'error');
+                }
+            }
+
+            function handleLogout() {
+                showConfirmation("Apakah Anda yakin ingin logout?", (confirmed) => {
+                    if (confirmed) {
+                        appState.currentCashier = null;
+                        localStorage.removeItem(STORAGE_KEYS.CURRENT_CASHIER);
+                        $('#mainApp').fadeOut(() => $('#loginModal').fadeIn());
+                    }
+                });
+        
         function updateCart() {
             currentCart.subtotal = currentCart.items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 currentCart.totalCost = currentCart.items.reduce((sum, item) => sum + (item.costPrice * item.quantity), 0);
