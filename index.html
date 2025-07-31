@@ -92,6 +92,7 @@
       border: 1px solid #ddd;
       border-radius: 8px;
       font-size: 1rem;
+      background-color: white;
     }
     .form-floating label {
       position: absolute;
@@ -101,6 +102,9 @@
       color: #999;
       pointer-events: none;
       transition: all 0.2s;
+      background-color: white;
+      padding: 0 5px;
+      border-radius: 4px;
     }
     .form-floating input:focus,
     .form-floating input:not(:placeholder-shown) {
@@ -745,6 +749,7 @@
     function init() {
       loadData();
       initializeDefaultData();
+      loadStoreOptions(); // Panggil fungsi ini untuk memuat dropdown toko
       setupEventListeners();
       updateAllUI();
       initDateRangePicker();
@@ -860,6 +865,19 @@
       }
     }
 
+    function loadStoreOptions() {
+      const sel = $('#storeSelect');
+      sel.empty();
+      sel.append('<option value="" selected disabled>Pilih Toko</option>');
+      if(appState.stores.length === 0){
+        sel.append('<option value="" disabled>Tidak ada toko</option>');
+      } else {
+        appState.stores.forEach(store => {
+          sel.append(`<option value="${store.id}">${store.name}</option>`);
+        });
+      }
+    }
+
     function updateAllUI() {
       $('#storeName').text(appState.settings.storeName);
       $('#storeAddress').text(appState.settings.storeAddress);
@@ -875,7 +893,6 @@
       updateCategoryDropdowns();
       updateCart();
       updateReports();
-      loadStoreOptions();
     }
 
     function updateDashboard() {
@@ -1238,19 +1255,6 @@
       const sel = $('#productCategory');
       sel.empty().append('<option value="all">Semua Kategori</option>');
       appState.categories.forEach(c => sel.append(`<option value="${c.id}">${c.name}</option>`));
-    }
-
-    function loadStoreOptions() {
-      const sel = $('#storeSelect');
-      sel.empty();
-      sel.append('<option value="" selected disabled>Pilih Toko</option>');
-      if(appState.stores.length === 0){
-        sel.append('<option value="" disabled>Tidak ada toko</option>');
-      } else {
-        appState.stores.forEach(store => {
-          sel.append(`<option value="${store.id}">${store.name}</option>`);
-        });
-      }
     }
 
     function generateReceipt(transaction) {
