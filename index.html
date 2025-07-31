@@ -390,7 +390,7 @@
           <label for="cashierPin">PIN</label>
         </div>
         <div class="form-floating">
-          <select id="storeSelect" class="form-control"></select>
+          <select id="storeSelect" class="form-control" required></select>
           <label for="storeSelect">Pilih Toko</label>
         </div>
         <button type="submit" class="btn-block">Login</button>
@@ -639,7 +639,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
-    // [Sisanya tetap sama seperti kode asli Anda]
     const STORAGE_KEYS = {
       PRODUCTS: 'pos_premium_products',
       CATEGORIES: 'pos_premium_categories',
@@ -654,6 +653,7 @@
       SHIFT_HISTORY: 'pos_premium_shift_history',
       STORES: 'pos_premium_stores'
     };
+    
     let appState = {
       products: [],
       categories: [],
@@ -673,6 +673,7 @@
       currentShift: null,
       shiftHistory: []
     };
+    
     let currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
     let currentCashier = null;
     let salesChart = null;
@@ -719,10 +720,15 @@
 
       const savedCashier = localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER);
       if (savedCashier) {
-        currentCashier = JSON.parse(savedCashier);
-        $('#loginModal').hide();
-        $('#mainApp').show();
-        updateAllUI();
+        try {
+          currentCashier = JSON.parse(savedCashier);
+          $('#loginModal').hide();
+          $('#mainApp').show();
+          updateAllUI();
+        } catch (e) {
+          console.error('Error parsing saved cashier:', e);
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_CASHIER);
+        }
       }
 
       function autoBackup() {
@@ -737,19 +743,13 @@
       setInterval(autoBackup, 5 * 60 * 1000);
     }
 
-      // Register Service Worker
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js')
-          .then(() => console.log('SW registered'))
-          .catch(e => console.error('SW failed:', e));
-      }
-    }
-
     function loadData() {
       Object.keys(STORAGE_KEYS).forEach(key => {
         try {
           const data = localStorage.getItem(STORAGE_KEYS[key]);
-          if (data) appState[key.toLowerCase()] = JSON.parse(data);
+          if (data) {
+            appState[key.toLowerCase()] = JSON.parse(data);
+          }
         } catch (e) {
           console.error(`Error loading ${key}:`, e);
         }
@@ -757,7 +757,11 @@
     }
 
     function saveData(key, data) {
-      localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(data));
+      try {
+        localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(data));
+      } catch (e) {
+        console.error(`Error saving ${key}:`, e);
+      }
     }
 
     function initializeDefaultData() {
@@ -768,6 +772,7 @@
         ];
         saveData('CASHIERS', appState.cashiers);
       }
+      
       if (appState.stores.length === 0) {
         appState.stores = [
           { id: 'S001', name: 'Toko Geraiku Pusat', address: 'Jl. Digital Raya No. 1', phone: '081234567890' },
@@ -775,6 +780,7 @@
         ];
         saveData('STORES', appState.stores);
       }
+      
       if (!appState.settings.storeName) {
         const defaultStore = appState.stores[0];
         appState.settings = {
@@ -786,6 +792,7 @@
         };
         saveData('SETTINGS', appState.settings);
       }
+      
       if (appState.categories.length === 0) {
         appState.categories = [
           { id: 'C001', name: 'Minuman', description: 'Minuman ringan' },
@@ -793,6 +800,7 @@
         ];
         saveData('CATEGORIES', appState.categories);
       }
+      
       if (appState.products.length === 0) {
         appState.products = [
           { id: 'P001', barcode: '8991234567890', name: 'Aqua 600ml', categoryId: 'C001', costPrice: 3000, price: 4000, stock: 50 },
@@ -807,11 +815,13 @@
       $('#storeAddress').text(appState.settings.storeAddress);
       $('#currentDate').text(moment().format('dddd, D MMMM YYYY, HH:mm'));
       $('#loggedInCashier').text(currentCashier?.name || 'Tidak diketahui');
+      
       if (appState.currentShift && appState.currentShift.isActive) {
         $('#shiftStatus').text(`Aktif Sejak ${moment(appState.currentShift.startTime).format('HH:mm')}`).removeClass('badge-danger').addClass('badge-success');
       } else {
         $('#shiftStatus').text('Belum Dimulai').removeClass('badge-success').addClass('badge-danger');
       }
+      
       updateDashboard();
       loadProducts();
       updateCategoryDropdowns();
@@ -827,6 +837,7 @@
       const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
       const todayProfit = todayTransactions.reduce((sum, t) => sum + t.profit, 0);
       const lowStockItems = appState.products.filter(p => p.stock > 0 && p.stock <= 5).length;
+      
       $('#todaySales').text(formatCurrency(todaySales));
       $('#todayProfit').text(formatCurrency(todayProfit));
       $('#todayTransactions').text(todayTransactions.length);
@@ -834,7 +845,11 @@
     }
 
     function formatCurrency(amount) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
+      return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR', 
+        minimumFractionDigits: 0 
+      }).format(amount || 0);
     }
 
     function showToast(message, type = 'info', duration = 3000) {
@@ -848,8 +863,14 @@
     function showConfirmation(message, callback) {
       $('#confirmationDialog').show();
       $('#confirmationMessage').text(message);
-      $('#confirmOk').off('click').on('click', () => { callback(true); $('#confirmationDialog').hide(); });
-      $('#confirmCancel').off('click').on('click', () => { callback(false); $('#confirmationDialog').hide(); });
+      $('#confirmOk').off('click').on('click', () => { 
+        callback(true); 
+        $('#confirmationDialog').hide(); 
+      });
+      $('#confirmCancel').off('click').on('click', () => { 
+        callback(false); 
+        $('#confirmationDialog').hide(); 
+      });
     }
 
     function setupEventListeners() {
@@ -859,14 +880,22 @@
 
       $('#loginForm').on('submit', function(e) {
         e.preventDefault();
-        const id = $('#cashierId').val();
-        const pin = $('#cashierPin').val();
+        const id = $('#cashierId').val().trim();
+        const pin = $('#cashierPin').val().trim();
         const storeId = $('#storeSelect').val();
+        
+        if (!id || !pin || !storeId) {
+          showToast('Harap isi semua field!', 'error');
+          return;
+        }
+        
         const cashier = appState.cashiers.find(c => c.id === id && c.pin === pin && c.status === 'active');
         const store = appState.stores.find(s => s.id === storeId);
+        
         if (cashier && store) {
           currentCashier = cashier;
           saveData('CURRENT_CASHIER', cashier);
+          
           appState.settings = {
             ...appState.settings,
             storeName: store.name,
@@ -874,10 +903,12 @@
             storePhone: store.phone
           };
           saveData('SETTINGS', appState.settings);
+          
           $('#loginModal').fadeOut(() => {
             $('#mainApp').fadeIn();
             updateAllUI();
           });
+          
           showToast(`Selamat datang, ${cashier.name} di ${store.name}!`, 'success');
         } else {
           showToast('ID Kasir, PIN, atau Toko salah.', 'error');
@@ -936,8 +967,10 @@
         const id = $('#productIdToAdd').val();
         const qty = parseInt($('#quantityInput').val()) || 1;
         const product = appState.products.find(p => p.id === id);
+        
         if (product && product.stock >= qty) {
           const existing = currentCart.items.find(i => i.id === product.id);
+          
           if (existing) {
             existing.quantity += qty;
           } else {
@@ -949,6 +982,7 @@
               quantity: qty
             });
           }
+          
           updateCartSummary();
           $('#quantityModal').hide();
           showToast(`${qty}x ${product.name} ditambahkan`, 'success');
@@ -959,6 +993,7 @@
 
       $('#holdSale').on('click', function() {
         if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
+        
         const name = `Transaksi #${appState.heldSales.length + 1}`;
         appState.heldSales.push({ name, cart: { ...currentCart } });
         saveData('HELD_SALES', appState.heldSales);
@@ -966,42 +1001,43 @@
         showToast('Transaksi ditahan.');
       });
 
-     $('#checkoutBtn').on('click', function() {
-  if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
+      $('#checkoutBtn').on('click', function() {
+        if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
 
-  showConfirmation('Proses pembayaran?', (yes) => {
-    if (yes) {
-      const transaction = {
-        id: 'TRX' + Date.now(),
-        date: new Date(),
-        items: currentCart.items,
-        subtotal: currentCart.subtotal,
-        total: currentCart.total,
-        totalCost: currentCart.totalCost,
-        profit: currentCart.profit,
-        paymentMethod: 'cash',
-        paymentAmount: currentCart.total,
-        change: 0,
-        cashier: { id: currentCashier.id, name: currentCashier.name }
-      };
+        showConfirmation('Proses pembayaran?', (yes) => {
+          if (yes) {
+            const transaction = {
+              id: 'TRX' + Date.now(),
+              date: new Date(),
+              items: currentCart.items,
+              subtotal: currentCart.subtotal,
+              total: currentCart.total,
+              totalCost: currentCart.totalCost,
+              profit: currentCart.profit,
+              paymentMethod: 'cash',
+              paymentAmount: currentCart.total,
+              change: 0,
+              cashier: { id: currentCashier.id, name: currentCashier.name }
+            };
 
-      // 🔥 Jika offline, simpan sementara
-      if (!navigator.onLine) {
-        savePendingTransaction(transaction);
-        showToast('📦 Transaksi disimpan offline. Akan disinkronkan saat online.', 'warning');
-      } else {
-        appState.transactions.unshift(transaction);
-        saveData('TRANSACTIONS', appState.transactions);
-      }
+            // Jika offline, simpan sementara
+            if (!navigator.onLine) {
+              savePendingTransaction(transaction);
+              showToast('📦 Transaksi disimpan offline. Akan disinkronkan saat online.', 'warning');
+            } else {
+              appState.transactions.unshift(transaction);
+              saveData('TRANSACTIONS', appState.transactions);
+            }
 
-      generateReceipt(transaction);
-      $('#transactionDetailModal').show();
-      resetCart();
-      updateAllUI();
-      showToast('✅ Transaksi berhasil!', 'success');
-    }
-  });
-});
+            generateReceipt(transaction);
+            $('#transactionDetailModal').show();
+            resetCart();
+            updateAllUI();
+            showToast('✅ Transaksi berhasil!', 'success');
+          }
+        });
+      });
+
       $('#stockInModal .close-modal, .close-stock-in-modal').on('click', function() {
         $('#stockInModal').hide();
       });
@@ -1010,10 +1046,12 @@
         const date = $('#stockInDate').val();
         const ref = $('#stockInRef').val();
         const supplier = $('#stockInSupplier').val();
+        
         if (!date || !ref || !supplier || currentStockInItems.length === 0) {
           showToast('Lengkapi semua data dan tambahkan item.', 'error');
           return;
         }
+        
         const record = {
           id: 'SI' + moment().format('YYYYMMDDHHmmss'),
           date: date,
@@ -1022,8 +1060,10 @@
           items: [...currentStockInItems],
           totalCost: currentStockInItems.reduce((sum, item) => sum + (item.quantity * item.purchasePrice), 0)
         };
+        
         appState.stockInRecords.unshift(record);
         saveData('STOCK_IN', appState.stockInRecords);
+        
         record.items.forEach(item => {
           const product = appState.products.find(p => p.id === item.productId);
           if (product) {
@@ -1031,6 +1071,7 @@
             product.costPrice = item.purchasePrice;
           }
         });
+        
         saveData('PRODUCTS', appState.products);
         $('#stockInModal').hide();
         resetStockInForm();
@@ -1047,6 +1088,7 @@
       });
 
       $('#exportData').on('click', exportData);
+      
       $('#importData').on('click', function() {
         const fileInput = $('#importDataFile')[0];
         if (fileInput.files.length > 0) {
@@ -1063,6 +1105,7 @@
         if (!html5QrCode) {
           html5QrCode = new Html5Qrcode("qr-reader");
         }
+        
         html5QrCode.start(
           { facingMode: "environment" },
           {
@@ -1095,6 +1138,7 @@
         const element = document.createElement('div');
         element.innerHTML = receipt;
         document.body.appendChild(element);
+        
         html2pdf().from(element).set({
           margin: 0.5,
           filename: `Struk_${moment().format('YYYYMMDD_HHmm')}.pdf`,
@@ -1114,6 +1158,7 @@
     function updateCart() {
       const el = $('#cartItems');
       el.empty();
+      
       if (currentCart.items.length === 0) {
         el.html('<div class="empty-state">Keranjang kosong</div>');
       } else {
@@ -1121,23 +1166,35 @@
           el.append(`<div>${i.name} x ${i.quantity} = ${formatCurrency(i.price * i.quantity)}</div>`);
         });
       }
+      
       $('#cartTotal').text(formatCurrency(currentCart.total));
     }
 
     function loadProducts(search = '', cat = 'all') {
       const body = $('#productListBody');
       body.empty();
+      
       const filtered = appState.products.filter(p => {
-        const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || p.barcode.includes(search);
+        const matchSearch = !search || 
+          p.name.toLowerCase().includes(search.toLowerCase()) || 
+          p.barcode.includes(search);
         const matchCat = cat === 'all' || p.categoryId === cat;
         return matchSearch && matchCat;
       });
+      
       if (filtered.length === 0) {
         body.html('<tr><td colspan="4" class="empty-state">Tidak ditemukan</td></tr>');
       } else {
         filtered.forEach(p => {
           const stockClass = p.stock <= 5 ? 'style="color: #ef476f;"' : '';
-          body.append(`<tr ${stockClass}><td>${p.name}</td><td>${formatCurrency(p.price)}</td><td>${p.stock}</td><td><button class="btn btn-success btn-sm add-to-cart" data-id="${p.id}">+</button></td></tr>`);
+          body.append(`
+            <tr ${stockClass}>
+              <td>${p.name}</td>
+              <td>${formatCurrency(p.price)}</td>
+              <td>${p.stock}</td>
+              <td><button class="btn btn-success btn-sm add-to-cart" data-id="${p.id}">+</button></td>
+            </tr>
+          `);
         });
       }
     }
@@ -1170,7 +1227,13 @@
           </div>
           <hr>
           <table width="100%" style="font-size: 12px;">
-            ${transaction.items.map(i => `<tr><td>${i.name}</td><td align="right">${i.quantity} x ${formatCurrency(i.price)}</td><td align="right">${formatCurrency(i.quantity * i.price)}</td></tr>`).join('')}
+            ${transaction.items.map(i => `
+              <tr>
+                <td>${i.name}</td>
+                <td align="right">${i.quantity} x ${formatCurrency(i.price)}</td>
+                <td align="right">${formatCurrency(i.quantity * i.price)}</td>
+              </tr>
+            `).join('')}
           </table>
           <hr>
           <div>Subtotal: ${formatCurrency(transaction.subtotal)}</div>
@@ -1227,6 +1290,7 @@
       const totalSales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
       const totalProfit = todayTransactions.reduce((sum, t) => sum + t.profit, 0);
       const bestSeller = appState.products.reduce((prev, curr) => (prev.sales || 0) > (curr.sales || 0) ? prev : curr, { name: '-' });
+      
       $('#reportTotalSales').text(formatCurrency(totalSales));
       $('#reportTotalProfit').text(formatCurrency(totalProfit));
       $('#reportTotalTransactions').text(todayTransactions.length);
@@ -1247,6 +1311,7 @@
         </table>
         <div style="height: 300px;"><canvas id="chartForExport"></canvas></div>
       `;
+      
       document.body.appendChild(element);
       const chartCtx = document.getElementById('chartForExport').getContext('2d');
       new Chart(chartCtx, {
@@ -1254,6 +1319,7 @@
         data: salesChart.data,
         options: salesChart.options
       });
+      
       html2pdf().from(element).set({
         margin: 1,
         filename: `Laporan_${moment().format('YYYYMMDD')}.pdf`,
@@ -1275,6 +1341,7 @@
         Laba: t.profit,
         Kasir: t.cashier.name
       }));
+      
       const ws = XLSX.utils.json_to_sheet(data);
       XLSX.utils.book_append_sheet(wb, ws, "Ringkasan");
 
@@ -1291,6 +1358,7 @@
           });
         });
       });
+      
       const wsDetail = XLSX.utils.json_to_sheet(detailData);
       XLSX.utils.book_append_sheet(wb, wsDetail, "Detail Penjualan");
 
@@ -1311,6 +1379,7 @@
         stores: appState.stores,
         backupDate: new Date().toISOString()
       };
+      
       const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1343,12 +1412,15 @@
 
     function addToCartByBarcode(barcode) {
       const product = appState.products.find(p => p.barcode === barcode);
+      
       if (product) {
         if (product.stock <= 0) {
           showToast('Stok habis!', 'warning');
           return;
         }
+        
         const existing = currentCart.items.find(i => i.id === product.id);
+        
         if (existing) {
           existing.quantity += 1;
         } else {
@@ -1360,6 +1432,7 @@
             quantity: 1
           });
         }
+        
         updateCartSummary();
         showToast(`Produk ditemukan: ${product.name}`, 'success');
       } else {
@@ -1373,10 +1446,12 @@
       const profit = subtotal - totalCost;
       const tax = subtotal * (appState.settings.taxRate / 100);
       const total = subtotal + tax;
+      
       currentCart.subtotal = subtotal;
       currentCart.totalCost = totalCost;
       currentCart.profit = profit;
       currentCart.total = total;
+      
       updateCart();
     }
 
