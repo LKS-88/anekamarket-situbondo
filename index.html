@@ -57,7 +57,7 @@
     body.dark-mode .login-title,
     body.dark-mode .form-floating input,
     body.dark-mode .form-floating label {
-      color: #e0e0e0 !important;
+      color: #333 !important;
     }
     * {
       box-sizing: border-box;
@@ -424,9 +424,17 @@
       background: #d4edda;
       color: #155724;
     }
+    body.dark-mode .badge-success {
+      background: #155724;
+      color: #d4edda;
+    }
     .badge-danger {
       background: #f8d7da;
       color: #721c24;
+    }
+    body.dark-mode .badge-danger {
+      background: #721c24;
+      color: #f8d7da;
     }
     .action-buttons {
       display: flex;
@@ -1337,11 +1345,10 @@
       if (!appState.settings.storeName) {
         const defaultStore = appState.stores[0];
         appState.settings = {
+          ...appState.settings,
           storeName: defaultStore.name,
           storeAddress: defaultStore.address,
-          storePhone: defaultStore.phone,
-          taxRate: 11,
-          receiptFooter: "Terima kasih telah berbelanja!"
+          storePhone: defaultStore.phone
         };
         saveData('SETTINGS', appState.settings);
       }
