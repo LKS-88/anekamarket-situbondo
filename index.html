@@ -675,6 +675,50 @@
     let html5QrCode = null;
 
     function init() {
+    // Tambahkan di dalam <script> setelah init()
+
+// Cek koneksi dan simpan status
+function checkConnection() {
+  const isOnline = navigator.onLine;
+  $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
+  $('body').toggleClass('offline', !isOnline);
+}
+
+// Tambahkan status koneksi di UI
+$('.header-info').append('<p id="connectionStatus">🟢 Online</p>');
+
+// Event listener koneksi
+window.addEventListener('online', () => {
+  checkConnection();
+  showToast('Koneksi internet pulih. Menyinkronkan...', 'info');
+  syncPendingTransactions();
+});
+window.addEventListener('offline', checkConnection);
+
+// Panggil saat inisialisasi
+checkConnection();
+
+// Simpan transaksi sementara jika offline
+function savePendingTransaction(transaction) {
+  const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+  pending.push(transaction);
+  localStorage.setItem('pendingTransactions', JSON.stringify(pending));
+}
+
+// Sinkronisasi saat online
+function syncPendingTransactions() {
+  const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+  if (pending.length === 0) return;
+
+  pending.forEach(trans => {
+    appState.transactions.unshift(trans);
+  });
+
+  saveData('TRANSACTIONS', appState.transactions);
+  localStorage.removeItem('pendingTransactions');
+  showToast(`Sinkronisasi ${pending.length} transaksi offline`, 'success');
+}
+      
       loadData();
       initializeDefaultData();
       setupEventListeners();
@@ -688,6 +732,42 @@
         $('#mainApp').show();
         updateAllUI();
       }
+      $('#checkoutBtn').on('click', function() {
+  if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
+
+  showConfirmation('Proses pembayaran?', (yes) => {
+    if (yes) {
+      const transaction = {
+        id: 'TRX' + Date.now(),
+        date: new Date(),
+        items: currentCart.items,
+        subtotal: currentCart.subtotal,
+        total: currentCart.total,
+        totalCost: currentCart.totalCost,
+        profit: currentCart.profit,
+        paymentMethod: 'cash',
+        paymentAmount: currentCart.total,
+        change: 0,
+        cashier: { id: currentCashier.id, name: currentCashier.name }
+      };
+
+      // 🔥 Jika offline, simpan sementara
+      if (!navigator.onLine) {
+        savePendingTransaction(transaction);
+        showToast('Transaksi disimpan offline. Akan disinkronkan saat online.', 'warning');
+      } else {
+        appState.transactions.unshift(transaction);
+        saveData('TRANSACTIONS', appState.transactions);
+      }
+
+      generateReceipt(transaction);
+      $('#transactionDetailModal').show();
+      resetCart();
+      updateAllUI();
+      showToast('Transaksi berhasil!', 'success');
+    }
+  });
+});
       // Register PWA
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js').catch(e => console.error('SW failed:', e));
@@ -704,6 +784,16 @@
         localStorage.setItem('lastBackup', now);
       }
     }
+
+    function autoBackup() {
+  const now = Date.now();
+  const last = localStorage.getItem('lastBackupTime');
+  if (!last || now - last > 60 * 60 * 1000) {
+    exportData(); // Sudah ada fungsi ini
+    localStorage.setItem('lastBackupTime', now);
+  }
+}
+setInterval(autoBackup, 5 * 60 * 1000); // Cek tiap 5 menit
 
     function loadData() {
       Object.keys(STORAGE_KEYS).forEach(key => {
