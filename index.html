@@ -12,6 +12,8 @@
   <link rel="icon" href="icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>POS ANEKAMARKET</title>
+  <!-- Tambahkan Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
   <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"></noscript>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -506,7 +508,9 @@
       <div class="tab-content" id="productsTab">
         <button class="btn btn-primary" id="openScanModal">Scan Barcode</button>
         <input type="text" id="productSearch" class="form-control" style="margin-top:10px;" placeholder="Cari produk..." />
-        <select id="productCategory" class="form-control" style="margin-top:10px;"></select>
+        <select id="productCategory" class="form-control" style="margin-top:10px;">
+          <option value="all">Semua Kategori</option>
+        </select>
         <table class="table" id="productList" style="margin-top:10px;">
           <thead>
             <tr>
@@ -699,6 +703,7 @@
     }
   </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -721,6 +726,7 @@
       SHIFT_HISTORY: 'pos_premium_shift_history',
       STORES: 'pos_premium_stores'
     };
+    
     let appState = {
       products: [],
       categories: [],
@@ -740,38 +746,50 @@
       currentShift: null,
       shiftHistory: []
     };
+    
     let currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
     let currentCashier = null;
     let salesChart = null;
     let currentStockInItems = [];
     let html5QrCode = null;
 
+    // Fungsi yang perlu diakses global
+    window.removeFromCart = function(index) {
+      currentCart.items.splice(index, 1);
+      updateCartSummary();
+    };
+
     function init() {
       loadData();
       initializeDefaultData();
-      loadStoreOptions(); // Panggil fungsi ini untuk memuat dropdown toko
+      loadStoreOptions();
       setupEventListeners();
       updateAllUI();
       initDateRangePicker();
       initChart();
 
+      // Cek koneksi internet
       function checkConnection() {
         const isOnline = navigator.onLine;
         $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
       }
 
+      // Simpan transaksi pending saat offline
       function savePendingTransaction(transaction) {
-        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
+        const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]';
         pending.push(transaction);
         localStorage.setItem('pendingTransactions', JSON.stringify(pending));
       }
 
+      // Sinkronkan transaksi pending saat online
       function syncPendingTransactions() {
         const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
         if (pending.length === 0) return;
+        
         pending.forEach(trans => {
           appState.transactions.unshift(trans);
         });
+        
         saveData('TRANSACTIONS', appState.transactions);
         localStorage.removeItem('pendingTransactions');
         updateAllUI();
@@ -785,14 +803,21 @@
       });
       window.addEventListener('offline', checkConnection);
 
+      // Cek apakah ada kasir yang sudah login
       const savedCashier = localStorage.getItem(STORAGE_KEYS.CURRENT_CASHIER);
       if (savedCashier) {
-        currentCashier = JSON.parse(savedCashier);
-        $('#loginModal').hide();
-        $('#mainApp').show();
-        updateAllUI();
+        try {
+          currentCashier = JSON.parse(savedCashier);
+          $('#loginModal').hide();
+          $('#mainApp').show();
+          updateAllUI();
+        } catch (e) {
+          console.error('Error parsing saved cashier:', e);
+          localStorage.removeItem(STORAGE_KEYS.CURRENT_CASHIER);
+        }
       }
 
+      // Backup otomatis setiap 5 menit
       function autoBackup() {
         const now = Date.now();
         const last = localStorage.getItem('lastBackupTime');
@@ -820,7 +845,14 @@
     }
 
     function saveData(key, data) {
-      localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(data));
+      try {
+        localStorage.setItem(STORAGE_KEYS[key], JSON.stringify(data));
+        return true;
+      } catch (e) {
+        console.error(`Error saving ${key}:`, e);
+        showToast('Gagal menyimpan data ke localStorage', 'error');
+        return false;
+      }
     }
 
     function initializeDefaultData() {
@@ -831,6 +863,7 @@
         ];
         saveData('CASHIERS', appState.cashiers);
       }
+      
       if (appState.stores.length === 0) {
         appState.stores = [
           { id: 'S001', name: 'Toko Geraiku Pusat', address: 'Jl. Digital Raya No. 1', phone: '081234567890' },
@@ -838,6 +871,7 @@
         ];
         saveData('STORES', appState.stores);
       }
+      
       if (!appState.settings.storeName) {
         const defaultStore = appState.stores[0];
         appState.settings = {
@@ -849,6 +883,7 @@
         };
         saveData('SETTINGS', appState.settings);
       }
+      
       if (appState.categories.length === 0) {
         appState.categories = [
           { id: 'C001', name: 'Minuman', description: 'Minuman ringan' },
@@ -856,6 +891,7 @@
         ];
         saveData('CATEGORIES', appState.categories);
       }
+      
       if (appState.products.length === 0) {
         appState.products = [
           { id: 'P001', barcode: '8991234567890', name: 'Aqua 600ml', categoryId: 'C001', costPrice: 3000, price: 4000, stock: 50 },
@@ -869,7 +905,8 @@
       const sel = $('#storeSelect');
       sel.empty();
       sel.append('<option value="" selected disabled>Pilih Toko</option>');
-      if(appState.stores.length === 0){
+      
+      if (appState.stores.length === 0) {
         sel.append('<option value="" disabled>Tidak ada toko</option>');
       } else {
         appState.stores.forEach(store => {
@@ -883,11 +920,15 @@
       $('#storeAddress').text(appState.settings.storeAddress);
       $('#currentDate').text(moment().format('dddd, D MMMM YYYY, HH:mm'));
       $('#loggedInCashier').text(currentCashier?.name || 'Tidak diketahui');
+      
       if (appState.currentShift && appState.currentShift.isActive) {
-        $('#shiftStatus').text(`Aktif Sejak ${moment(appState.currentShift.startTime).format('HH:mm')}`).removeClass('badge-danger').addClass('badge-success');
+        $('#shiftStatus').text(`Aktif Sejak ${moment(appState.currentShift.startTime).format('HH:mm')}`)
+          .removeClass('badge-danger').addClass('badge-success');
       } else {
-        $('#shiftStatus').text('Belum Dimulai').removeClass('badge-success').addClass('badge-danger');
+        $('#shiftStatus').text('Belum Dimulai')
+          .removeClass('badge-success').addClass('badge-danger');
       }
+      
       updateDashboard();
       loadProducts();
       updateCategoryDropdowns();
@@ -901,6 +942,7 @@
       const todaySales = todayTransactions.reduce((sum, t) => sum + t.total, 0);
       const todayProfit = todayTransactions.reduce((sum, t) => sum + t.profit, 0);
       const lowStockItems = appState.products.filter(p => p.stock > 0 && p.stock <= 5).length;
+      
       $('#todaySales').text(formatCurrency(todaySales));
       $('#todayProfit').text(formatCurrency(todayProfit));
       $('#todayTransactions').text(todayTransactions.length);
@@ -908,7 +950,11 @@
     }
 
     function formatCurrency(amount) {
-      return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount || 0);
+      return new Intl.NumberFormat('id-ID', { 
+        style: 'currency', 
+        currency: 'IDR', 
+        minimumFractionDigits: 0 
+      }).format(amount || 0);
     }
 
     function showToast(message, type = 'info', duration = 3000) {
@@ -916,21 +962,34 @@
       toast.removeClass("success error warning info").addClass(type);
       $("#toast-message").text(message);
       toast.addClass("show");
-      setTimeout(() => toast.removeClass("show"), duration);
+      
+      setTimeout(() => {
+        toast.removeClass("show");
+      }, duration);
     }
 
     function showConfirmation(message, callback) {
       $('#confirmationDialog').css('display', 'flex');
       $('#confirmationMessage').text(message);
-      $('#confirmOk').off('click').on('click', () => { callback(true); $('#confirmationDialog').hide(); });
-      $('#confirmCancel, #closeConfirmDialog').off('click').on('click', () => { callback(false); $('#confirmationDialog').hide(); });
+      
+      $('#confirmOk').off('click').on('click', () => { 
+        callback(true); 
+        $('#confirmationDialog').hide(); 
+      });
+      
+      $('#confirmCancel, #closeConfirmDialog').off('click').on('click', () => { 
+        callback(false); 
+        $('#confirmationDialog').hide(); 
+      });
     }
 
     function setupEventListeners() {
+      // Validasi input PIN hanya angka
       $('#cashierPin').on('input', function() {
         this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
       });
 
+      // Form login
       $('#loginForm').on('submit', function(e) {
         e.preventDefault();
         const id = $('#cashierId').val().trim();
@@ -967,6 +1026,7 @@
         }
       });
 
+      // Logout
       $('#logoutBtn').on('click', function(e) {
         e.preventDefault();
         showConfirmation("Yakin ingin logout?", (yes) => {
@@ -977,15 +1037,18 @@
         });
       });
 
+      // Dark mode toggle
       $('#toggleDarkMode').on('click', function() {
         $('body').toggleClass('dark-mode');
         localStorage.setItem('darkMode', $('body').hasClass('dark-mode'));
       });
 
+      // Set dark mode jika sebelumnya aktif
       if (localStorage.getItem('darkMode') === 'true') {
         $('body').addClass('dark-mode');
       }
 
+      // Tab utama
       $('.tabs .tab:not(.admin-tab)').on('click', function() {
         $('.tabs .tab:not(.admin-tab)').removeClass('active');
         $(this).addClass('active');
@@ -993,6 +1056,7 @@
         $(`#${$(this).data('tab')}Tab`).addClass('active');
       });
 
+      // Tab admin
       $('.admin-tab').on('click', function() {
         $('.admin-tab').removeClass('active');
         $(this).addClass('active');
@@ -1000,14 +1064,17 @@
         $(`#admin${$(this).data('tab').charAt(0).toUpperCase() + $(this).data('tab').slice(1)}Tab`).addClass('active');
       });
 
+      // Pencarian produk
       $('#productSearch').on('input', function() {
         loadProducts($(this).val(), $('#productCategory').val());
       });
 
+      // Filter kategori produk
       $('#productCategory').on('change', function() {
         loadProducts($('#productSearch').val(), $(this).val());
       });
 
+      // Tambah ke keranjang
       $(document).on('click', '.add-to-cart', function() {
         const id = $(this).data('id');
         $('#productIdToAdd').val(id);
@@ -1015,12 +1082,15 @@
         $('#quantityModal').css('display', 'flex');
       });
 
+      // Konfirmasi jumlah produk
       $('#confirmAddQuantity').on('click', function() {
         const id = $('#productIdToAdd').val();
         const qty = parseInt($('#quantityInput').val()) || 1;
         const product = appState.products.find(p => p.id === id);
+        
         if (product && product.stock >= qty) {
           const existing = currentCart.items.find(i => i.id === product.id);
+          
           if (existing) {
             existing.quantity += qty;
           } else {
@@ -1032,6 +1102,7 @@
               quantity: qty
             });
           }
+          
           updateCartSummary();
           $('#quantityModal').hide();
           showToast(`${qty}x ${product.name} ditambahkan`, 'success');
@@ -1040,8 +1111,12 @@
         }
       });
 
+      // Tahan transaksi
       $('#holdSale').on('click', function() {
-        if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
+        if (currentCart.items.length === 0) {
+          return showToast('Keranjang kosong.', 'warning');
+        }
+        
         const name = `Transaksi #${appState.heldSales.length + 1}`;
         appState.heldSales.push({ name, cart: { ...currentCart } });
         saveData('HELD_SALES', appState.heldSales);
@@ -1049,8 +1124,11 @@
         showToast('Transaksi ditahan.');
       });
 
+      // Checkout
       $('#checkoutBtn').on('click', function() {
-        if (currentCart.items.length === 0) return showToast('Keranjang kosong.', 'warning');
+        if (currentCart.items.length === 0) {
+          return showToast('Keranjang kosong.', 'warning');
+        }
 
         showConfirmation('Proses pembayaran?', (yes) => {
           if (yes) {
@@ -1076,10 +1154,14 @@
               saveData('TRANSACTIONS', appState.transactions);
             }
 
+            // Kurangi stok produk
             currentCart.items.forEach(item => {
               const product = appState.products.find(p => p.id === item.id);
-              if (product) product.stock -= item.quantity;
+              if (product) {
+                product.stock -= item.quantity;
+              }
             });
+            
             saveData('PRODUCTS', appState.products);
 
             generateReceipt(transaction);
@@ -1091,18 +1173,22 @@
         });
       });
 
+      // Tutup modal stok masuk
       $('#stockInModal .close-modal, .close-stock-in-modal').on('click', function() {
         $('#stockInModal').hide();
       });
 
+      // Simpan stok masuk
       $('#saveStockInBtn').on('click', function() {
         const date = $('#stockInDate').val();
         const ref = $('#stockInRef').val();
         const supplier = $('#stockInSupplier').val();
+        
         if (!date || !ref || !supplier || currentStockInItems.length === 0) {
           showToast('Lengkapi semua data dan tambahkan item.', 'error');
           return;
         }
+        
         const record = {
           id: 'SI' + moment().format('YYYYMMDDHHmmss'),
           date: date,
@@ -1111,8 +1197,11 @@
           items: [...currentStockInItems],
           totalCost: currentStockInItems.reduce((sum, item) => sum + (item.quantity * item.purchasePrice), 0)
         };
+        
         appState.stockInRecords.unshift(record);
         saveData('STOCK_IN', appState.stockInRecords);
+        
+        // Update stok produk
         record.items.forEach(item => {
           const product = appState.products.find(p => p.id === item.productId);
           if (product) {
@@ -1120,6 +1209,7 @@
             product.costPrice = item.purchasePrice;
           }
         });
+        
         saveData('PRODUCTS', appState.products);
         $('#stockInModal').hide();
         resetStockInForm();
@@ -1127,15 +1217,20 @@
         showToast('Stok masuk berhasil disimpan.', 'success');
       });
 
+      // Ekspor PDF
       $('#exportReportPDF').on('click', function() {
         exportToPDF();
       });
 
+      // Ekspor Excel
       $('#exportReportExcel').on('click', function() {
         exportToExcelDetailed();
       });
 
+      // Ekspor data
       $('#exportData').on('click', exportData);
+      
+      // Impor data
       $('#importData').on('click', function() {
         const fileInput = $('#importDataFile')[0];
         if (fileInput.files.length > 0) {
@@ -1147,18 +1242,20 @@
         }
       });
 
+      // Buka modal scan barcode
       $('#openScanModal').on('click', function() {
         $('#scanModal').css('display', 'flex');
         if (!html5QrCode) {
           html5QrCode = new Html5Qrcode("qr-reader");
         }
+        
         html5QrCode.start(
           { facingMode: "environment" },
           { fps: 10, qrbox: { width: 250, height: 250 } },
           (decodedText) => {
             html5QrCode.stop().then(() => {
-                $('#scanModal').hide();
-                addToCartByBarcode(decodedText);
+              $('#scanModal').hide();
+              addToCartByBarcode(decodedText);
             }).catch(err => console.error("Failed to stop QR scanner.", err));
           },
           (errorMessage) => {}
@@ -1168,6 +1265,7 @@
         });
       });
 
+      // Tutup modal
       $('.close-modal').on('click', function() {
         if (html5QrCode && html5QrCode.isScanning) {
           html5QrCode.stop().catch(e => console.error(e));
@@ -1175,6 +1273,7 @@
         $(this).closest('.modal').hide();
       });
 
+      // Cetak struk PDF
       $('#printReceiptPDF').on('click', function() {
         const receiptContent = document.getElementById('transactionDetailReceipt').innerHTML;
         const element = document.createElement('div');
@@ -1183,9 +1282,9 @@
         // Apply specific styles for PDF generation
         const receiptElement = element.querySelector('.receipt');
         if(receiptElement) {
-           receiptElement.style.border = 'none';
-           receiptElement.style.padding = '0';
-           receiptElement.style.maxWidth = '80mm'; // Thermal printer width
+          receiptElement.style.border = 'none';
+          receiptElement.style.padding = '0';
+          receiptElement.style.maxWidth = '80mm'; // Thermal printer width
         }
         
         html2pdf().from(element).set({
@@ -1207,11 +1306,13 @@
     function updateCart() {
       const el = $('#cartItems');
       el.empty();
+      
       if (currentCart.items.length === 0) {
         el.html('<div class="empty-state">Keranjang kosong</div>');
       } else {
         const table = $('<table class="table"></table>');
         table.append('<thead><tr><th>Produk</th><th>Jml</th><th>Harga</th><th>Aksi</th></tr></thead>');
+        
         const tbody = $('<tbody></tbody>');
         currentCart.items.forEach((item, index) => {
           tbody.append(`
@@ -1222,31 +1323,38 @@
               <td><button class="btn btn-danger btn-sm" onclick="removeFromCart(${index})">&times;</button></td>
             </tr>`);
         });
+        
         table.append(tbody);
         el.append(table);
       }
+      
       $('#cartTotal').text(formatCurrency(currentCart.total));
-    }
-
-    function removeFromCart(index) {
-        currentCart.items.splice(index, 1);
-        updateCartSummary();
     }
 
     function loadProducts(search = '', cat = 'all') {
       const body = $('#productListBody');
       body.empty();
+      
       const filtered = appState.products.filter(p => {
-        const matchSearch = !search || p.name.toLowerCase().includes(search.toLowerCase()) || (p.barcode && p.barcode.includes(search));
+        const matchSearch = !search || 
+          p.name.toLowerCase().includes(search.toLowerCase()) || 
+          (p.barcode && p.barcode.includes(search));
         const matchCat = cat === 'all' || p.categoryId === cat;
         return matchSearch && matchCat;
       });
+      
       if (filtered.length === 0) {
         body.html('<tr><td colspan="4" class="empty-state">Tidak ditemukan</td></tr>');
       } else {
         filtered.forEach(p => {
           const stockClass = p.stock <= 5 ? 'style="color: #ef476f;"' : '';
-          body.append(`<tr ${stockClass}><td>${p.name}</td><td>${formatCurrency(p.price)}</td><td>${p.stock}</td><td><button class="btn btn-success btn-sm add-to-cart" data-id="${p.id}">+</button></td></tr>`);
+          body.append(`
+            <tr ${stockClass}>
+              <td>${p.name}</td>
+              <td>${formatCurrency(p.price)}</td>
+              <td>${p.stock}</td>
+              <td><button class="btn btn-success btn-sm add-to-cart" data-id="${p.id}">+</button></td>
+            </tr>`);
         });
       }
     }
@@ -1254,7 +1362,10 @@
     function updateCategoryDropdowns() {
       const sel = $('#productCategory');
       sel.empty().append('<option value="all">Semua Kategori</option>');
-      appState.categories.forEach(c => sel.append(`<option value="${c.id}">${c.name}</option>`));
+      
+      appState.categories.forEach(c => {
+        sel.append(`<option value="${c.id}">${c.name}</option>`);
+      });
     }
 
     function generateReceipt(transaction) {
@@ -1293,6 +1404,7 @@
           <div style="margin-top: 15px; text-align: center; font-size: 11px;">${appState.settings.receiptFooter}</div>
         </div>
       `;
+      
       $('#transactionDetailReceipt').html(receiptHTML);
     }
 
@@ -1313,58 +1425,75 @@
     }
 
     function initChart() {
-        if (salesChart) {
-            salesChart.destroy();
+      if (salesChart) {
+        salesChart.destroy();
+      }
+      
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+          labels: [], 
+          datasets: [] 
+        },
+        options: { 
+          responsive: true, 
+          scales: { 
+            y: { 
+              beginAtZero: true 
+            } 
+          } 
         }
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        salesChart = new Chart(ctx, {
-            type: 'bar',
-            data: { labels: [], datasets: [] },
-            options: { responsive: true, scales: { y: { beginAtZero: true } } }
-        });
+      });
     }
 
     function updateReports(startDate, endDate) {
-        let transactionsInRange;
-        if (startDate && endDate) {
-            transactionsInRange = appState.transactions.filter(t => moment(t.date).isBetween(startDate, endDate, null, '[]'));
-        } else {
-            const today = moment().startOf('day');
-            transactionsInRange = appState.transactions.filter(t => moment(t.date).isSameOrAfter(today));
-        }
+      let transactionsInRange;
+      
+      if (startDate && endDate) {
+        transactionsInRange = appState.transactions.filter(t => 
+          moment(t.date).isBetween(startDate, endDate, null, '[]'));
+      } else {
+        const today = moment().startOf('day');
+        transactionsInRange = appState.transactions.filter(t => 
+          moment(t.date).isSameOrAfter(today));
+      }
 
-        const totalSales = transactionsInRange.reduce((sum, t) => sum + t.total, 0);
-        const totalProfit = transactionsInRange.reduce((sum, t) => sum + t.profit, 0);
-        
-        let productSales = {};
-        transactionsInRange.forEach(t => {
-            t.items.forEach(i => {
-                productSales[i.name] = (productSales[i.name] || 0) + i.quantity;
-            });
+      const totalSales = transactionsInRange.reduce((sum, t) => sum + t.total, 0);
+      const totalProfit = transactionsInRange.reduce((sum, t) => sum + t.profit, 0);
+      
+      let productSales = {};
+      transactionsInRange.forEach(t => {
+        t.items.forEach(i => {
+          productSales[i.name] = (productSales[i.name] || 0) + i.quantity;
         });
-        const bestSeller = Object.keys(productSales).length > 0 ? 
-            Object.keys(productSales).reduce((a, b) => productSales[a] > productSales[b] ? a : b) : '-';
+      });
+      
+      const bestSeller = Object.keys(productSales).length > 0 ? 
+        Object.keys(productSales).reduce((a, b) => productSales[a] > productSales[b] ? a : b) : '-';
 
-        $('#reportTotalSales').text(formatCurrency(totalSales));
-        $('#reportTotalProfit').text(formatCurrency(totalProfit));
-        $('#reportTotalTransactions').text(transactionsInRange.length);
-        $('#reportBestSeller').text(bestSeller);
+      $('#reportTotalSales').text(formatCurrency(totalSales));
+      $('#reportTotalProfit').text(formatCurrency(totalProfit));
+      $('#reportTotalTransactions').text(transactionsInRange.length);
+      $('#reportBestSeller').text(bestSeller);
 
-        // Update Chart
-        const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-        let salesByDay = [0,0,0,0,0,0,0];
-        transactionsInRange.forEach(t => {
-            const dayIndex = moment(t.date).day();
-            salesByDay[dayIndex] += t.total;
-        });
+      // Update Chart
+      const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+      let salesByDay = [0,0,0,0,0,0,0];
+      
+      transactionsInRange.forEach(t => {
+        const dayIndex = moment(t.date).day();
+        salesByDay[dayIndex] += t.total;
+      });
 
-        salesChart.data.labels = days;
-        salesChart.data.datasets = [{
-            label: 'Penjualan (Rp)',
-            data: salesByDay,
-            backgroundColor: '#4361ee'
-        }];
-        salesChart.update();
+      salesChart.data.labels = days;
+      salesChart.data.datasets = [{
+        label: 'Penjualan (Rp)',
+        data: salesByDay,
+        backgroundColor: '#4361ee'
+      }];
+      
+      salesChart.update();
     }
 
     function exportToPDF() {
@@ -1381,14 +1510,16 @@
         </table>
         <h4 style="margin-top:20px;">Grafik Penjualan Mingguan</h4>
       `;
+      
       const canvas = document.createElement('canvas');
-      canvas.width = 400; canvas.height = 200;
+      canvas.width = 400; 
+      canvas.height = 200;
       element.appendChild(canvas);
       
       const chartImg = document.getElementById('salesChart').toDataURL('image/png');
       const pdfContent = `
-         ${element.innerHTML}
-         <img src="${chartImg}" style="width:100%; max-width:500px; margin-top:20px;">
+        ${element.innerHTML}
+        <img src="${chartImg}" style="width:100%; max-width:500px; margin-top:20px;">
       `;
      
       html2pdf().from(pdfContent).set({
@@ -1403,6 +1534,8 @@
 
     function exportToExcelDetailed() {
       const wb = XLSX.utils.book_new();
+      
+      // Sheet ringkasan
       const data = appState.transactions.map(t => ({
         ID: t.id,
         Tanggal: moment(t.date).format('YYYY-MM-DD HH:mm'),
@@ -1412,9 +1545,11 @@
         Laba: t.profit,
         Kasir: t.cashier.name
       }));
+      
       const ws = XLSX.utils.json_to_sheet(data);
       XLSX.utils.book_append_sheet(wb, ws, "Ringkasan");
 
+      // Sheet detail
       const detailData = [];
       appState.transactions.forEach(t => {
         t.items.forEach(i => {
@@ -1428,6 +1563,7 @@
           });
         });
       });
+      
       const wsDetail = XLSX.utils.json_to_sheet(detailData);
       XLSX.utils.book_append_sheet(wb, wsDetail, "Detail Penjualan");
 
@@ -1448,6 +1584,7 @@
         stores: appState.stores,
         backupDate: new Date().toISOString()
       };
+      
       const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1457,42 +1594,51 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+      
       showToast('Data berhasil diekspor!', 'success');
     }
 
     function importData(file) {
       const reader = new FileReader();
+      
       reader.onload = function(e) {
         try {
           const imported = JSON.parse(e.target.result);
+          
           // Validasi sederhana
           if(!imported.products || !imported.settings) {
-             throw new Error("File tidak valid");
+            throw new Error("File tidak valid");
           }
+          
           Object.keys(STORAGE_KEYS).forEach(key => {
-             const lowerKey = key.toLowerCase();
-             if (imported[lowerKey]) {
-                appState[lowerKey] = imported[lowerKey];
-                saveData(key, imported[lowerKey]);
-             }
+            const lowerKey = key.toLowerCase();
+            if (imported[lowerKey]) {
+              appState[lowerKey] = imported[lowerKey];
+              saveData(key, imported[lowerKey]);
+            }
           });
+          
           showToast('Data berhasil diimpor! Aplikasi akan dimuat ulang.', 'success');
           setTimeout(() => location.reload(), 1500);
         } catch (err) {
           showToast(`Gagal mengimpor: ${err.message}`, 'error');
         }
       };
+      
       reader.readAsText(file);
     }
 
     function addToCartByBarcode(barcode) {
       const product = appState.products.find(p => p.barcode === barcode);
+      
       if (product) {
         if (product.stock <= 0) {
           showToast('Stok habis!', 'warning');
           return;
         }
+        
         const existing = currentCart.items.find(i => i.id === product.id);
+        
         if (existing) {
           existing.quantity += 1;
         } else {
@@ -1504,6 +1650,7 @@
             quantity: 1
           });
         }
+        
         updateCartSummary();
         showToast(`Produk ditemukan: ${product.name}`, 'success');
       } else {
@@ -1522,6 +1669,7 @@
       currentCart.totalCost = totalCost;
       currentCart.profit = subtotal - totalCost;
       currentCart.total = total;
+      
       updateCart();
     }
 
