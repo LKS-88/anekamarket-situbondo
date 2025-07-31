@@ -430,7 +430,9 @@
           <label for="cashierPin">PIN</label>
         </div>
         <div class="form-floating">
-          <select id="storeSelect" class="form-control" required></select>
+          <select id="storeSelect" class="form-control" required>
+            <option value="" selected disabled>Pilih Toko</option>
+          </select>
           <label for="storeSelect">Pilih Toko</label>
         </div>
         <button type="submit" class="btn-block">Login</button>
@@ -1241,8 +1243,9 @@
     function loadStoreOptions() {
       const sel = $('#storeSelect');
       sel.empty();
+      sel.append('<option value="" selected disabled>Pilih Toko</option>');
       if(appState.stores.length === 0){
-        sel.append('<option value="">Tidak ada toko</option>');
+        sel.append('<option value="" disabled>Tidak ada toko</option>');
       } else {
         appState.stores.forEach(store => {
           sel.append(`<option value="${store.id}">${store.name}</option>`);
