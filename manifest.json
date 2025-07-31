@@ -8,15 +8,15 @@
   "theme_color": "#4361ee",
   "orientation": "portrait",
   "icons": [
-    {
-      "src": "https://raw.githubusercontent.com/LKS-88/anekamarket/refs/heads/main/Logo-Anekamarketku.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "https://raw.githubusercontent.com/LKS-88/anekamarket/refs/heads/main/Logo-Anekamarketku.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  {
+    "src": "./Logo-Anekamarketku.png",
+    "sizes": "192x192",
+    "type": "image/png"
+  },
+  {
+    "src": "./Logo-Anekamarketku.png",
+    "sizes": "512x512",
+    "type": "image/png"
+  }
+]
 }
