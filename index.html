@@ -2,15 +2,19 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#4361ee">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="POS Geraiku">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icon-192.png">
   <title>Premium POS System - Geraiku</title>
-  <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Bootstrap Date Range Picker -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
-  <!-- Styles -->
   <style>
     :root {
       --primary-color: #4361ee;
@@ -25,6 +29,27 @@
       --rounded: 12px;
       --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
     }
+    body.dark-mode {
+      background-color: #121212;
+      color: #e0e0e0;
+    }
+    body.dark-mode .login-container,
+    body.dark-mode .modal-content,
+    body.dark-mode .dashboard-card,
+    body.dark-mode .table,
+    body.dark-mode .tab,
+    body.dark-mode .form-control,
+    body.dark-mode .form-floating input {
+      background: #1f1f1f;
+      color: #e0e0e0;
+      border-color: #444;
+    }
+    body.dark-mode .form-floating label {
+      color: #aaa;
+    }
+    body.dark-mode .table th {
+      background: #2c2c2c;
+    }
     * {
       box-sizing: border-box;
       margin: 0;
@@ -34,6 +59,7 @@
     body {
       background-color: #f4f6f9;
       color: #333;
+      transition: background-color 0.3s, color 0.3s;
     }
     .login-container {
       max-width: 400px;
@@ -339,8 +365,9 @@
         position: absolute;
         left: 0;
         top: 0;
-        width: 100mm;
+        width: 80mm;
         margin: 0;
+        font-size: 11px;
       }
     }
   </style>
@@ -381,46 +408,18 @@
         </div>
         <div class="header-info">
           <p id="currentDate">Senin, 1 Januari 2023</p>
-          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a></p>
+          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em;">🌙</button></p>
           <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
         </div>
       </div>
-      <div class="dashboard-cards">
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon icon-sales"><i class="fas fa-dollar-sign"></i></div>
-          <div class="dashboard-card-content">
-            <div class="dashboard-card-label">Penjualan Hari Ini</div>
-            <div class="dashboard-card-value" id="todaySales">Rp 0</div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon icon-profit"><i class="fas fa-chart-line"></i></div>
-          <div class="dashboard-card-content">
-            <div class="dashboard-card-label">Laba Hari Ini</div>
-            <div class="dashboard-card-value" id="todayProfit">Rp 0</div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon icon-transactions"><i class="fas fa-exchange-alt"></i></div>
-          <div class="dashboard-card-content">
-            <div class="dashboard-card-label">Jumlah Transaksi</div>
-            <div class="dashboard-card-value" id="todayTransactions">0</div>
-          </div>
-        </div>
-        <div class="dashboard-card">
-          <div class="dashboard-card-icon icon-low-stock"><i class="fas fa-exclamation-triangle"></i></div>
-          <div class="dashboard-card-content">
-            <div class="dashboard-card-label">Stok Rendah</div>
-            <div class="dashboard-card-value" id="lowStockItems">0</div>
-          </div>
-        </div>
-      </div>
+
       <div class="tabs">
         <div class="tab active" data-tab="cart">Keranjang</div>
         <div class="tab" data-tab="products">Produk</div>
         <div class="tab" data-tab="reports">Laporan</div>
         <div class="tab" data-tab="admin">Admin</div>
       </div>
+
       <div class="tab-content active" id="cartTab">
         <div id="cartItems"></div>
         <div style="margin-top: 20px;">
@@ -429,6 +428,7 @@
           <button class="btn btn-success" id="checkoutBtn">Checkout</button>
         </div>
       </div>
+
       <div class="tab-content" id="productsTab">
         <button class="btn btn-primary" id="openScanModal">Scan Barcode</button>
         <input type="text" id="productSearch" class="form-control mb-2" placeholder="Cari produk..." />
@@ -445,6 +445,7 @@
           <tbody id="productListBody"></tbody>
         </table>
       </div>
+
       <div class="tab-content" id="reportsTab">
         <h4>Laporan Penjualan</h4>
         <input type="text" id="reportRange" class="form-control mb-2" placeholder="Pilih rentang tanggal" />
@@ -456,11 +457,12 @@
         </div>
         <div class="sales-report"><canvas id="salesChart" height="150"></canvas></div>
         <div class="mt-3">
-          <button id="exportReportPDF" class="btn btn-info"><i class="fas fa-file-pdf"></i> Ekspor ke PDF</button>
-          <button id="exportReportExcel" class="btn btn-success ml-2"><i class="fas fa-file-excel"></i> Ekspor ke Excel</button>
+          <button id="exportReportPDF" class="btn btn-info"><i class="fas fa-file-pdf"></i> Ekspor PDF</button>
+          <button id="exportReportExcel" class="btn btn-success ml-2"><i class="fas fa-file-excel"></i> Ekspor Excel</button>
           <button id="exportReportPrint" class="btn btn-secondary ml-2"><i class="fas fa-print"></i> Cetak Laporan</button>
         </div>
       </div>
+
       <div class="tab-content" id="adminTab">
         <div class="tabs">
           <div class="tab admin-tab active" data-tab="reports">Laporan</div>
@@ -485,12 +487,29 @@
           <h4>Backup Data</h4>
           <p>Ekspor semua data ke file JSON untuk disimpan atau dipindahkan.</p>
           <button class="btn btn-success" id="exportData">📥 Ekspor Data (JSON)</button>
-
           <h4 style="margin-top: 30px;">Restore Data</h4>
           <p>Impor data dari file JSON. Semua data akan ditimpa!</p>
           <input type="file" id="importDataFile" accept=".json" />
           <button class="btn btn-warning" id="importData">📤 Impor Data</button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Input Jumlah -->
+  <div id="quantityModal" class="modal">
+    <div class="modal-content" style="max-width:400px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Masukkan Jumlah</h3>
+        <button class="modal-close close-modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="number" id="quantityInput" class="form-control" value="1" min="1" />
+        <input type="hidden" id="productIdToAdd" />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary close-modal">Batal</button>
+        <button class="btn btn-success" id="confirmAddQuantity">Tambah</button>
       </div>
     </div>
   </div>
@@ -559,7 +578,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary close-modal">Tutup</button>
-        <button class="btn btn-primary print-receipt"><i class="fas fa-print"></i> Cetak Ulang</button>
+        <button class="btn btn-primary print-receipt"><i class="fas fa-print"></i> Cetak</button>
+        <button class="btn btn-info" id="printReceiptPDF"><i class="fas fa-file-pdf"></i> PDF</button>
       </div>
     </div>
   </div>
@@ -611,11 +631,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <!-- Html5-QRCode (Barcode Scanner) -->
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-
   <script>
-    // Storage Keys
     const STORAGE_KEYS = {
       PRODUCTS: 'pos_premium_products',
       CATEGORIES: 'pos_premium_categories',
@@ -631,7 +648,6 @@
       STORES: 'pos_premium_stores'
     };
 
-    // App State
     let appState = {
       products: [],
       categories: [],
@@ -652,20 +668,12 @@
       stores: []
     };
 
-    let currentCart = {
-      items: [],
-      subtotal: 0,
-      total: 0,
-      totalCost: 0,
-      profit: 0
-    };
-
+    let currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
     let currentCashier = null;
     let salesChart = null;
     let currentStockInItems = [];
     let html5QrCode = null;
 
-    // Initialize
     function init() {
       loadData();
       initializeDefaultData();
@@ -680,15 +688,28 @@
         $('#mainApp').show();
         updateAllUI();
       }
+      // Register PWA
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js').catch(e => console.error('SW failed:', e));
+      }
+      // Auto backup
+      setInterval(autoBackup, 60 * 60 * 1000);
+    }
+
+    function autoBackup() {
+      const last = localStorage.getItem('lastBackup');
+      const now = Date.now();
+      if (!last || now - last > 24 * 3600 * 1000) {
+        exportData();
+        localStorage.setItem('lastBackup', now);
+      }
     }
 
     function loadData() {
       Object.keys(STORAGE_KEYS).forEach(key => {
         try {
           const data = localStorage.getItem(STORAGE_KEYS[key]);
-          if (data) {
-            appState[key.toLowerCase()] = JSON.parse(data);
-          }
+          if (data) appState[key.toLowerCase()] = JSON.parse(data);
         } catch (e) {
           console.error(`Error loading ${key}:`, e);
         }
@@ -707,7 +728,6 @@
         ];
         saveData('CASHIERS', appState.cashiers);
       }
-
       if (appState.stores.length === 0) {
         appState.stores = [
           { id: 'S001', name: 'Toko Geraiku Pusat', address: 'Jl. Digital Raya No. 1', phone: '081234567890' },
@@ -715,7 +735,6 @@
         ];
         saveData('STORES', appState.stores);
       }
-
       if (Object.keys(appState.settings).length === 0 || !appState.settings.storeName) {
         const defaultStore = appState.stores[0];
         appState.settings = {
@@ -727,7 +746,6 @@
         };
         saveData('SETTINGS', appState.settings);
       }
-
       if (appState.categories.length === 0) {
         appState.categories = [
           { id: 'C001', name: 'Minuman', description: 'Minuman ringan' },
@@ -735,7 +753,6 @@
         ];
         saveData('CATEGORIES', appState.categories);
       }
-
       if (appState.products.length === 0) {
         appState.products = [
           { id: 'P001', barcode: '8991234567890', name: 'Aqua 600ml', categoryId: 'C001', costPrice: 3000, price: 4000, stock: 50 },
@@ -796,6 +813,10 @@
     }
 
     function setupEventListeners() {
+      $('#cashierPin').on('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '').slice(0, 4);
+      });
+
       $('#loginForm').on('submit', function(e) {
         e.preventDefault();
         const id = $('#cashierId').val();
@@ -803,12 +824,9 @@
         const storeId = $('#storeSelect').val();
         const cashier = appState.cashiers.find(c => c.id === id && c.pin === pin && c.status === 'active');
         const store = appState.stores.find(s => s.id === storeId);
-
         if (cashier && store) {
           currentCashier = cashier;
           saveData('CURRENT_CASHIER', cashier);
-
-          // Update setting toko
           appState.settings = {
             ...appState.settings,
             storeName: store.name,
@@ -816,7 +834,6 @@
             storePhone: store.phone
           };
           saveData('SETTINGS', appState.settings);
-
           $('#loginModal').fadeOut(() => {
             $('#mainApp').fadeIn();
             updateAllUI();
@@ -836,6 +853,15 @@
           }
         });
       });
+
+      $('#toggleDarkMode').on('click', function() {
+        $('body').toggleClass('dark-mode');
+        localStorage.setItem('darkMode', $('body').hasClass('dark-mode'));
+      });
+
+      if (localStorage.getItem('darkMode') === 'true') {
+        $('body').addClass('dark-mode');
+      }
 
       $('.tab').on('click', function() {
         $('.tab').removeClass('active');
@@ -857,6 +883,38 @@
 
       $('#productCategory').on('change', function() {
         loadProducts($('#productSearch').val(), $(this).val());
+      });
+
+      $(document).on('click', '.add-to-cart', function() {
+        const id = $(this).data('id');
+        $('#productIdToAdd').val(id);
+        $('#quantityInput').val(1);
+        $('#quantityModal').show();
+      });
+
+      $('#confirmAddQuantity').on('click', function() {
+        const id = $('#productIdToAdd').val();
+        const qty = parseInt($('#quantityInput').val()) || 1;
+        const product = appState.products.find(p => p.id === id);
+        if (product && product.stock >= qty) {
+          const existing = currentCart.items.find(i => i.id === product.id);
+          if (existing) {
+            existing.quantity += qty;
+          } else {
+            currentCart.items.push({
+              id: product.id,
+              name: product.name,
+              price: product.price,
+              costPrice: product.costPrice,
+              quantity: qty
+            });
+          }
+          updateCartSummary();
+          $('#quantityModal').hide();
+          showToast(`${qty}x ${product.name} ditambahkan`, 'success');
+        } else {
+          showToast('Stok tidak mencukupi!', 'error');
+        }
       });
 
       $('#holdSale').on('click', function() {
@@ -896,7 +954,6 @@
         });
       });
 
-      // Stok Masuk
       $('#stockInModal .close-modal, .close-stock-in-modal').on('click', function() {
         $('#stockInModal').hide();
       });
@@ -919,7 +976,6 @@
         };
         appState.stockInRecords.unshift(record);
         saveData('STOCK_IN', appState.stockInRecords);
-
         record.items.forEach(item => {
           const product = appState.products.find(p => p.id === item.productId);
           if (product) {
@@ -934,15 +990,14 @@
         showToast('Stok masuk berhasil disimpan.', 'success');
       });
 
-      // Grafik & Laporan
       $('#exportReportPDF').on('click', function() {
         exportToPDF();
       });
+
       $('#exportReportExcel').on('click', function() {
-        exportToExcel();
+        exportToExcelDetailed();
       });
 
-      // Backup & Restore
       $('#exportData').on('click', exportData);
       $('#importData').on('click', function() {
         const fileInput = $('#importDataFile')[0];
@@ -955,7 +1010,6 @@
         }
       });
 
-      // Barcode Scan
       $('#openScanModal').on('click', function() {
         $('#scanModal').show();
         if (!html5QrCode) {
@@ -977,7 +1031,7 @@
           (errorMessage) => {}
         ).catch(err => {
           console.error("Error starting scanner: ", err);
-          $('#qr-reader-results').html('<p>Camera tidak bisa diakses. Coba di browser lain.</p>');
+          $('#qr-reader-results').html('<p>Camera tidak bisa diakses.</p>');
         });
       });
 
@@ -985,7 +1039,22 @@
         if (html5QrCode) {
           html5QrCode.stop().catch(e => console.error(e));
         }
-        $('#scanModal').hide();
+        $(this).closest('.modal').hide();
+      });
+
+      $('#printReceiptPDF').on('click', function() {
+        const receipt = $('#transactionDetailReceipt').html();
+        const element = document.createElement('div');
+        element.innerHTML = receipt;
+        document.body.appendChild(element);
+        html2pdf().from(element).set({
+          margin: 0.5,
+          filename: `Struk_${moment().format('YYYYMMDD_HHmm')}.pdf`,
+          html2canvas: { scale: 2 }
+        }).save().then(() => {
+          document.body.removeChild(element);
+          showToast('Struk berhasil disimpan sebagai PDF', 'success');
+        });
       });
     }
 
@@ -1147,19 +1216,38 @@
       });
     }
 
-    function exportToExcel() {
+    function exportToExcelDetailed() {
+      const wb = XLSX.utils.book_new();
       const data = appState.transactions.map(t => ({
         ID: t.id,
         Tanggal: moment(t.date).format('YYYY-MM-DD HH:mm'),
+        Subtotal: t.subtotal,
+        Pajak: t.subtotal * (appState.settings.taxRate / 100),
         Total: t.total,
         Laba: t.profit,
         Kasir: t.cashier.name
       }));
       const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Penjualan");
-      XLSX.writeFile(wb, `Laporan_Penjualan_${moment().format('YYYYMMDD')}.xlsx`);
-      showToast('Data berhasil diekspor ke Excel', 'success');
+      XLSX.utils.book_append_sheet(wb, ws, "Ringkasan");
+
+      const detailData = [];
+      appState.transactions.forEach(t => {
+        t.items.forEach(i => {
+          detailData.push({
+            Transaksi: t.id,
+            Produk: i.name,
+            Jumlah: i.quantity,
+            Harga: i.price,
+            Subtotal: i.quantity * i.price,
+            Tanggal: moment(t.date).format('YYYY-MM-DD HH:mm')
+          });
+        });
+      });
+      const wsDetail = XLSX.utils.json_to_sheet(detailData);
+      XLSX.utils.book_append_sheet(wb, wsDetail, "Detail Penjualan");
+
+      XLSX.writeFile(wb, `Laporan_Penjualan_Detail_${moment().format('YYYYMMDD')}.xlsx`);
+      showToast('Laporan Excel dengan detail berhasil diekspor!', 'success');
     }
 
     function exportData() {
@@ -1175,7 +1263,6 @@
         stores: appState.stores,
         backupDate: new Date().toISOString()
       };
-
       const blob = new Blob([JSON.stringify(dataToExport, null, 2)], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1209,6 +1296,10 @@
     function addToCartByBarcode(barcode) {
       const product = appState.products.find(p => p.barcode === barcode);
       if (product) {
+        if (product.stock <= 0) {
+          showToast('Stok habis!', 'warning');
+          return;
+        }
         const existing = currentCart.items.find(i => i.id === product.id);
         if (existing) {
           existing.quantity += 1;
@@ -1234,12 +1325,10 @@
       const profit = subtotal - totalCost;
       const tax = subtotal * (appState.settings.taxRate / 100);
       const total = subtotal + tax;
-
       currentCart.subtotal = subtotal;
       currentCart.totalCost = totalCost;
       currentCart.profit = profit;
       currentCart.total = total;
-
       updateCart();
     }
 
@@ -1248,14 +1337,6 @@
       $('#stockInItemsTable').empty();
       $('#stockInTotalCost').text('Rp 0');
     }
-
-    $(document).on('click', '.print-receipt', function() {
-      window.print();
-    });
-
-    $(document).on('click', '.close-modal', function() {
-      $(this).closest('.modal').hide();
-    });
 
     $(document).ready(init);
   </script>
