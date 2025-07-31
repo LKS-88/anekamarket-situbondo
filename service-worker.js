@@ -1,11 +1,13 @@
 // service-worker.js
 
-const CACHE_NAME = 'pos-anekamarketku-v3';
+const CACHE_NAME = 'pos-anekamarketku-v4'; // versi dinaikkan
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
   './Logo-Anekamarketku.png',
+  './icon-192.png', // tambahkan jika ada
+  './icon-512.png',
   'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap',
   'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
   'https://code.jquery.com/jquery-3.6.0.min.js',
@@ -24,7 +26,7 @@ self.addEventListener('install', event => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(urlsToCache))
-      .catch(err => console.error('Failed to cache:', err))
+      .catch(err => console.error('Failed to cache during install:', err))
   );
 });
 
@@ -43,28 +45,57 @@ self.addEventListener('activate', event => {
 
 // Fetch: Gunakan cache jika offline
 self.addEventListener('fetch', event => {
-  const isResource = ['script', 'style', 'font', 'image'].includes(event.request.destination);
+  const { request } = event;
+  const isResource = ['script', 'style', 'font', 'image', 'document'].includes(request.destination);
+  const isHTML = request.headers.get('accept')?.includes('text/html');
 
+  // Cache HTML (index.html)
+  if (isHTML) {
+    event.respondWith(
+      fetch(request)
+        .then(res => {
+          const clone = res.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          return res;
+        })
+        .catch(() => caches.match('./index.html'))
+    );
+    return;
+  }
+
+  // Cache resource (CSS, JS, font, image)
   if (isResource) {
     event.respondWith(
-      caches.match(event.request)
-        .then(response => {
-          return response || fetch(event.request)
-            .then(fetchRes => {
-              // Simpan ke cache jika berhasil
-              const responseClone = fetchRes.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, responseClone));
-              return fetchRes;
+      caches.match(request)
+        .then(cached => {
+          if (cached) return cached;
+          return fetch(request)
+            .then(res => {
+              if (res.status === 404) return res;
+              const clone = res.clone();
+              caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+              return res;
             })
-            .catch(() => caches.match(event.request)); // fallback
+            .catch(() => caches.match(request.url.split('/').pop()) || caches.match('./index.html'));
         })
     );
-  } else if (event.request.mode === 'navigate') {
-    // Untuk navigasi HTML
+  }
+});
+
+// Optional: Cache font dari Google Fonts (gstatic.com)
+self.addEventListener('fetch', event => {
+  if (event.request.url.includes('fonts.gstatic.com')) {
     event.respondWith(
-      fetch(event.request)
-        .catch(() => caches.match('./index.html'))
+      caches.match(event.request)
+        .then(cached => cached || fetch(event.request)
+          .then(res => {
+            if (res.ok) {
+              const clone = res.clone();
+              caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
+            }
+            return res;
+          })
+        )
     );
   }
 });
