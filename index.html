@@ -12,9 +12,9 @@
   <link rel="icon" href="icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icon-192.png">
   <title>POS ANEKAMARKET</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css" />
+  <!-- Preload kritis -->
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"></noscript>
   <style>
     :root {
       --primary-color: #4361ee;
@@ -413,14 +413,12 @@
           <p id="connectionStatus">🟢 Online</p>
         </div>
       </div>
-
       <div class="tabs">
         <div class="tab active" data-tab="cart">Keranjang</div>
         <div class="tab" data-tab="products">Produk</div>
         <div class="tab" data-tab="reports">Laporan</div>
         <div class="tab" data-tab="admin">Admin</div>
       </div>
-
       <div class="tab-content active" id="cartTab">
         <div id="cartItems"></div>
         <div style="margin-top: 20px;">
@@ -429,7 +427,6 @@
           <button class="btn btn-success" id="checkoutBtn">Checkout</button>
         </div>
       </div>
-
       <div class="tab-content" id="productsTab">
         <button class="btn btn-primary" id="openScanModal">Scan Barcode</button>
         <input type="text" id="productSearch" class="form-control mb-2" placeholder="Cari produk..." />
@@ -446,7 +443,6 @@
           <tbody id="productListBody"></tbody>
         </table>
       </div>
-
       <div class="tab-content" id="reportsTab">
         <h4>Laporan Penjualan</h4>
         <input type="text" id="reportRange" class="form-control mb-2" placeholder="Pilih rentang tanggal" />
@@ -463,7 +459,6 @@
           <button id="exportReportPrint" class="btn btn-secondary ml-2"><i class="fas fa-print"></i> Cetak Laporan</button>
         </div>
       </div>
-
       <div class="tab-content" id="adminTab">
         <div class="tabs">
           <div class="tab admin-tab active" data-tab="reports">Laporan</div>
@@ -625,6 +620,16 @@
   </div>
 
   <!-- Scripts -->
+  <script>
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js')
+          .then(reg => console.log('SW registered:', reg.scope))
+          .catch(err => console.error('SW registration failed:', err));
+      });
+    }
+  </script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -634,6 +639,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <script>
+    // [Sisanya tetap sama seperti kode asli Anda]
     const STORAGE_KEYS = {
       PRODUCTS: 'pos_premium_products',
       CATEGORIES: 'pos_premium_categories',
@@ -648,7 +654,6 @@
       SHIFT_HISTORY: 'pos_premium_shift_history',
       STORES: 'pos_premium_stores'
     };
-
     let appState = {
       products: [],
       categories: [],
@@ -668,7 +673,6 @@
       currentShift: null,
       shiftHistory: []
     };
-
     let currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
     let currentCashier = null;
     let salesChart = null;
@@ -683,20 +687,17 @@
       initDateRangePicker();
       initChart();
 
-      // Cek koneksi
       function checkConnection() {
         const isOnline = navigator.onLine;
         $('#connectionStatus').text(isOnline ? '🟢 Online' : '🔴 Offline');
       }
 
-      // Simpan transaksi offline
       function savePendingTransaction(transaction) {
         const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
         pending.push(transaction);
         localStorage.setItem('pendingTransactions', JSON.stringify(pending));
       }
 
-      // Sinkronkan saat online
       function syncPendingTransactions() {
         const pending = JSON.parse(localStorage.getItem('pendingTransactions') || '[]');
         if (pending.length === 0) return;
@@ -705,7 +706,7 @@
         });
         saveData('TRANSACTIONS', appState.transactions);
         localStorage.removeItem('pendingTransactions');
-        updateAllUI(); // 🔥 Update UI setelah sync
+        updateAllUI();
         showToast(`✅ ${pending.length} transaksi offline disinkronkan`, 'success');
       }
 
@@ -724,7 +725,6 @@
         updateAllUI();
       }
 
-      // Auto backup setiap 1 jam
       function autoBackup() {
         const now = Date.now();
         const last = localStorage.getItem('lastBackupTime');
@@ -735,6 +735,7 @@
         }
       }
       setInterval(autoBackup, 5 * 60 * 1000);
+    }
 
       // Register Service Worker
       if ('serviceWorker' in navigator) {
