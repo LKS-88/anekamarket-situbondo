@@ -57,7 +57,7 @@
     body.dark-mode .login-title,
     body.dark-mode .form-floating input,
     body.dark-mode .form-floating label {
-      color: #e0e0e0 !important;
+      color: #333 !important;
     }
     * {
       box-sizing: border-box;
@@ -93,9 +93,6 @@
       margin-bottom: 20px;
       color: var(--dark-color);
     }
-    body.dark-mode .login-title {
-      color: #e0e0e0 !important;
-    }
     .form-floating {
       position: relative;
       margin-bottom: 15px;
@@ -120,7 +117,7 @@
       left: 15px;
       top: 12px;
       font-size: 1rem;
-      color: #999;
+      color: #666;
       pointer-events: none;
       transition: all 0.2s;
       background-color: white;
@@ -474,6 +471,24 @@
         font-size: 1.5rem;
         font-weight: 600;
     }
+    .payment-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: var(--rounded);
+      margin-top: 20px;
+    }
+    body.dark-mode .payment-section {
+      background: #2c2c2c;
+    }
+    .customer-section {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: var(--rounded);
+      margin-bottom: 20px;
+    }
+    body.dark-mode .customer-section {
+      background: #2c2c2c;
+    }
 
     @media (max-width: 768px) {
       .dashboard-cards, .report-card-container {
@@ -589,23 +604,87 @@
             </div>
         </div>
         <hr style="margin: 20px 0;">
+        
+        <!-- Bagian Pelanggan -->
+        <div class="customer-section">
+          <h5>Data Pelanggan</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <select id="customerSelect" class="form-control">
+                  <option value="">Pilih Pelanggan</option>
+                </select>
+                <label for="customerSelect">Pelanggan</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <button class="btn btn-info" id="addCustomerFromCart" style="height: 58px; width: 100%;">Tambah Pelanggan Baru</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Bagian Produk -->
+        <div style="margin-bottom: 20px;">
+          <div class="row">
+            <div class="col-md-8">
+              <input type="text" id="productSearchCart" class="form-control" placeholder="Cari produk...">
+            </div>
+            <div class="col-md-4">
+              <button class="btn btn-primary" id="openScanModal" style="width: 100%; height: 100%;">Scan Barcode</button>
+            </div>
+          </div>
+        </div>
+        
         <div id="cartItems"></div>
+        
+        <!-- Bagian Pembayaran -->
+        <div class="payment-section">
+          <h5>Pembayaran</h5>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <select id="paymentMethod" class="form-control">
+                  <option value="cash">Tunai</option>
+                  <option value="transfer">Transfer</option>
+                  <option value="debit">Kartu Debit</option>
+                  <option value="credit">Kartu Kredit</option>
+                </select>
+                <label for="paymentMethod">Metode Pembayaran</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <input type="number" id="paymentAmount" class="form-control" placeholder="Jumlah Bayar" min="0">
+                <label for="paymentAmount">Jumlah Bayar</label>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <input type="text" id="paymentNote" class="form-control" placeholder="Catatan">
+                <label for="paymentNote">Catatan</label>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-floating mb-3">
+                <input type="text" id="changeAmount" class="form-control" placeholder="Kembalian" readonly>
+                <label for="changeAmount">Kembalian</label>
+              </div>
+            </div>
+          </div>
+        </div>
+        
         <div style="margin-top: 20px;">
           <h4>Total: <span id="cartTotal">Rp0</span></h4>
-          <div class="form-floating mb-3">
-            <input type="text" id="customerNameInput" class="form-control" placeholder="Nama Pelanggan">
-            <label for="customerNameInput">Nama Pelanggan</label>
-          </div>
-          <div class="form-floating mb-3">
-            <input type="number" id="paymentAmount" class="form-control" placeholder="Jumlah Bayar" min="0">
-            <label for="paymentAmount">Jumlah Bayar</label>
-          </div>
           <button class="btn btn-warning" id="holdSale">Tahan Transaksi</button>
           <button class="btn btn-success" id="checkoutBtn">Checkout</button>
         </div>
       </div>
+      
+      <!-- Tab Produk -->
       <div class="tab-content" id="productsTab">
-        <button class="btn btn-primary" id="openScanModal">Scan Barcode</button>
+        <button class="btn btn-primary" id="openScanModalProducts">Scan Barcode</button>
         <input type="text" id="productSearch" class="form-control" style="margin-top:10px;" placeholder="Cari produk..." />
         <select id="productCategory" class="form-control" style="margin-top:10px;">
           <option value="all">Semua Kategori</option>
@@ -613,6 +692,7 @@
         <table class="table" id="productList" style="margin-top:10px;">
           <thead>
             <tr>
+              <th>Barcode</th>
               <th>Nama</th>
               <th>Harga</th>
               <th>Stok</th>
@@ -622,6 +702,8 @@
           <tbody id="productListBody"></tbody>
         </table>
       </div>
+      
+      <!-- Tab Laporan -->
       <div class="tab-content" id="reportsTab">
         <h4>Laporan Penjualan</h4>
         <input type="text" id="reportRange" class="form-control" style="margin-bottom:20px;" placeholder="Pilih rentang tanggal" />
@@ -638,6 +720,8 @@
           <button id="exportReportPrint" class="btn btn-secondary"><i class="fas fa-print"></i> Cetak Laporan</button>
         </div>
       </div>
+      
+      <!-- Tab Admin -->
       <div class="tab-content" id="adminTab">
         <div class="tabs">
           <div class="tab admin-tab active" data-tab="reports">Laporan</div>
@@ -654,6 +738,7 @@
         <!-- Admin Reports Tab -->
         <div class="tab-content admin-tab-content active" id="adminReportsTab">
           <h4>Laporan Admin</h4>
+          <input type="text" id="adminReportRange" class="form-control mb-3" placeholder="Pilih rentang tanggal" />
           <div class="report-card-container">
             <div class="report-card"><div class="report-card-title">Total Produk</div><div class="report-card-value" id="adminTotalProducts">0</div></div>
             <div class="report-card"><div class="report-card-title">Total Kategori</div><div class="report-card-value" id="adminTotalCategories">0</div></div>
@@ -1240,6 +1325,7 @@
       initDateRangePicker();
       initChart();
       initAdminTransactionRangePicker();
+      initAdminReportRangePicker();
 
       // Cek koneksi internet
       function checkConnection() {
@@ -1426,9 +1512,23 @@
       updateDashboard();
       loadProducts();
       updateCategoryDropdowns();
+      updateCustomerDropdown();
       updateCart();
       updateReports();
       updateAdminUI();
+    }
+
+    /**
+     * Memperbarui dropdown pelanggan
+     */
+    function updateCustomerDropdown() {
+      const sel = $('#customerSelect');
+      sel.empty();
+      sel.append('<option value="">Pilih Pelanggan</option>');
+      
+      appState.customers.forEach(customer => {
+        sel.append(`<option value="${customer.id}">${customer.name}</option>`);
+      });
     }
 
     /**
@@ -1750,6 +1850,89 @@
     }
 
     /**
+     * Inisialisasi date range picker untuk laporan
+     */
+    function initDateRangePicker() {
+      $('#reportRange').daterangepicker({
+        opens: 'left',
+        locale: {
+          format: 'DD/MM/YYYY',
+          applyLabel: 'Terapkan',
+          cancelLabel: 'Batal',
+          daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+          monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+          firstDay: 1
+        }
+      }, function(start, end) {
+        updateReports(start.toDate(), end.toDate());
+      });
+    }
+
+    /**
+     * Inisialisasi date range picker untuk transaksi admin
+     */
+    function initAdminTransactionRangePicker() {
+      $('#adminTransactionRange').daterangepicker({
+        opens: 'left',
+        locale: {
+          format: 'DD/MM/YYYY',
+          applyLabel: 'Terapkan',
+          cancelLabel: 'Batal',
+          daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+          monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+          firstDay: 1
+        }
+      }, function(start, end) {
+        updateAdminTransactionsTable(start.toDate(), end.toDate());
+      });
+    }
+
+    /**
+     * Inisialisasi date range picker untuk laporan admin
+     */
+    function initAdminReportRangePicker() {
+      $('#adminReportRange').daterangepicker({
+        opens: 'left',
+        locale: {
+          format: 'DD/MM/YYYY',
+          applyLabel: 'Terapkan',
+          cancelLabel: 'Batal',
+          daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
+          monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
+          firstDay: 1
+        }
+      }, function(start, end) {
+        updateAdminReportsTable(start.toDate(), end.toDate());
+      });
+    }
+
+    /**
+     * Inisialisasi chart
+     */
+    function initChart() {
+      if (salesChart) {
+        salesChart.destroy();
+      }
+      
+      const ctx = document.getElementById('salesChart').getContext('2d');
+      salesChart = new Chart(ctx, {
+        type: 'bar',
+        data: { 
+          labels: [], 
+          datasets: [] 
+        },
+        options: { 
+          responsive: true, 
+          scales: { 
+            y: { 
+              beginAtZero: true 
+            } 
+          } 
+        }
+      });
+    }
+
+    /**
      * Setup event listeners
      */
     function setupEventListeners() {
@@ -1838,6 +2021,23 @@
         loadProducts($(this).val(), $('#productCategory').val());
       });
 
+      // Pencarian produk di keranjang
+      $('#productSearchCart').on('input', function() {
+        const searchTerm = $(this).val().trim().toLowerCase();
+        if (searchTerm) {
+          const filtered = appState.products.filter(p => 
+            p.name.toLowerCase().includes(searchTerm) || 
+            (p.barcode && p.barcode.includes(searchTerm))
+          );
+          
+          if (filtered.length > 0) {
+            $('#productIdToAdd').val(filtered[0].id);
+            $('#quantityInput').val(1);
+            $('#quantityModal').css('display', 'flex');
+          }
+        }
+      });
+
       // Filter kategori produk
       $('#productCategory').on('change', function() {
         loadProducts($('#productSearch').val(), $(this).val());
@@ -1874,10 +2074,18 @@
           
           updateCartSummary();
           $('#quantityModal').hide();
+          $('#productSearchCart').val('');
           showToast(`${qty}x ${product.name} ditambahkan`, 'success');
         } else {
           showToast('Stok tidak mencukupi!', 'error');
         }
+      });
+
+      // Hitung kembalian
+      $('#paymentAmount').on('input', function() {
+        const payment = parseFloat($(this).val()) || 0;
+        const change = payment - currentCart.total;
+        $('#changeAmount').val(change > 0 ? formatCurrency(change) : 'Rp0');
       });
 
       // Tahan transaksi
@@ -1900,14 +2108,15 @@
         }
 
         const paymentAmount = parseFloat($('#paymentAmount').val()) || 0;
-        const customerName = $('#customerNameInput').val().trim() || 'Pelanggan Umum';
-        
         if (paymentAmount < currentCart.total) {
           return showToast('Jumlah pembayaran kurang!', 'error');
         }
 
         showConfirmation('Proses pembayaran?', (yes) => {
           if (yes) {
+            const customerId = $('#customerSelect').val();
+            const customer = appState.customers.find(c => c.id === customerId) || appState.customers[0];
+            
             const transaction = {
               id: 'TRX' + Date.now(),
               date: new Date(),
@@ -1916,11 +2125,11 @@
               total: currentCart.total,
               totalCost: currentCart.totalCost,
               profit: currentCart.profit,
-              paymentMethod: 'cash',
+              paymentMethod: $('#paymentMethod').val(),
               paymentAmount: paymentAmount,
               change: paymentAmount - currentCart.total,
               cashier: { id: currentCashier.id, name: currentCashier.name },
-              customer: customerName
+              customer: customer
             };
 
             if (!navigator.onLine) {
@@ -1948,6 +2157,14 @@
             showToast('✅ Transaksi berhasil!', 'success');
           }
         });
+      });
+
+      // Tambah pelanggan dari keranjang
+      $('#addCustomerFromCart').on('click', function() {
+        $('#customerModalTitle').text('Tambah Pelanggan');
+        $('#customerForm')[0].reset();
+        $('#customerId').val('');
+        $('#customerModal').css('display', 'flex');
       });
 
       // Kelola shift
@@ -2268,6 +2485,7 @@
         
         saveData('CUSTOMERS', appState.customers);
         $('#customerModal').hide();
+        updateCustomerDropdown();
         updateAllUI();
         showToast('Pelanggan disimpan', 'success');
       });
@@ -2519,7 +2737,7 @@
       });
 
       // Buka modal scan barcode
-      $('#openScanModal').on('click', function() {
+      $('#openScanModal, #openScanModalProducts').on('click', function() {
         $('#scanModal').css('display', 'flex');
         if (!html5QrCode) {
           html5QrCode = new Html5Qrcode("qr-reader");
@@ -2592,6 +2810,8 @@
      */
     function resetCart() {
       currentCart = { items: [], subtotal: 0, total: 0, totalCost: 0, profit: 0 };
+      $('#paymentAmount').val('');
+      $('#changeAmount').val('');
       updateCart();
     }
 
@@ -2661,12 +2881,13 @@
       });
       
       if (filtered.length === 0) {
-        body.html('<tr><td colspan="4" class="empty-state">Tidak ditemukan</td></tr>');
+        body.html('<tr><td colspan="5" class="empty-state">Tidak ditemukan</td></tr>');
       } else {
         filtered.forEach(p => {
           const stockClass = p.stock <= 5 ? 'style="color: #ef476f;"' : '';
           body.append(`
             <tr ${stockClass}>
+              <td>${p.barcode || '-'}</td>
               <td>${p.name}</td>
               <td>${formatCurrency(p.price)}</td>
               <td>${p.stock}</td>
@@ -2703,7 +2924,7 @@
             <div>Tgl: ${moment(transaction.date).format('DD/MM/YY HH:mm')}</div>
             <div>No: ${transaction.id}</div>
             <div>Kasir: ${transaction.cashier.name}</div>
-            <div>Pelanggan: ${transaction.customer}</div>
+            <div>Pelanggan: ${transaction.customer.name}</div>
           </div>
           <hr>
           <table width="100%" style="font-size: 12px; border-collapse: collapse;">
@@ -2730,70 +2951,6 @@
       `;
       
       $('#transactionDetailReceipt').html(receiptHTML);
-    }
-
-    /**
-     * Inisialisasi date range picker untuk laporan
-     */
-    function initDateRangePicker() {
-      $('#reportRange').daterangepicker({
-        opens: 'left',
-        locale: {
-          format: 'DD/MM/YYYY',
-          applyLabel: 'Terapkan',
-          cancelLabel: 'Batal',
-          daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
-          monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-          firstDay: 1
-        }
-      }, function(start, end) {
-        updateReports(start.toDate(), end.toDate());
-      });
-    }
-
-    /**
-     * Inisialisasi date range picker untuk transaksi admin
-     */
-    function initAdminTransactionRangePicker() {
-      $('#adminTransactionRange').daterangepicker({
-        opens: 'left',
-        locale: {
-          format: 'DD/MM/YYYY',
-          applyLabel: 'Terapkan',
-          cancelLabel: 'Batal',
-          daysOfWeek: ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'],
-          monthNames: ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'],
-          firstDay: 1
-        }
-      }, function(start, end) {
-        updateAdminTransactionsTable(start.toDate(), end.toDate());
-      });
-    }
-
-    /**
-     * Inisialisasi chart
-     */
-    function initChart() {
-      if (salesChart) {
-        salesChart.destroy();
-      }
-      
-      const ctx = document.getElementById('salesChart').getContext('2d');
-      salesChart = new Chart(ctx, {
-        type: 'bar',
-        data: { 
-          labels: [], 
-          datasets: [] 
-        },
-        options: { 
-          responsive: true, 
-          scales: { 
-            y: { 
-              beginAtZero: true 
-            } 
-          } 
-        }
-      });
     }
 
     /**
