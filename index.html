@@ -35,71 +35,6 @@
       --transition: all 0.3s ease;
     }
     
-    /* Dark mode */
-    body.dark-mode {
-      background-color: #121212;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .login-container,
-    body.dark-mode .modal-content,
-    body.dark-mode .dashboard-card,
-    body.dark-mode .table,
-    body.dark-mode .tab,
-    body.dark-mode .form-control,
-    body.dark-mode .form-floating input,
-    body.dark-mode .report-card,
-    body.dark-mode .payment-section,
-    body.dark-mode .customer-section,
-    body.dark-mode .receipt {
-      background: #1f1f1f;
-      color: #e0e0e0;
-      border-color: #444;
-    }
-    
-    body.dark-mode .form-floating label {
-      color: #aaa;
-    }
-    
-    body.dark-mode .table th {
-      background: #2c2c2c;
-      color: #e0e0e0;
-    }
-    
-    body.dark-mode .table td {
-      border-color: #444;
-    }
-    
-    body.dark-mode .login-title,
-    body.dark-mode .form-floating input,
-    body.dark-mode .form-floating label {
-      color: #333 !important;
-    }
-    
-    body.dark-mode .login-container .form-floating label {
-      color: #666 !important;
-    }
-    
-    body.dark-mode .login-container .form-floating input:focus + label,
-    body.dark-mode .login-container .form-floating input:not(:placeholder-shown) + label {
-      color: var(--primary-color) !important;
-      background: white !important;
-    }
-    
-    body.dark-mode .empty-state {
-      color: #aaa;
-    }
-    
-    body.dark-mode .badge-success {
-      background: #155724;
-      color: #d4edda;
-    }
-    
-    body.dark-mode .badge-danger {
-      background: #721c24;
-      color: #f8d7da;
-    }
-    
     /* Global Styles */
     * {
       box-sizing: border-box;
@@ -175,16 +110,8 @@
       color: #666;
       pointer-events: none;
       transition: var(--transition);
-      background-color: white;
       padding: 0 5px;
       border-radius: 4px;
-    }
-    
-    .form-floating input:focus,
-    .form-floating input:not(:placeholder-shown),
-    .form-floating select:focus,
-    .form-floating select:not(:placeholder-shown) {
-      padding-top: 20px;
     }
     
     .form-floating input:focus + label,
@@ -194,8 +121,6 @@
       top: -10px;
       left: 10px;
       font-size: 0.8rem;
-      background: white;
-      padding: 0 5px;
       color: var(--primary-color);
     }
     
@@ -715,7 +640,7 @@
         </div>
         <div class="header-info">
           <p id="currentDate">Senin, 1 Januari 2023</p>
-          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a> | <button id="toggleDarkMode" style="background:none;border:none;font-size:1.2em; cursor:pointer;">🌙</button></p>
+          <p>Kasir: <span id="loggedInCashier">John Doe</span> | <a href="#" id="logoutBtn">Logout</a></p>
           <p>Shift: <span id="shiftStatus" class="badge badge-danger">Belum Dimulai</span> <button id="manageShift" class="btn btn-warning btn-sm">Kelola</button></p>
           <p id="connectionStatus">🟢 Online</p>
         </div>
@@ -1575,6 +1500,9 @@
           $('#loginModal').hide();
           $('#mainApp').show();
           updateAllUI();
+          
+          // Cek role dan sesuaikan tampilan
+          checkUserRole();
         } catch (e) {
           console.error('Error parsing saved cashier:', e);
           localStorage.removeItem(STORAGE_KEYS.CURRENT_CASHIER);
@@ -1592,6 +1520,18 @@
         }
       }
       setInterval(autoBackup, 5 * 60 * 1000);
+    }
+
+    /**
+     * Cek role user dan sesuaikan tampilan
+     */
+    function checkUserRole() {
+      // Jika kasir biasa (bukan admin), sembunyikan menu admin
+      if (currentCashier && currentCashier.id !== 'K001') {
+        $('.tab[data-tab="admin"]').hide();
+      } else {
+        $('.tab[data-tab="admin"]').show();
+      }
     }
 
     /**
@@ -1631,8 +1571,8 @@
     function initializeDefaultData() {
       if (appState.cashiers.length === 0) {
         appState.cashiers = [
-          { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null },
-          { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null }
+          { id: 'K001', name: 'Admin', pin: '1234', status: 'active', lastLogin: null, isAdmin: true },
+          { id: 'K002', name: 'Kasir 1', pin: '1111', status: 'active', lastLogin: null, isAdmin: false }
         ];
         saveData('CASHIERS', appState.cashiers);
       }
@@ -2181,6 +2121,7 @@
           $('#loginModal').hide();
           $('#mainApp').show();
           updateAllUI();
+          checkUserRole();
           showToast(`Selamat datang, ${cashier.name} di ${store.name}!`, 'success');
         } else {
           showToast('ID Kasir, PIN, atau Toko salah.', 'error');
@@ -2197,17 +2138,6 @@
           }
         });
       });
-
-      // Dark mode toggle
-      $('#toggleDarkMode').on('click', function() {
-        $('body').toggleClass('dark-mode');
-        localStorage.setItem('darkMode', $('body').hasClass('dark-mode'));
-      });
-
-      // Set dark mode jika sebelumnya aktif
-      if (localStorage.getItem('darkMode') === 'true') {
-        $('body').addClass('dark-mode');
-      }
 
       // Tab utama
       $('.tabs .tab:not(.admin-tab)').on('click', function() {
@@ -2831,7 +2761,8 @@
             name,
             pin,
             status,
-            lastLogin: null
+            lastLogin: null,
+            isAdmin: false
           };
           appState.cashiers.unshift(newCashier);
         }
@@ -3075,6 +3006,17 @@
         }).save().then(() => {
           showToast('Struk berhasil disimpan sebagai PDF', 'success');
         });
+      });
+
+      // View transaction detail
+      $(document).on('click', '.view-transaction', function() {
+        const id = $(this).data('id');
+        const transaction = appState.transactions.find(t => t.id === id);
+        
+        if (transaction) {
+          generateReceipt(transaction);
+          $('#transactionDetailModal').css('display', 'flex');
+        }
       });
     }
 
