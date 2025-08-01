@@ -6,6 +6,7 @@
   <title>POS ANEKAMARKET PRO</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-daterangepicker/3.0.5/daterangepicker.min.css">
   <style>
     :root {
@@ -998,7 +999,7 @@
           <div class="card-header">
             <div class="input-group">
               <input type="text" class="form-control" id="transactionSearch" placeholder="Cari transaksi...">
-              <button class="btn btn-outline-secondary" type="button">
+              <button class="btn btn-outline-secondary" type="button" id="searchTransactionBtn">
                 <i class="fas fa-search"></i>
               </button>
             </div>
@@ -1042,7 +1043,7 @@
           <div class="card-header">
             <div class="input-group">
               <input type="text" class="form-control" id="productSearch" placeholder="Cari produk...">
-              <button class="btn btn-outline-secondary" type="button">
+              <button class="btn btn-outline-secondary" type="button" id="searchProductBtn">
                 <i class="fas fa-search"></i>
               </button>
             </div>
@@ -1113,7 +1114,7 @@
           <div class="card-header">
             <div class="input-group" style="max-width: 300px;">
               <input type="text" class="form-control" id="customerSearch" placeholder="Cari pelanggan...">
-              <button class="btn btn-outline-secondary" type="button">
+              <button class="btn btn-outline-secondary" type="button" id="searchCustomerBtn">
                 <i class="fas fa-search"></i>
               </button>
             </div>
@@ -1462,6 +1463,12 @@
         ];
         saveState('customers');
       }
+      
+      // Initialize held transactions if not exists
+      if (!appState.held_transactions) {
+        appState.held_transactions = [];
+        saveState('held_transactions');
+      }
     }
 
     // UI Helpers
@@ -1550,10 +1557,14 @@
           const categoriesOptions = appState.categories
             .filter(function(c) { return c.active; })
             .map(function(c) { 
-              return '<option value="' + c.id + '" ' + (item.categoryId === c.id ? 'selected' : '') + '>' + c.name + '</option>';
+              return '<option value="' + c.id + '">' + c.name + '</option>';
             })
             .join('');
             
+          if (id) {
+            item = appState.products.find(function(p) { return p.id === id; });
+          }
+          
           formHtml = `
             <input type="hidden" name="id" value="${item.id || ''}">
             <div class="mb-3">
@@ -1592,6 +1603,10 @@
           
         case 'categories':
           title.textContent = actionText + ' Kategori';
+          if (id) {
+            item = appState.categories.find(function(c) { return c.id === id; });
+          }
+          
           formHtml = `
             <input type="hidden" name="id" value="${item.id || ''}">
             <div class="mb-3">
@@ -1607,6 +1622,10 @@
           
         case 'cashiers':
           title.textContent = actionText + ' Kasir';
+          if (id) {
+            item = appState.cashiers.find(function(c) { return c.id === id; });
+          }
+          
           formHtml = `
             <input type="hidden" name="id" value="${item.id || ''}">
             <div class="mb-3">
@@ -1624,12 +1643,12 @@
             <div class="mb-3">
               <label class="form-label">Peran</label>
               <select class="form-select" name="role" required>
-                <option value="cashier" ${item.role === 'cashier' ? 'selected' : ''}>Kasir</option>
-                <option value="admin" ${item.role === 'admin' ? 'selected' : ''}>Administrator</option>
+                <option value="cashier" ${item && item.role === 'cashier' ? 'selected' : ''}>Kasir</option>
+                <option value="admin" ${item && item.role === 'admin' ? 'selected' : ''}>Administrator</option>
               </select>
             </div>
             <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" name="active" id="cashierActive" ${item.active !== false ? 'checked' : ''}>
+              <input type="checkbox" class="form-check-input" name="active" id="cashierActive" ${item && item.active !== false ? 'checked' : ''}>
               <label class="form-check-label" for="cashierActive">Aktif</label>
             </div>
           `;
@@ -1637,6 +1656,10 @@
           
         case 'customers':
           title.textContent = actionText + ' Pelanggan';
+          if (id) {
+            item = appState.customers.find(function(c) { return c.id === id; });
+          }
+          
           formHtml = `
             <input type="hidden" name="id" value="${item.id || ''}">
             <div class="mb-3">
@@ -1691,12 +1714,17 @@
         }
       } else {
         // Clear form for new item
-        form.reset();
+        form.innerHTML = formHtml;
       }
       
       form.innerHTML = formHtml;
       form.dataset.type = type;
       modal.style.display = 'flex';
+      
+      // Set selected category if editing product
+      if (type === 'products' && id && item.categoryId) {
+        form.querySelector('[name="categoryId"]').value = item.categoryId;
+      }
       
       // Focus first input
       const firstInput = form.querySelector('input, select, textarea');
@@ -2048,7 +2076,21 @@
     
     function renderTransactions() {
       const tbody = $('#transactionsTable');
-      const transactions = appState.transactions.slice().reverse(); // Show latest first
+      const search = $('#transactionSearch').value.toLowerCase();
+      
+      let transactions = appState.transactions.slice().reverse(); // Show latest first
+      
+      // Filter by search term
+      if (search) {
+        transactions = transactions.filter(function(t) {
+          const customer = appState.customers.find(function(c) { return c.id === t.customer; }) || { name: 'Umum' };
+          const cashier = appState.cashiers.find(function(c) { return c.id === t.cashierId; }) || { name: 'Unknown' };
+          
+          return t.id.toLowerCase().includes(search) || 
+                 customer.name.toLowerCase().includes(search) ||
+                 cashier.name.toLowerCase().includes(search);
+        });
+      }
       
       if (transactions.length === 0) {
         render(tbody, '<tr><td colspan="8" class="text-center py-5">Tidak ada data transaksi</td></tr>');
@@ -2879,6 +2921,18 @@
             renderCashierView();
           } else if (tab === 'transactions') {
             renderTransactions();
+          } else if (tab === 'products') {
+            renderProductsTable();
+          } else if (tab === 'categories') {
+            renderCategoriesTable();
+          } else if (tab === 'customers') {
+            renderCustomersTable();
+          } else if (tab === 'cashiers') {
+            renderCashiersTable();
+          } else if (tab === 'reports') {
+            renderReports();
+          } else if (tab === 'settings') {
+            renderSettings();
           }
         });
       });
@@ -2886,8 +2940,14 @@
       // Cashier view
       $('#productSearchCart').addEventListener('input', renderProductGrid);
       $('#paymentAmount').addEventListener('input', updateChange);
-      $('#discountAmount').addEventListener('input', updateCartSummary);
-      $('#discountType').addEventListener('change', updateCartSummary);
+      $('#discountAmount').addEventListener('input', function() {
+        currentCart.discount.amount = parseFloat(this.value) || 0;
+        updateCartSummary();
+      });
+      $('#discountType').addEventListener('change', function() {
+        currentCart.discount.type = this.value;
+        updateCartSummary();
+      });
       $('#taxAmount').addEventListener('input', function() {
         currentCart.tax = parseFloat(this.value) || 0;
         updateCartSummary();
@@ -2994,15 +3054,22 @@
       
       // Product search
       $('#productSearch').addEventListener('input', renderProductsTable);
+      $('#searchProductBtn').addEventListener('click', renderProductsTable);
       
       // Customer search
       $('#customerSearch').addEventListener('input', renderCustomersTable);
+      $('#searchCustomerBtn').addEventListener('click', renderCustomersTable);
       
       // Transaction search
       $('#transactionSearch').addEventListener('input', renderTransactions);
+      $('#searchTransactionBtn').addEventListener('click', renderTransactions);
       
       // Report generation
       $('#applyReportFilterBtn').addEventListener('click', renderReports);
+      $('#generateReportBtn').addEventListener('click', renderReports);
+      $('#printReportBtn').addEventListener('click', function() {
+        window.print();
+      });
       
       // Dashboard date filters
       $$('#todayBtn, #weekBtn, #monthBtn').forEach(function(btn) {
