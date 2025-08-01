@@ -615,7 +615,7 @@
         <div style="margin-bottom: 20px;">
           <div class="row">
             <div class="col-md-8">
-              <input type="text" id="productSearchCart" class="form-control" placeholder="Cari produk...">
+              <input type="text" id="productSearchCart" class="form-control" placeholder="Cari produk (tekan Enter untuk tambah ke keranjang)">
             </div>
             <div class="col-md-4">
               <button class="btn btn-primary" id="openScanModal" style="width: 100%; height: 100%;">Scan Barcode</button>
@@ -674,23 +674,35 @@
       
       <!-- Products Tab -->
       <div class="tab-content" id="productsTab">
-        <button class="btn btn-primary" id="openScanModalProducts">Scan Barcode</button>
-        <input type="text" id="productSearch" class="form-control" style="margin-top:10px;" placeholder="Cari produk..." />
-        <select id="productCategory" class="form-control" style="margin-top:10px;">
-          <option value="all">Semua Kategori</option>
-        </select>
-        <table class="table" id="productList" style="margin-top:10px;">
-          <thead>
-            <tr>
-              <th>Barcode</th>
-              <th>Nama</th>
-              <th>Harga</th>
-              <th>Stok</th>
-              <th>Aksi</th>
-            </tr>
-          </thead>
-          <tbody id="productListBody"></tbody>
-        </table>
+        <div class="row">
+          <div class="col-md-8">
+            <input type="text" id="productSearch" class="form-control" placeholder="Cari produk..." />
+          </div>
+          <div class="col-md-4">
+            <button class="btn btn-primary" id="openScanModalProducts" style="width: 100%;">Scan Barcode</button>
+          </div>
+        </div>
+        <div class="row mt-2">
+          <div class="col-md-12">
+            <select id="productCategory" class="form-control">
+              <option value="all">Semua Kategori</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-responsive mt-3">
+          <table class="table" id="productList">
+            <thead>
+              <tr>
+                <th>Barcode</th>
+                <th>Nama</th>
+                <th>Harga</th>
+                <th>Stok</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productListBody"></tbody>
+          </table>
+        </div>
       </div>
       
       <!-- Reports Tab -->
@@ -734,7 +746,7 @@
             <div class="report-card"><div class="report-card-title">Total Kasir</div><div class="report-card-value" id="adminTotalCashiers">0</div></div>
             <div class="report-card"><div class="report-card-title">Total Pelanggan</div><div class="report-card-value" id="adminTotalCustomers">0</div></div>
           </div>
-          <div class="table-responsive">
+          <div class="table-responsive mt-3">
             <table class="table">
               <thead>
                 <tr>
@@ -746,7 +758,7 @@
                 </tr>
               </thead>
               <tbody id="adminReportsTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="5" class="empty-state">Tidak ada transaksi</td></tr>
               </tbody>
             </table>
           </div>
@@ -769,7 +781,7 @@
                 </tr>
               </thead>
               <tbody id="adminProductsTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="6" class="empty-state">Tidak ada produk</td></tr>
               </tbody>
             </table>
           </div>
@@ -792,7 +804,7 @@
                 </tr>
               </thead>
               <tbody id="adminStockInTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="6" class="empty-state">Tidak ada stok masuk</td></tr>
               </tbody>
             </table>
           </div>
@@ -813,7 +825,7 @@
                 </tr>
               </thead>
               <tbody id="adminCategoriesTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="4" class="empty-state">Tidak ada kategori</td></tr>
               </tbody>
             </table>
           </div>
@@ -835,7 +847,7 @@
                 </tr>
               </thead>
               <tbody id="adminCustomersTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="5" class="empty-state">Tidak ada pelanggan</td></tr>
               </tbody>
             </table>
           </div>
@@ -858,7 +870,7 @@
                 </tr>
               </thead>
               <tbody id="adminTransactionsTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="6" class="empty-state">Tidak ada transaksi</td></tr>
               </tbody>
             </table>
           </div>
@@ -880,7 +892,7 @@
                 </tr>
               </thead>
               <tbody id="adminCashiersTable">
-                <!-- Data akan diisi oleh JavaScript -->
+                <tr><td colspan="5" class="empty-state">Tidak ada kasir</td></tr>
               </tbody>
             </table>
           </div>
@@ -909,6 +921,10 @@
             <div class="form-group mb-3">
               <label>Catatan Struk</label>
               <textarea class="form-control" id="settingReceiptFooter" rows="3" required></textarea>
+            </div>
+            <div class="form-group mb-3">
+              <label>Logo Toko</label>
+              <input type="file" class="form-control" id="settingStoreLogo" accept="image/*">
             </div>
             <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
           </form>
@@ -1129,10 +1145,16 @@
           </div>
         </div>
         <div style="margin-top: 20px;">
-          <input type="text" id="stockInProductSearch" class="form-control" placeholder="Cari produk untuk ditambahkan..." />
-          <button class="btn btn-info" id="searchStockProductBtn"><i class="fas fa-search"></i> Cari</button>
+          <div class="row">
+            <div class="col-md-9">
+              <input type="text" id="stockInProductSearch" class="form-control" placeholder="Cari produk untuk ditambahkan..." />
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-info" id="searchStockProductBtn" style="width: 100%;"><i class="fas fa-search"></i> Cari</button>
+            </div>
+          </div>
         </div>
-        <div class="table-responsive" style="max-height: 250px; overflow-y:auto;">
+        <div class="table-responsive" style="max-height: 250px; overflow-y:auto; margin-top: 15px;">
           <table class="table">
             <thead>
               <tr>
@@ -1151,7 +1173,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-secondary close-stock-in-modal">Batal</button>
+        <button class="btn btn-secondary close-modal">Batal</button>
         <button class="btn btn-success" id="saveStockInBtn">Simpan Stok Masuk</button>
       </div>
     </div>
@@ -1165,7 +1187,7 @@
         <button class="modal-close close-modal">&times;</button>
       </div>
       <div class="modal-body" id="transactionDetailReceipt">
-        </div>
+      </div>
       <div class="modal-footer">
         <button class="btn btn-secondary close-modal">Tutup</button>
         <button class="btn btn-primary" onclick="window.print()"><i class="fas fa-print"></i> Cetak</button>
@@ -2001,18 +2023,41 @@
       });
 
       // Pencarian produk di keranjang
-      $('#productSearchCart').on('input', function() {
-        const searchTerm = $(this).val().trim().toLowerCase();
-        if (searchTerm) {
-          const filtered = appState.products.filter(p => 
-            p.name.toLowerCase().includes(searchTerm) || 
-            (p.barcode && p.barcode.includes(searchTerm))
-          );
-          
-          if (filtered.length > 0) {
-            $('#productIdToAdd').val(filtered[0].id);
-            $('#quantityInput').val(1);
-            $('#quantityModal').css('display', 'flex');
+      $('#productSearchCart').on('keypress', function(e) {
+        if (e.which === 13) { // Enter key
+          const searchTerm = $(this).val().trim().toLowerCase();
+          if (searchTerm) {
+            const product = appState.products.find(p => 
+              p.name.toLowerCase().includes(searchTerm) || 
+              (p.barcode && p.barcode.includes(searchTerm))
+            );
+            
+            if (product) {
+              if (product.stock <= 0) {
+                showToast('Stok habis!', 'warning');
+                return;
+              }
+              
+              const existing = currentCart.items.find(i => i.id === product.id);
+              
+              if (existing) {
+                existing.quantity += 1;
+              } else {
+                currentCart.items.push({
+                  id: product.id,
+                  name: product.name,
+                  price: product.price,
+                  costPrice: product.costPrice,
+                  quantity: 1
+                });
+              }
+              
+              updateCartSummary();
+              $(this).val('');
+              showToast(`${product.name} ditambahkan ke keranjang`, 'success');
+            } else {
+              showToast('Produk tidak ditemukan!', 'error');
+            }
           }
         }
       });
@@ -2641,6 +2686,7 @@
           }
           
           updateStockInItemsTable();
+          $('#stockInProductSearch').val('');
         } else {
           showToast('Produk tidak ditemukan', 'error');
         }
