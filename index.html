@@ -57,7 +57,7 @@
     body.dark-mode .login-title,
     body.dark-mode .form-floating input,
     body.dark-mode .form-floating label {
-      color: #333 !important;
+      color: #e0e0e0 !important;
     }
     * {
       box-sizing: border-box;
@@ -92,6 +92,9 @@
       font-size: 1.5rem;
       margin-bottom: 20px;
       color: var(--dark-color);
+    }
+    body.dark-mode .login-title {
+      color: #e0e0e0 !important;
     }
     .form-floating {
       position: relative;
@@ -150,6 +153,7 @@
     body.dark-mode .form-floating select:focus + label,
     body.dark-mode .form-floating select:not(:placeholder-shown) + label {
       background: #2c2c2c;
+      color: var(--primary-color);
     }
     .btn-block {
       width: 100%;
@@ -588,6 +592,14 @@
         <div id="cartItems"></div>
         <div style="margin-top: 20px;">
           <h4>Total: <span id="cartTotal">Rp0</span></h4>
+          <div class="form-floating mb-3">
+            <input type="text" id="customerNameInput" class="form-control" placeholder="Nama Pelanggan">
+            <label for="customerNameInput">Nama Pelanggan</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input type="number" id="paymentAmount" class="form-control" placeholder="Jumlah Bayar" min="0">
+            <label for="paymentAmount">Jumlah Bayar</label>
+          </div>
           <button class="btn btn-warning" id="holdSale">Tahan Transaksi</button>
           <button class="btn btn-success" id="checkoutBtn">Checkout</button>
         </div>
@@ -1887,6 +1899,13 @@
           return showToast('Keranjang kosong.', 'warning');
         }
 
+        const paymentAmount = parseFloat($('#paymentAmount').val()) || 0;
+        const customerName = $('#customerNameInput').val().trim() || 'Pelanggan Umum';
+        
+        if (paymentAmount < currentCart.total) {
+          return showToast('Jumlah pembayaran kurang!', 'error');
+        }
+
         showConfirmation('Proses pembayaran?', (yes) => {
           if (yes) {
             const transaction = {
@@ -1898,9 +1917,10 @@
               totalCost: currentCart.totalCost,
               profit: currentCart.profit,
               paymentMethod: 'cash',
-              paymentAmount: currentCart.total,
-              change: 0,
-              cashier: { id: currentCashier.id, name: currentCashier.name }
+              paymentAmount: paymentAmount,
+              change: paymentAmount - currentCart.total,
+              cashier: { id: currentCashier.id, name: currentCashier.name },
+              customer: customerName
             };
 
             if (!navigator.onLine) {
@@ -2683,6 +2703,7 @@
             <div>Tgl: ${moment(transaction.date).format('DD/MM/YY HH:mm')}</div>
             <div>No: ${transaction.id}</div>
             <div>Kasir: ${transaction.cashier.name}</div>
+            <div>Pelanggan: ${transaction.customer}</div>
           </div>
           <hr>
           <table width="100%" style="font-size: 12px; border-collapse: collapse;">
