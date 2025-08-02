@@ -24,6 +24,7 @@
             --rounded-sm: 0.35rem;
             --rounded: 0.75rem;
             --rounded-lg: 1rem;
+            --donation: #6f42c1;
         }
 
         * {
@@ -362,6 +363,14 @@
             background-color: #138496;
         }
 
+        .btn-donation {
+            background-color: var(--donation);
+        }
+
+        .btn-donation:hover {
+            background-color: #5a32a3;
+        }
+
         /* Tab Styles */
         .tabs {
             display: flex;
@@ -664,6 +673,91 @@
             border-color: var(--primary);
         }
 
+        /* Member Search */
+        .member-search-container {
+            position: relative;
+        }
+
+        .member-search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            width: 100%;
+            max-height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 0 0 var(--rounded-sm) var(--rounded-sm);
+            z-index: 100;
+            display: none;
+        }
+
+        .member-search-item {
+            padding: 8px 12px;
+            cursor: pointer;
+        }
+
+        .member-search-item:hover {
+            background-color: var(--light);
+        }
+
+        /* Kitchen Status */
+        .kitchen-status {
+            margin-top: 16px;
+            padding: 12px;
+            background-color: var(--light);
+            border-radius: var(--rounded-sm);
+        }
+
+        .kitchen-status h4 {
+            margin-bottom: 8px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .status-item:last-child {
+            border-bottom: none;
+        }
+
+        .status-preparing {
+            color: var(--danger);
+            cursor: pointer;
+        }
+
+        .status-ready {
+            color: var(--success);
+        }
+
+        .status-locked {
+            color: var(--gray);
+            cursor: default;
+        }
+
+        /* Member Badge */
+        .member-badge {
+            background-color: var(--info);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+        }
+
+        /* Donation Badge */
+        .donation-badge {
+            background-color: var(--donation);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+        }
+
         /* Responsive Adjustments */
         @media (min-width: 768px) {
             .app-content {
@@ -759,63 +853,6 @@
             color: var(--gray);
             font-size: 0.8rem;
         }
-
-        /* Kitchen Status */
-        .kitchen-status {
-            margin-top: 16px;
-            padding: 12px;
-            background-color: var(--light);
-            border-radius: var(--rounded-sm);
-        }
-
-        .kitchen-status h4 {
-            margin-bottom: 8px;
-        }
-
-        .status-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-
-        .status-item:last-child {
-            border-bottom: none;
-        }
-
-        .status-preparing {
-            color: var(--danger);
-        }
-
-        .status-ready {
-            color: var(--success);
-        }
-
-        /* Member Badge */
-        .member-badge {
-            background-color: var(--info);
-            color: white;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            margin-left: 6px;
-        }
-
-        /* Member Modal */
-        .member-form {
-            margin-top: 16px;
-        }
-
-        /* Discount Badge */
-        .discount-badge {
-            background-color: var(--warning);
-            color: #000;
-            padding: 2px 6px;
-            border-radius: 10px;
-            font-size: 0.7rem;
-            margin-left: 6px;
-        }
     </style>
 </head>
 <body>
@@ -894,9 +931,9 @@
                     <button id="addMenuBtn" class="btn btn-sm mb-2">Tambah Menu</button>
                     <button id="manageCategoriesBtn" class="btn btn-sm mb-2">Kelola Kategori</button>
                     <button id="viewReportsBtn" class="btn btn-sm mb-2">Laporan Penjualan</button>
-                    <button id="kitchenDisplayBtn" class="btn btn-sm mb-2">Tampilan Dapur</button>
+                    <button id="kitchenDisplayBtn" class="btn btn-sm mb-2">Info Pesanan</button>
                     <button id="manageMembersBtn" class="btn btn-sm mb-2">Kelola Member</button>
-                    <button id="manageStoreInfoBtn" class="btn btn-sm">Kelola Info Warung</button>
+                    <button id="manageStoreInfoBtn" class="btn btn-sm">Kelola Info Restoran</button>
                 </div>
             </section>
 
@@ -925,13 +962,19 @@
 
                 <div class="form-group mt-2">
                     <label class="form-label">Member</label>
-                    <div class="d-flex align-center">
-                        <select id="customerMember" class="form-control" style="flex: 1;">
+                    <div class="member-search-container">
+                        <select id="customerMember" class="form-control" style="display: none;">
                             <option value="">Bukan Member</option>
                             <!-- Member options will be added here -->
                         </select>
-                        <button id="addMemberBtn" class="btn btn-sm ml-2" style="width: auto;">+</button>
+                        <input type="text" id="memberSearchInput" class="form-control" placeholder="Cari member...">
+                        <div id="memberSearchResults" class="member-search-results"></div>
                     </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Donasi LAZISNU (opsional)</label>
+                    <input type="number" id="donationAmount" class="form-control" placeholder="Masukkan jumlah donasi" value="0" min="0">
                 </div>
                 
                 <div id="orderItems">
@@ -947,6 +990,10 @@
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="orderSubtotal">Rp 0</span>
+                    </div>
+                    <div id="donationRow" class="summary-row">
+                        <span>Donasi LAZISNU:</span>
+                        <span id="orderDonation">Rp 0</span>
                     </div>
                     <div id="discountRow" class="summary-row" style="display: none;">
                         <span>Diskon Member:</span>
@@ -997,6 +1044,10 @@
                         <div class="summary-row">
                             <span>Subtotal:</span>
                             <span id="paymentSubtotal">Rp 0</span>
+                        </div>
+                        <div id="paymentDonationRow" class="summary-row">
+                            <span>Donasi LAZISNU:</span>
+                            <span id="paymentDonation">Rp 0</span>
                         </div>
                         <div id="paymentDiscountRow" class="summary-row" style="display: none;">
                             <span>Diskon Member:</span>
@@ -1145,7 +1196,7 @@
     <div id="kitchenDisplayModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Tampilan Dapur</h3>
+                <h3 class="modal-title">Info Pesanan</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
@@ -1211,17 +1262,17 @@
     <div id="manageStoreInfoModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3 class="modal-title">Kelola Info Warung</h3>
+                <h3 class="modal-title">Kelola Info Restoran</h3>
                 <button class="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <form id="storeInfoForm">
                     <div class="form-group">
-                        <label class="form-label">Nama Warung</label>
+                        <label class="form-label">Nama Restoran</label>
                         <input type="text" id="storeName" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Alamat Warung</label>
+                        <label class="form-label">Alamat Restoran</label>
                         <textarea id="storeAddress" class="form-control" required></textarea>
                     </div>
                     <div class="form-group">
@@ -1258,6 +1309,7 @@
                 <p>Tipe: <span id="receiptOrderType">Makan di Tempat</span></p>
                 <p id="receiptTableInfo">Meja: <span id="receiptTableNumber">1</span></p>
                 <p id="receiptMemberInfo" style="display: none;">Member: <span id="receiptMemberName"></span></p>
+                <p id="receiptDonationInfo" style="display: none;">Donasi LAZISNU: <span id="receiptDonationAmount"></span></p>
             </div>
             
             <hr>
@@ -1276,6 +1328,10 @@
                 <div class="summary-row">
                     <span>Subtotal:</span>
                     <span id="receiptSubtotal">Rp 0</span>
+                </div>
+                <div id="receiptDonationRow" class="summary-row" style="display: none;">
+                    <span>Donasi LAZISNU:</span>
+                    <span id="receiptDonation">Rp 0</span>
                 </div>
                 <div id="receiptDiscountRow" class="summary-row" style="display: none;">
                     <span>Diskon Member:</span>
@@ -1304,6 +1360,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/id.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script>
         // Set locale to Indonesian
@@ -1446,6 +1503,7 @@
             subtotal: 0,
             total: 0,
             discount: 0,
+            donation: 0,
             type: 'dinein',
             tableNumber: '1',
             note: '',
@@ -1648,11 +1706,66 @@
                 currentOrder.tableNumber = $(this).val();
             });
             
-            // Member change
-            $('#customerMember').change(function() {
-                const memberId = $(this).val();
-                currentOrder.memberId = memberId || null;
+            // Donation amount change
+            $('#donationAmount').on('input', function() {
+                const donation = parseFloat($(this).val()) || 0;
+                currentOrder.donation = donation;
                 updateOrder();
+            });
+            
+            // Member search functionality
+            $('#memberSearchInput').on('input', function() {
+                const searchTerm = $(this).val().trim().toLowerCase();
+                const $results = $('#memberSearchResults');
+                
+                if (searchTerm.length === 0) {
+                    $results.hide();
+                    currentOrder.memberId = null;
+                    updateOrder();
+                    return;
+                }
+                
+                const filteredMembers = members.filter(member => 
+                    member.name.toLowerCase().includes(searchTerm) || 
+                    member.id.toLowerCase().includes(searchTerm)
+                );
+                
+                $results.empty();
+                
+                if (filteredMembers.length > 0) {
+                    filteredMembers.forEach(member => {
+                        $results.append(`
+                            <div class="member-search-item" data-id="${member.id}">
+                                ${member.name} (${member.id})
+                            </div>
+                        `);
+                    });
+                    $results.show();
+                } else {
+                    $results.hide();
+                }
+            });
+            
+            // Member search item click
+            $(document).on('click', '.member-search-item', function() {
+                const memberId = $(this).data('id');
+                const member = members.find(m => m.id === memberId);
+                
+                if (member) {
+                    $('#memberSearchInput').val(member.name);
+                    $('#customerMember').val(memberId);
+                    currentOrder.memberId = memberId;
+                    updateOrder();
+                }
+                
+                $('#memberSearchResults').hide();
+            });
+            
+            // Clear member search when clicking outside
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.member-search-container').length) {
+                    $('#memberSearchResults').hide();
+                }
             });
             
             // Order note change
@@ -1759,6 +1872,7 @@
                     customerName: currentOrder.customerName,
                     subtotal: currentOrder.subtotal,
                     discount: currentOrder.discount,
+                    donation: currentOrder.donation,
                     total: currentOrder.total,
                     paymentMethod: $('#paymentMethod').val(),
                     paymentAmount: paymentAmount,
@@ -1768,7 +1882,8 @@
                     tableNumber: currentOrder.tableNumber,
                     note: currentOrder.note,
                     memberId: currentOrder.memberId,
-                    status: currentOrder.type === 'dinein' ? 'preparing' : 'completed'
+                    status: currentOrder.type === 'dinein' ? 'preparing' : 'completed',
+                    statusLocked: false
                 };
                 
                 // Add order
@@ -1869,15 +1984,6 @@
                     $('#manageStoreInfoModal').show();
                     loadStoreInfo();
                 }
-            });
-            
-            // Add member button
-            $('#addMemberBtn').click(function() {
-                $('#manageMembersModal').show();
-                $('#memberForm')[0]?.reset();
-                $('#saveMemberBtn').text('Tambah Member');
-                $('#deleteMemberBtn').hide();
-                $('#memberAdminFields').hide();
             });
             
             // Save menu
@@ -2000,9 +2106,22 @@
                     return;
                 }
                 
+                // Generate member ID (6 characters: 3 letters + 3 numbers)
+                const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const numbers = '0123456789';
+                let id = '';
+                
+                for (let i = 0; i < 3; i++) {
+                    id += letters.charAt(Math.floor(Math.random() * letters.length));
+                }
+                
+                for (let i = 0; i < 3; i++) {
+                    id += numbers.charAt(Math.floor(Math.random() * numbers.length));
+                }
+                
                 // Create new member
                 const newMember = {
-                    id: 'MEM' + moment().format('YYYYMMDDHHmmss'),
+                    id: id,
                     name: name,
                     phone: phone,
                     address: address,
@@ -2106,6 +2225,7 @@
                     return sum + o.items.reduce((itemSum, item) => itemSum + item.quantity, 0);
                 }, 0);
                 const totalDiscount = filteredOrders.reduce((sum, o) => sum + (o.discount || 0), 0);
+                const totalDonation = filteredOrders.reduce((sum, o) => sum + (o.donation || 0), 0);
                 
                 // Group by order type
                 const orderTypes = {};
@@ -2184,6 +2304,10 @@
                         <div class="summary-row">
                             <span>Total Diskon:</span>
                             <span>${formatCurrency(totalDiscount)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Total Donasi:</span>
+                            <span>${formatCurrency(totalDonation)}</span>
                         </div>
                         <div class="summary-row">
                             <span>Total Item Terjual:</span>
@@ -2290,8 +2414,12 @@
                     `);
                 } else {
                     kitchenOrders.forEach(order => {
+                        const statusClass = order.status === 'ready' ? 
+                            (order.statusLocked ? 'status-locked' : 'status-ready') : 
+                            'status-preparing';
+                            
                         $('#kitchenOrders').append(`
-                            <div class="status-item ${order.status === 'ready' ? 'status-ready' : 'status-preparing'}" data-id="${order.id}">
+                            <div class="status-item ${statusClass}" data-id="${order.id}">
                                 <div>
                                     <strong>${order.id}</strong>
                                     <div>Meja ${order.tableNumber}</div>
@@ -2310,16 +2438,22 @@
             }
             
             // Change kitchen order status
-            $(document).on('click', '.status-item', function() {
+            $(document).on('click', '.status-item.status-preparing, .status-item.status-ready', function() {
                 if (currentUser.role !== 'admin' && currentUser.role !== 'cashier') return;
                 
                 const orderId = $(this).data('id');
                 const order = orders.find(o => o.id === orderId);
                 
-                if (!order) return;
+                if (!order || order.statusLocked) return;
                 
                 // Toggle status between preparing and ready
                 order.status = order.status === 'preparing' ? 'ready' : 'preparing';
+                
+                // Lock the status if changed to ready
+                if (order.status === 'ready') {
+                    order.statusLocked = true;
+                }
+                
                 saveOrders();
                 loadKitchenOrders();
                 
@@ -2329,7 +2463,7 @@
             // Refresh kitchen display
             $('#refreshKitchenBtn').click(function() {
                 loadKitchenOrders();
-                showToast('Dapur diperbarui', 'success');
+                showToast('Info pesanan diperbarui', 'success');
             });
             
             // Load store info
@@ -2348,7 +2482,7 @@
                 const tableCount = parseInt($('#tableCount').val()) || 5;
                 
                 if (!storeName || !storeAddress || !storePhone) {
-                    showToast('Nama warung, alamat, dan nomor telepon harus diisi', 'error');
+                    showToast('Nama restoran, alamat, dan nomor telepon harus diisi', 'error');
                     return;
                 }
                 
@@ -2364,7 +2498,7 @@
                 
                 $('#manageStoreInfoModal').hide();
                 
-                showToast('Info warung berhasil diperbarui', 'success');
+                showToast('Info restoran berhasil diperbarui', 'success');
             });
             
             // Cancel buttons
@@ -2386,6 +2520,15 @@
             
             $('#cancelStoreInfo').click(function() {
                 $('#manageStoreInfoModal').hide();
+            });
+            
+            // Report period change
+            $('#reportPeriod').change(function() {
+                if ($(this).val() === 'custom') {
+                    $('#customDateRange').show();
+                } else {
+                    $('#customDateRange').hide();
+                }
             });
         });
         
@@ -2554,6 +2697,7 @@
                                 <div class="order-item-name">${member.name}</div>
                                 <div class="order-item-price">
                                     ${member.phone}
+                                    <span class="member-badge">${member.id}</span>
                                     <span class="member-badge">${member.transactions || 0} transaksi</span>
                                 </div>
                             </div>
@@ -2573,6 +2717,9 @@
                 return total + (item.menu.price * item.quantity);
             }, 0);
             
+            // Get donation amount
+            currentOrder.donation = parseFloat($('#donationAmount').val()) || 0;
+            
             // Calculate discount (2% if member and more than 5 items)
             currentOrder.discount = 0;
             if (currentOrder.memberId && currentOrder.items.length > 5) {
@@ -2580,7 +2727,7 @@
             }
             
             // Calculate total
-            currentOrder.total = currentOrder.subtotal - currentOrder.discount;
+            currentOrder.total = currentOrder.subtotal - currentOrder.discount + currentOrder.donation;
             
             // Save order
             localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
@@ -2588,6 +2735,10 @@
             // Update order UI
             $('#orderItems').empty();
             $('#orderCount').text(`(${currentOrder.items.length} item)`);
+            
+            // Show donation row
+            $('#donationRow').show();
+            $('#orderDonation').text(formatCurrency(currentOrder.donation));
             
             // Show/hide discount row
             if (currentOrder.discount > 0) {
@@ -2651,6 +2802,15 @@
                 </div>
             `;
             
+            if (currentOrder.donation > 0) {
+                summaryHTML += `
+                    <div class="summary-row">
+                        <span>Donasi LAZISNU:</span>
+                        <span>${formatCurrency(currentOrder.donation)}</span>
+                    </div>
+                `;
+            }
+            
             if (currentOrder.discount > 0) {
                 summaryHTML += `
                     <div class="summary-row">
@@ -2673,6 +2833,13 @@
         // Update payment tab
         function updatePaymentTab() {
             $('#paymentSubtotal').text(formatCurrency(currentOrder.subtotal));
+            
+            if (currentOrder.donation > 0) {
+                $('#paymentDonationRow').show();
+                $('#paymentDonation').text(formatCurrency(currentOrder.donation));
+            } else {
+                $('#paymentDonationRow').hide();
+            }
             
             if (currentOrder.discount > 0) {
                 $('#paymentDiscountRow').show();
@@ -2721,6 +2888,14 @@
                 $('#receiptMemberInfo').hide();
             }
             
+            // Show donation info if donation exists
+            if (order.donation > 0) {
+                $('#receiptDonationInfo').show();
+                $('#receiptDonationAmount').text(formatCurrency(order.donation));
+            } else {
+                $('#receiptDonationInfo').hide();
+            }
+            
             // Add items
             $('#receiptItems').empty();
             order.items.forEach(item => {
@@ -2744,6 +2919,13 @@
             
             // Update totals
             $('#receiptSubtotal').text(formatCurrency(order.subtotal));
+            
+            if (order.donation > 0) {
+                $('#receiptDonationRow').show();
+                $('#receiptDonation').text(formatCurrency(order.donation));
+            } else {
+                $('#receiptDonationRow').hide();
+            }
             
             if (order.discount > 0) {
                 $('#receiptDiscountRow').show();
@@ -2788,6 +2970,7 @@
                 subtotal: 0,
                 total: 0,
                 discount: 0,
+                donation: 0,
                 type: 'dinein',
                 tableNumber: '1',
                 note: '',
@@ -2800,7 +2983,9 @@
             $('[data-type="dinein"]').addClass('active');
             $('#orderNote').val('');
             $('#tableNumberContainer').show();
+            $('#memberSearchInput').val('');
             $('#customerMember').val('');
+            $('#donationAmount').val('0');
         }
         
         // Save data functions
