@@ -1457,6 +1457,19 @@
             role: 'cashier'
         };
         
+        // Default menu images based on category
+        const DEFAULT_MENU_IMAGES = {
+            'Makanan': {
+                'Nasi Goreng': 'https://raw.githubusercontent.com/LKS-88/aplikasi-transaksi-cafe-resto/refs/heads/main/nasi%20goreng.jpeg',
+                'Mie Goreng': 'https://raw.githubusercontent.com/LKS-88/aplikasi-transaksi-cafe-resto/refs/heads/main/mie%20goreng.jpeg',
+                'Ayam Goreng': 'https://raw.githubusercontent.com/LKS-88/aplikasi-transaksi-cafe-resto/refs/heads/main/ayam%20goreng.jpeg'
+            },
+            'Minuman': {
+                'Es Teh': 'https://raw.githubusercontent.com/LKS-88/aplikasi-transaksi-cafe-resto/refs/heads/main/minuman%20segar.jpeg',
+                'Es Jeruk': 'https://raw.githubusercontent.com/LKS-88/aplikasi-transaksi-cafe-resto/refs/heads/main/minuman%20segar.jpeg'
+            }
+        };
+        
         // Initialize data
         function initializeData() {
             // Check if users exist, if not create default users
@@ -1479,14 +1492,14 @@
             
             // Initialize other data if not exists
             if (!localStorage.getItem(STORAGE_KEYS.MENUS)) {
-                // Sample menu data for warung makan
+                // Sample menu data for warung makan with default images
                 const sampleMenus = [
                     {
                         id: 'M001',
                         name: 'Nasi Goreng',
                         category: 'Makanan',
                         price: 15000,
-                        image: 'https://via.placeholder.com/150?text=Nasi+Goreng',
+                        image: DEFAULT_MENU_IMAGES['Makanan']['Nasi Goreng'],
                         description: 'Nasi goreng spesial dengan telur dan ayam'
                     },
                     {
@@ -1494,7 +1507,7 @@
                         name: 'Mie Goreng',
                         category: 'Makanan',
                         price: 12000,
-                        image: 'https://via.placeholder.com/150?text=Mie+Goreng',
+                        image: DEFAULT_MENU_IMAGES['Makanan']['Mie Goreng'],
                         description: 'Mie goreng dengan sayuran dan telur'
                     },
                     {
@@ -1502,7 +1515,7 @@
                         name: 'Ayam Goreng',
                         category: 'Makanan',
                         price: 18000,
-                        image: 'https://via.placeholder.com/150?text=Ayam+Goreng',
+                        image: DEFAULT_MENU_IMAGES['Makanan']['Ayam Goreng'],
                         description: 'Ayam goreng krispi dengan sambal'
                     },
                     {
@@ -1510,7 +1523,7 @@
                         name: 'Es Teh',
                         category: 'Minuman',
                         price: 5000,
-                        image: 'https://via.placeholder.com/150?text=Es+Teh',
+                        image: DEFAULT_MENU_IMAGES['Minuman']['Es Teh'],
                         description: 'Es teh manis segar'
                     },
                     {
@@ -1518,7 +1531,7 @@
                         name: 'Es Jeruk',
                         category: 'Minuman',
                         price: 7000,
-                        image: 'https://via.placeholder.com/150?text=Es+Jeruk',
+                        image: DEFAULT_MENU_IMAGES['Minuman']['Es Jeruk'],
                         description: 'Es jeruk asli'
                     }
                 ];
@@ -2048,6 +2061,12 @@
                     return;
                 }
                 
+                // Use default image if available and no image provided
+                let finalImage = image;
+                if (!image && DEFAULT_MENU_IMAGES[category] && DEFAULT_MENU_IMAGES[category][name]) {
+                    finalImage = DEFAULT_MENU_IMAGES[category][name];
+                }
+                
                 if (id) {
                     // Update existing menu
                     const menuIndex = menus.findIndex(m => m.id === id);
@@ -2057,7 +2076,7 @@
                             name: name,
                             category: category,
                             price: price,
-                            image: image || null,
+                            image: finalImage || null,
                             description: description || null
                         };
                     }
@@ -2068,7 +2087,7 @@
                         name: name,
                         category: category,
                         price: price,
-                        image: image || null,
+                        image: finalImage || null,
                         description: description || null
                     };
                     
@@ -2631,6 +2650,12 @@
                 `);
             } else {
                 filteredMenus.forEach(menu => {
+                    // Use default image if available and no image provided
+                    let menuImage = menu.image;
+                    if (!menuImage && DEFAULT_MENU_IMAGES[menu.category] && DEFAULT_MENU_IMAGES[menu.category][menu.name]) {
+                        menuImage = DEFAULT_MENU_IMAGES[menu.category][menu.name];
+                    }
+                    
                     $('#menuGrid').append(`
                         <div class="menu-card" data-id="${menu.id}">
                             ${currentUser.role === 'admin' ? `
@@ -2644,7 +2669,7 @@
                             </div>
                             ` : ''}
                             <div class="menu-image">
-                                ${menu.image ? `<img src="${menu.image}" alt="${menu.name}">` : `<i class="fas fa-utensils"></i>`}
+                                ${menuImage ? `<img src="${menuImage}" alt="${menu.name}">` : `<i class="fas fa-utensils"></i>`}
                             </div>
                             <div class="menu-name">${menu.name}</div>
                             <div class="menu-price">${formatCurrency(menu.price)}</div>
