@@ -777,18 +777,44 @@
             justify-content: space-between;
             padding: 8px 0;
             border-bottom: 1px solid #eee;
+            cursor: pointer;
         }
 
         .status-item:last-child {
             border-bottom: none;
         }
 
+        .status-preparing {
+            color: var(--danger);
+        }
+
         .status-ready {
             color: var(--success);
         }
 
-        .status-preparing {
-            color: var(--warning);
+        /* Member Badge */
+        .member-badge {
+            background-color: var(--info);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 6px;
+        }
+
+        /* Member Modal */
+        .member-form {
+            margin-top: 16px;
+        }
+
+        /* Discount Badge */
+        .discount-badge {
+            background-color: var(--warning);
+            color: #000;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            margin-left: 6px;
         }
     </style>
 </head>
@@ -869,6 +895,7 @@
                     <button id="manageCategoriesBtn" class="btn btn-sm mb-2">Kelola Kategori</button>
                     <button id="viewReportsBtn" class="btn btn-sm mb-2">Laporan Penjualan</button>
                     <button id="kitchenDisplayBtn" class="btn btn-sm mb-2">Tampilan Dapur</button>
+                    <button id="manageMembersBtn" class="btn btn-sm mb-2">Kelola Member</button>
                     <button id="manageStoreInfoBtn" class="btn btn-sm">Kelola Info Warung</button>
                 </div>
             </section>
@@ -895,6 +922,17 @@
                         <option value="5">Meja 5</option>
                     </select>
                 </div>
+
+                <div class="form-group mt-2">
+                    <label class="form-label">Member</label>
+                    <div class="d-flex align-center">
+                        <select id="customerMember" class="form-control" style="flex: 1;">
+                            <option value="">Bukan Member</option>
+                            <!-- Member options will be added here -->
+                        </select>
+                        <button id="addMemberBtn" class="btn btn-sm ml-2" style="width: auto;">+</button>
+                    </div>
+                </div>
                 
                 <div id="orderItems">
                     <!-- Order items will be added here -->
@@ -909,6 +947,10 @@
                     <div class="summary-row">
                         <span>Subtotal:</span>
                         <span id="orderSubtotal">Rp 0</span>
+                    </div>
+                    <div id="discountRow" class="summary-row" style="display: none;">
+                        <span>Diskon Member:</span>
+                        <span id="orderDiscount">-Rp 0</span>
                     </div>
                     <div class="summary-row total-row">
                         <span>Total:</span>
@@ -955,6 +997,10 @@
                         <div class="summary-row">
                             <span>Subtotal:</span>
                             <span id="paymentSubtotal">Rp 0</span>
+                        </div>
+                        <div id="paymentDiscountRow" class="summary-row" style="display: none;">
+                            <span>Diskon Member:</span>
+                            <span id="paymentDiscount">-Rp 0</span>
                         </div>
                         <div class="summary-row total-row">
                             <span>Total:</span>
@@ -1117,6 +1163,50 @@
         </div>
     </div>
 
+    <!-- Manage Members Modal -->
+    <div id="manageMembersModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Kelola Member</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="membersList">
+                    <!-- Members will be listed here -->
+                </div>
+                <div class="member-form">
+                    <div class="form-group">
+                        <label class="form-label">Nama Member</label>
+                        <input type="text" id="memberName" class="form-control" placeholder="Masukkan nama member">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Nomor Telepon</label>
+                        <input type="text" id="memberPhone" class="form-control" placeholder="Masukkan nomor telepon">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Alamat</label>
+                        <textarea id="memberAddress" class="form-control" placeholder="Masukkan alamat"></textarea>
+                    </div>
+                    <div id="memberAdminFields" style="display: none;">
+                        <div class="form-group">
+                            <label class="form-label">Total Transaksi</label>
+                            <input type="number" id="memberTransactions" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Belanja</label>
+                            <input type="text" id="memberTotalSpent" class="form-control" disabled>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" id="cancelManageMembers">Tutup</button>
+                <button class="btn btn-success" id="saveMemberBtn">Simpan Member</button>
+                <button class="btn btn-danger" id="deleteMemberBtn" style="display: none;">Hapus Member</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Manage Store Info Modal -->
     <div id="manageStoreInfoModal" class="modal">
         <div class="modal-content">
@@ -1167,6 +1257,7 @@
                 <p>Pelanggan: <span id="receiptCustomer">Pelanggan Biasa</span></p>
                 <p>Tipe: <span id="receiptOrderType">Makan di Tempat</span></p>
                 <p id="receiptTableInfo">Meja: <span id="receiptTableNumber">1</span></p>
+                <p id="receiptMemberInfo" style="display: none;">Member: <span id="receiptMemberName"></span></p>
             </div>
             
             <hr>
@@ -1185,6 +1276,10 @@
                 <div class="summary-row">
                     <span>Subtotal:</span>
                     <span id="receiptSubtotal">Rp 0</span>
+                </div>
+                <div id="receiptDiscountRow" class="summary-row" style="display: none;">
+                    <span>Diskon Member:</span>
+                    <span id="receiptDiscount">-Rp 0</span>
                 </div>
                 <div class="summary-row total-row">
                     <span>TOTAL:</span>
@@ -1222,7 +1317,8 @@
             USER: 'warungmakan_user',
             CURRENT_ORDER: 'warungmakan_current_order',
             SETTINGS: 'warungmakan_settings',
-            USERS: 'warungmakan_users'
+            USERS: 'warungmakan_users',
+            MEMBERS: 'warungmakan_members'
         };
         
         // Default admin user (username: admin, password: Admin.123)
@@ -1257,6 +1353,11 @@
             }
             
             localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+            
+            // Initialize members if not exists
+            if (!localStorage.getItem(STORAGE_KEYS.MEMBERS)) {
+                localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify([]));
+            }
             
             // Initialize other data if not exists
             if (!localStorage.getItem(STORAGE_KEYS.MENUS)) {
@@ -1338,14 +1439,17 @@
         let orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
         let settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || {};
         let users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+        let members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS)) || [];
         let currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER)) || null;
         let currentOrder = JSON.parse(localStorage.getItem(STORAGE_KEYS.CURRENT_ORDER)) || {
             items: [],
             subtotal: 0,
             total: 0,
+            discount: 0,
             type: 'dinein',
             tableNumber: '1',
-            note: ''
+            note: '',
+            memberId: null
         };
 
         // Initialize the app
@@ -1367,6 +1471,7 @@
                 updateCurrentDate();
                 updateStoreInfo();
                 updateTableNumbers();
+                loadMembersForSelect();
                 
                 // Show admin panel if user is admin
                 if (currentUser.role === 'admin') {
@@ -1424,6 +1529,7 @@
                 updateCurrentDate();
                 updateStoreInfo();
                 updateTableNumbers();
+                loadMembersForSelect();
                 
                 showToast('Login berhasil', 'success');
             });
@@ -1542,6 +1648,13 @@
                 currentOrder.tableNumber = $(this).val();
             });
             
+            // Member change
+            $('#customerMember').change(function() {
+                const memberId = $(this).val();
+                currentOrder.memberId = memberId || null;
+                updateOrder();
+            });
+            
             // Order note change
             $('#orderNote').on('input', function() {
                 currentOrder.note = $(this).val();
@@ -1645,6 +1758,7 @@
                     items: currentOrder.items,
                     customerName: currentOrder.customerName,
                     subtotal: currentOrder.subtotal,
+                    discount: currentOrder.discount,
                     total: currentOrder.total,
                     paymentMethod: $('#paymentMethod').val(),
                     paymentAmount: paymentAmount,
@@ -1653,12 +1767,23 @@
                     type: currentOrder.type,
                     tableNumber: currentOrder.tableNumber,
                     note: currentOrder.note,
+                    memberId: currentOrder.memberId,
                     status: currentOrder.type === 'dinein' ? 'preparing' : 'completed'
                 };
                 
                 // Add order
                 orders.unshift(order);
                 saveOrders();
+                
+                // Update member transaction count if member order
+                if (order.memberId) {
+                    const member = members.find(m => m.id === order.memberId);
+                    if (member) {
+                        member.transactions = (member.transactions || 0) + 1;
+                        member.totalSpent = (member.totalSpent || 0) + order.total;
+                        saveMembers();
+                    }
+                }
                 
                 // Generate receipt
                 generateReceipt(order);
@@ -1726,11 +1851,33 @@
                 loadKitchenOrders();
             });
             
+            $('#manageMembersBtn').click(function() {
+                $('#manageMembersModal').show();
+                loadMembersForManagement();
+                if (currentUser.role === 'admin') {
+                    $('#memberAdminFields').show();
+                } else {
+                    $('#memberAdminFields').hide();
+                }
+                $('#memberForm')[0]?.reset();
+                $('#saveMemberBtn').text('Tambah Member');
+                $('#deleteMemberBtn').hide();
+            });
+            
             $('#manageStoreInfoBtn').click(function() {
                 if (currentUser.role === 'admin') {
                     $('#manageStoreInfoModal').show();
                     loadStoreInfo();
                 }
+            });
+            
+            // Add member button
+            $('#addMemberBtn').click(function() {
+                $('#manageMembersModal').show();
+                $('#memberForm')[0]?.reset();
+                $('#saveMemberBtn').text('Tambah Member');
+                $('#deleteMemberBtn').hide();
+                $('#memberAdminFields').hide();
             });
             
             // Save menu
@@ -1842,6 +1989,79 @@
                 showToast('Kategori berhasil dihapus', 'success');
             });
             
+            // Save member
+            $('#saveMemberBtn').click(function() {
+                const name = $('#memberName').val().trim();
+                const phone = $('#memberPhone').val().trim();
+                const address = $('#memberAddress').val().trim();
+                
+                if (!name || !phone) {
+                    showToast('Nama dan nomor telepon harus diisi', 'error');
+                    return;
+                }
+                
+                // Create new member
+                const newMember = {
+                    id: 'MEM' + moment().format('YYYYMMDDHHmmss'),
+                    name: name,
+                    phone: phone,
+                    address: address,
+                    joinDate: new Date(),
+                    transactions: 0,
+                    totalSpent: 0
+                };
+                
+                members.unshift(newMember);
+                saveMembers();
+                loadMembersForSelect();
+                loadMembersForManagement();
+                
+                $('#manageMembersModal').hide();
+                $('#memberForm')[0].reset();
+                
+                showToast('Member berhasil ditambahkan', 'success');
+            });
+            
+            // Edit member
+            $(document).on('click', '.edit-member', function() {
+                const memberId = $(this).data('id');
+                const member = members.find(m => m.id === memberId);
+                
+                if (!member) return;
+                
+                $('#memberName').val(member.name);
+                $('#memberPhone').val(member.phone);
+                $('#memberAddress').val(member.address || '');
+                $('#memberTransactions').val(member.transactions || 0);
+                $('#memberTotalSpent').val(formatCurrency(member.totalSpent || 0));
+                
+                $('#saveMemberBtn').text('Simpan Perubahan');
+                $('#deleteMemberBtn').show().data('id', memberId);
+                $('#manageMembersModal').show();
+            });
+            
+            // Delete member
+            $('#deleteMemberBtn').click(function() {
+                const memberId = $(this).data('id');
+                
+                if (currentUser.role !== 'admin') {
+                    showToast('Hanya admin yang dapat menghapus member', 'error');
+                    return;
+                }
+                
+                if (confirm('Apakah Anda yakin ingin menghapus member ini?')) {
+                    members = members.filter(m => m.id !== memberId);
+                    saveMembers();
+                    loadMembersForSelect();
+                    loadMembersForManagement();
+                    
+                    $('#manageMembersModal').hide();
+                    $('#memberForm')[0].reset();
+                    
+                    showToast('Member berhasil dihapus', 'success');
+                }
+            });
+            
             // Generate report
             $('#generateReportBtn').click(function() {
                 const period = $('#reportPeriod').val();
@@ -1885,6 +2105,7 @@
                 const totalItemsSold = filteredOrders.reduce((sum, o) => {
                     return sum + o.items.reduce((itemSum, item) => itemSum + item.quantity, 0);
                 }, 0);
+                const totalDiscount = filteredOrders.reduce((sum, o) => sum + (o.discount || 0), 0);
                 
                 // Group by order type
                 const orderTypes = {};
@@ -1922,6 +2143,28 @@
                     .sort((a, b) => b.total - a.total)
                     .slice(0, 5);
                 
+                // Group by member
+                const memberOrders = {};
+                filteredOrders.forEach(o => {
+                    if (o.memberId) {
+                        if (!memberOrders[o.memberId]) {
+                            const member = members.find(m => m.id === o.memberId);
+                            memberOrders[o.memberId] = {
+                                name: member?.name || 'Unknown',
+                                count: 0,
+                                total: 0
+                            };
+                        }
+                        memberOrders[o.memberId].count++;
+                        memberOrders[o.memberId].total += o.total;
+                    }
+                });
+                
+                // Convert to array and sort by total spent
+                const topMembers = Object.values(memberOrders)
+                    .sort((a, b) => b.total - a.total)
+                    .slice(0, 5);
+                
                 // Create report HTML
                 const reportHTML = `
                     <div class="panel">
@@ -1937,6 +2180,10 @@
                         <div class="summary-row">
                             <span>Total Pendapatan:</span>
                             <span>${formatCurrency(totalRevenue)}</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Total Diskon:</span>
+                            <span>${formatCurrency(totalDiscount)}</span>
                         </div>
                         <div class="summary-row">
                             <span>Total Item Terjual:</span>
@@ -1963,6 +2210,18 @@
                             <div class="summary-row">
                                 <span>${menu.name}:</span>
                                 <span>${menu.quantity} terjual (${formatCurrency(menu.total)})</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    ${topMembers.length > 0 ? `
+                    <div class="panel mt-3">
+                        <h4>Member Teraktif</h4>
+                        ${topMembers.map(member => `
+                            <div class="summary-row">
+                                <span>${member.name}:</span>
+                                <span>${member.count} pesanan (${formatCurrency(member.total)})</span>
                             </div>
                         `).join('')}
                     </div>
@@ -2032,10 +2291,14 @@
                 } else {
                     kitchenOrders.forEach(order => {
                         $('#kitchenOrders').append(`
-                            <div class="status-item ${order.status === 'ready' ? 'status-ready' : 'status-preparing'}">
+                            <div class="status-item ${order.status === 'ready' ? 'status-ready' : 'status-preparing'}" data-id="${order.id}">
                                 <div>
                                     <strong>${order.id}</strong>
                                     <div>Meja ${order.tableNumber}</div>
+                                    <div class="order-items-summary">
+                                        ${order.items.slice(0, 2).map(item => `${item.menu.name} (${item.quantity}x)`).join(', ')}
+                                        ${order.items.length > 2 ? ` + ${order.items.length - 2} item lainnya` : ''}
+                                    </div>
                                 </div>
                                 <div>
                                     ${order.status === 'ready' ? 'Siap' : 'Sedang diproses'}
@@ -2045,6 +2308,23 @@
                     });
                 }
             }
+            
+            // Change kitchen order status
+            $(document).on('click', '.status-item', function() {
+                if (currentUser.role !== 'admin' && currentUser.role !== 'cashier') return;
+                
+                const orderId = $(this).data('id');
+                const order = orders.find(o => o.id === orderId);
+                
+                if (!order) return;
+                
+                // Toggle status between preparing and ready
+                order.status = order.status === 'preparing' ? 'ready' : 'preparing';
+                saveOrders();
+                loadKitchenOrders();
+                
+                showToast(`Status pesanan ${orderId} diperbarui`, 'success');
+            });
             
             // Refresh kitchen display
             $('#refreshKitchenBtn').click(function() {
@@ -2098,6 +2378,10 @@
             
             $('#cancelKitchenDisplay').click(function() {
                 $('#kitchenDisplayModal').hide();
+            });
+            
+            $('#cancelManageMembers').click(function() {
+                $('#manageMembersModal').hide();
             });
             
             $('#cancelStoreInfo').click(function() {
@@ -2236,6 +2520,52 @@
             }
         }
         
+        // Load members for select input
+        function loadMembersForSelect() {
+            const $select = $('#customerMember');
+            $select.empty();
+            
+            $select.append('<option value="">Bukan Member</option>');
+            
+            if (members.length > 0) {
+                members.forEach(member => {
+                    $select.append(`<option value="${member.id}">${member.name}</option>`);
+                });
+            }
+        }
+        
+        // Load members for management
+        function loadMembersForManagement() {
+            const $membersList = $('#membersList');
+            $membersList.empty();
+            
+            if (members.length === 0) {
+                $membersList.html(`
+                    <div class="empty-state">
+                        <i class="fas fa-users"></i>
+                        <p>Tidak ada member</p>
+                    </div>
+                `);
+            } else {
+                members.forEach(member => {
+                    $membersList.append(`
+                        <div class="order-item">
+                            <div class="order-item-info">
+                                <div class="order-item-name">${member.name}</div>
+                                <div class="order-item-price">
+                                    ${member.phone}
+                                    <span class="member-badge">${member.transactions || 0} transaksi</span>
+                                </div>
+                            </div>
+                            <div class="order-item-qty">
+                                <i class="fas fa-edit edit-member" data-id="${member.id}"></i>
+                            </div>
+                        </div>
+                    `);
+                });
+            }
+        }
+        
         // Update order
         function updateOrder() {
             // Calculate subtotal
@@ -2243,8 +2573,14 @@
                 return total + (item.menu.price * item.quantity);
             }, 0);
             
+            // Calculate discount (2% if member and more than 5 items)
+            currentOrder.discount = 0;
+            if (currentOrder.memberId && currentOrder.items.length > 5) {
+                currentOrder.discount = currentOrder.subtotal * 0.02;
+            }
+            
             // Calculate total
-            currentOrder.total = currentOrder.subtotal;
+            currentOrder.total = currentOrder.subtotal - currentOrder.discount;
             
             // Save order
             localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
@@ -2252,6 +2588,14 @@
             // Update order UI
             $('#orderItems').empty();
             $('#orderCount').text(`(${currentOrder.items.length} item)`);
+            
+            // Show/hide discount row
+            if (currentOrder.discount > 0) {
+                $('#discountRow').show();
+                $('#orderDiscount').text(`-${formatCurrency(currentOrder.discount)}`);
+            } else {
+                $('#discountRow').hide();
+            }
             
             if (currentOrder.items.length === 0) {
                 $('#orderItems').html(`
@@ -2301,6 +2645,22 @@
             });
             
             summaryHTML += `
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>${formatCurrency(currentOrder.subtotal)}</span>
+                </div>
+            `;
+            
+            if (currentOrder.discount > 0) {
+                summaryHTML += `
+                    <div class="summary-row">
+                        <span>Diskon Member:</span>
+                        <span>-${formatCurrency(currentOrder.discount)}</span>
+                    </div>
+                `;
+            }
+            
+            summaryHTML += `
                 <div class="summary-row total-row">
                     <span>Total:</span>
                     <span>${formatCurrency(currentOrder.total)}</span>
@@ -2313,6 +2673,14 @@
         // Update payment tab
         function updatePaymentTab() {
             $('#paymentSubtotal').text(formatCurrency(currentOrder.subtotal));
+            
+            if (currentOrder.discount > 0) {
+                $('#paymentDiscountRow').show();
+                $('#paymentDiscount').text(`-${formatCurrency(currentOrder.discount)}`);
+            } else {
+                $('#paymentDiscountRow').hide();
+            }
+            
             $('#paymentTotal').text(formatCurrency(currentOrder.total));
             $('#paymentAmount').val('');
             $('#paymentChange').text('Rp 0');
@@ -2340,6 +2708,19 @@
                 $('#receiptTableInfo').hide();
             }
             
+            // Show member info if member order
+            if (order.memberId) {
+                const member = members.find(m => m.id === order.memberId);
+                if (member) {
+                    $('#receiptMemberInfo').show();
+                    $('#receiptMemberName').text(member.name);
+                } else {
+                    $('#receiptMemberInfo').hide();
+                }
+            } else {
+                $('#receiptMemberInfo').hide();
+            }
+            
             // Add items
             $('#receiptItems').empty();
             order.items.forEach(item => {
@@ -2363,6 +2744,14 @@
             
             // Update totals
             $('#receiptSubtotal').text(formatCurrency(order.subtotal));
+            
+            if (order.discount > 0) {
+                $('#receiptDiscountRow').show();
+                $('#receiptDiscount').text(`-${formatCurrency(order.discount)}`);
+            } else {
+                $('#receiptDiscountRow').hide();
+            }
+            
             $('#receiptTotal').text(formatCurrency(order.total));
             $('#receiptPaymentMethod').text(paymentMethod + ':');
             $('#receiptPaymentAmount').text(formatCurrency(order.paymentAmount));
@@ -2398,9 +2787,11 @@
                 items: [],
                 subtotal: 0,
                 total: 0,
+                discount: 0,
                 type: 'dinein',
                 tableNumber: '1',
-                note: ''
+                note: '',
+                memberId: null
             };
             
             localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
@@ -2409,6 +2800,7 @@
             $('[data-type="dinein"]').addClass('active');
             $('#orderNote').val('');
             $('#tableNumberContainer').show();
+            $('#customerMember').val('');
         }
         
         // Save data functions
@@ -2426,6 +2818,10 @@
         
         function saveSettings() {
             localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        }
+        
+        function saveMembers() {
+            localStorage.setItem(STORAGE_KEYS.MEMBERS, JSON.stringify(members));
         }
         
         // Format currency
