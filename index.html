@@ -853,6 +853,62 @@
             color: var(--gray);
             font-size: 0.8rem;
         }
+
+        /* Print Button */
+        .print-btn {
+            background-color: var(--info);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
+            cursor: pointer;
+        }
+
+        /* Print Styles for Receipt */
+        .receipt {
+            width: 100%;
+            max-width: 300px;
+            margin: 0 auto;
+            padding: 15px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .receipt-title {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .receipt-info {
+            margin-bottom: 10px;
+            font-size: 12px;
+        }
+
+        .receipt-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .receipt-total {
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #000;
+        }
+
+        .receipt-footer {
+            margin-top: 15px;
+            font-size: 11px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -1295,21 +1351,21 @@
     <!-- Receipt Template (Hidden) -->
     <div id="receiptTemplate" style="display: none;">
         <div class="receipt">
-            <div class="text-center mb-2">
-                <h3 id="receiptStoreName">CAFE & RESTO</h3>
-                <p id="receiptStoreAddress">Jl. Contoh No. 123, Kota</p>
-                <p id="receiptStorePhone">Telp: 081234567890</p>
+            <div class="receipt-header">
+                <div class="receipt-title" id="receiptStoreName">CAFE & RESTO</div>
+                <div id="receiptStoreAddress">Jl. Contoh No. 123, Kota</div>
+                <div id="receiptStorePhone">Telp: 081234567890</div>
             </div>
             
-            <div class="mb-2">
-                <p>Tanggal: <span id="receiptDate">01/01/2023 10:00</span></p>
-                <p>No. Transaksi: <span id="receiptId">TRX001</span></p>
-                <p>Kasir: <span id="receiptCashier">Admin</span></p>
-                <p>Pelanggan: <span id="receiptCustomer">Pelanggan Biasa</span></p>
-                <p>Tipe: <span id="receiptOrderType">Makan di Tempat</span></p>
-                <p id="receiptTableInfo">Meja: <span id="receiptTableNumber">1</span></p>
-                <p id="receiptMemberInfo" style="display: none;">Member: <span id="receiptMemberName"></span></p>
-                <p id="receiptDonationInfo" style="display: none;">Donasi LAZISNU: <span id="receiptDonationAmount"></span></p>
+            <div class="receipt-info">
+                <div>Tanggal: <span id="receiptDate">01/01/2023 10:00</span></div>
+                <div>No. Transaksi: <span id="receiptId">TRX001</span></div>
+                <div>Kasir: <span id="receiptCashier">Admin</span></div>
+                <div>Pelanggan: <span id="receiptCustomer">Pelanggan Biasa</span></div>
+                <div>Tipe: <span id="receiptOrderType">Makan di Tempat</span></div>
+                <div id="receiptTableInfo">Meja: <span id="receiptTableNumber">1</span></div>
+                <div id="receiptMemberInfo" style="display: none;">Member: <span id="receiptMemberName"></span></div>
+                <div id="receiptDonationInfo" style="display: none;">Donasi LAZISNU: <span id="receiptDonationAmount"></span></div>
             </div>
             
             <hr>
@@ -1324,36 +1380,36 @@
             
             <hr>
             
-            <div class="summary-container">
-                <div class="summary-row">
+            <div>
+                <div class="receipt-item">
                     <span>Subtotal:</span>
                     <span id="receiptSubtotal">Rp 0</span>
                 </div>
-                <div id="receiptDonationRow" class="summary-row" style="display: none;">
+                <div id="receiptDonationRow" class="receipt-item" style="display: none;">
                     <span>Donasi LAZISNU:</span>
                     <span id="receiptDonation">Rp 0</span>
                 </div>
-                <div id="receiptDiscountRow" class="summary-row" style="display: none;">
+                <div id="receiptDiscountRow" class="receipt-item" style="display: none;">
                     <span>Diskon Member:</span>
                     <span id="receiptDiscount">-Rp 0</span>
                 </div>
-                <div class="summary-row total-row">
+                <div class="receipt-item receipt-total">
                     <span>TOTAL:</span>
                     <span id="receiptTotal">Rp 0</span>
                 </div>
-                <div class="summary-row">
+                <div class="receipt-item">
                     <span id="receiptPaymentMethod">Tunai:</span>
                     <span id="receiptPaymentAmount">Rp 0</span>
                 </div>
-                <div class="summary-row">
+                <div class="receipt-item">
                     <span>Kembali:</span>
                     <span id="receiptChange">Rp 0</span>
                 </div>
             </div>
             
-            <div class="text-center mt-3">
+            <div class="receipt-footer">
                 <p>Terima kasih telah berkunjung</p>
-                <p class="receipt-footer">&copy; <span id="receiptYear"></span> CAFE & RESTO - Hak Cipta oleh Lentera Karya Situbondo</p>
+                <p>&copy; <span id="receiptYear"></span> CAFE & RESTO - Hak Cipta oleh Lentera Karya Situbondo</p>
             </div>
         </div>
     </div>
@@ -1362,9 +1418,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/locale/id.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
         // Set locale to Indonesian
         moment.locale('id');
+
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
 
         // Data storage
         const STORAGE_KEYS = {
@@ -1904,20 +1965,7 @@
                 generateReceipt(order);
                 
                 // Print receipt
-                setTimeout(() => {
-                    const printWindow = window.open('', '', 'width=600,height=600');
-                    printWindow.document.write('<html><head><title>Struk Pembayaran</title>');
-                    printWindow.document.write('<style>body { font-family: Arial; font-size: 14px; } .text-center { text-align: center; } .summary-row { display: flex; justify-content: space-between; } hr { border-top: 1px dashed #000; }</style>');
-                    printWindow.document.write('</head><body>');
-                    printWindow.document.write($('#receiptTemplate').html());
-                    printWindow.document.write('</body></html>');
-                    printWindow.document.close();
-                    printWindow.focus();
-                    setTimeout(() => {
-                        printWindow.print();
-                        printWindow.close();
-                    }, 500);
-                }, 500);
+                printReceipt();
                 
                 // Reset order
                 resetOrder();
@@ -2385,18 +2433,25 @@
             
             // Print report
             $('#printReportBtn').click(function() {
+                const printContent = $('#reportResults').html();
                 const printWindow = window.open('', '', 'width=800,height=600');
                 printWindow.document.write('<html><head><title>Laporan Penjualan</title>');
                 printWindow.document.write('<style>body { font-family: Arial; font-size: 14px; } .panel { margin-bottom: 20px; } .summary-row { display: flex; justify-content: space-between; margin-bottom: 5px; } h3, h4 { margin-bottom: 10px; } table { width: 100%; border-collapse: collapse; margin-bottom: 15px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: left; } th { background-color: #f2f2f2; }</style>');
                 printWindow.document.write('</head><body>');
-                printWindow.document.write($('#reportResults').html());
+                printWindow.document.write(printContent);
                 printWindow.document.write('</body></html>');
                 printWindow.document.close();
                 printWindow.focus();
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.close();
-                }, 500);
+                
+                // Try to print, if fails (on mobile), show print button
+                try {
+                    setTimeout(() => {
+                        printWindow.print();
+                        printWindow.close();
+                    }, 500);
+                } catch (e) {
+                    printWindow.document.body.innerHTML += '<div class="print-btn" onclick="window.print()">Cetak Laporan</div>';
+                }
             });
             
             // Load kitchen orders
@@ -2902,7 +2957,7 @@
                 const itemTotal = item.menu.price * item.quantity;
                 
                 $('#receiptItems').append(`
-                    <div class="summary-row">
+                    <div class="receipt-item">
                         <span>${item.menu.name} (${item.quantity}x)</span>
                         <span>${formatCurrency(itemTotal)}</span>
                     </div>
@@ -2938,6 +2993,122 @@
             $('#receiptPaymentMethod').text(paymentMethod + ':');
             $('#receiptPaymentAmount').text(formatCurrency(order.paymentAmount));
             $('#receiptChange').text(formatCurrency(order.change));
+        }
+        
+        // Print receipt with multiple fallback methods
+        function printReceipt() {
+            // Method 1: Try window.print() first
+            try {
+                const printWindow = window.open('', '', 'width=600,height=600');
+                printWindow.document.write('<html><head><title>Struk Pembayaran</title>');
+                printWindow.document.write('<style>body { font-family: Arial; font-size: 14px; } .text-center { text-align: center; } .receipt-item { display: flex; justify-content: space-between; margin-bottom: 5px; } hr { border-top: 1px dashed #000; } .receipt-total { font-weight: bold; margin-top: 10px; padding-top: 10px; border-top: 1px dashed #000; }</style>');
+                printWindow.document.write('</head><body>');
+                printWindow.document.write($('#receiptTemplate').html());
+                printWindow.document.write('</body></html>');
+                printWindow.document.close();
+                printWindow.focus();
+                
+                setTimeout(() => {
+                    printWindow.print();
+                    printWindow.close();
+                }, 500);
+                return;
+            } catch (e) {
+                console.log('Window print failed, trying alternative methods');
+            }
+            
+            // Method 2: Try jsPDF for PDF generation
+            try {
+                const doc = new jsPDF();
+                
+                // Add store info
+                doc.setFontSize(16);
+                doc.text($('#receiptStoreName').text(), 105, 15, { align: 'center' });
+                doc.setFontSize(10);
+                doc.text($('#receiptStoreAddress').text(), 105, 22, { align: 'center' });
+                doc.text($('#receiptStorePhone').text(), 105, 27, { align: 'center' });
+                
+                // Add receipt info
+                doc.setFontSize(12);
+                doc.text(`Tanggal: ${$('#receiptDate').text()}`, 14, 35);
+                doc.text(`No. Transaksi: ${$('#receiptId').text()}`, 14, 40);
+                doc.text(`Kasir: ${$('#receiptCashier').text()}`, 14, 45);
+                doc.text(`Pelanggan: ${$('#receiptCustomer').text()}`, 14, 50);
+                doc.text(`Tipe: ${$('#receiptOrderType').text()}`, 14, 55);
+                
+                if ($('#receiptTableInfo').is(':visible')) {
+                    doc.text(`Meja: ${$('#receiptTableNumber').text()}`, 14, 60);
+                }
+                
+                if ($('#receiptMemberInfo').is(':visible')) {
+                    doc.text(`Member: ${$('#receiptMemberName').text()}`, 14, 65);
+                }
+                
+                if ($('#receiptDonationInfo').is(':visible')) {
+                    doc.text(`Donasi LAZISNU: ${$('#receiptDonationAmount').text()}`, 14, 70);
+                }
+                
+                // Add items
+                let yPos = 80;
+                $('#receiptItems .receipt-item').each(function() {
+                    const itemText = $(this).find('span:first').text();
+                    const itemPrice = $(this).find('span:last').text();
+                    
+                    doc.text(itemText, 14, yPos);
+                    doc.text(itemPrice, 190, yPos, { align: 'right' });
+                    yPos += 5;
+                });
+                
+                // Add totals
+                yPos += 5;
+                doc.text(`Subtotal: ${$('#receiptSubtotal').text()}`, 190, yPos, { align: 'right' });
+                yPos += 5;
+                
+                if ($('#receiptDonationRow').is(':visible')) {
+                    doc.text(`Donasi LAZISNU: ${$('#receiptDonation').text()}`, 190, yPos, { align: 'right' });
+                    yPos += 5;
+                }
+                
+                if ($('#receiptDiscountRow').is(':visible')) {
+                    doc.text(`Diskon Member: ${$('#receiptDiscount').text()}`, 190, yPos, { align: 'right' });
+                    yPos += 5;
+                }
+                
+                doc.setFontSize(14);
+                doc.text(`TOTAL: ${$('#receiptTotal').text()}`, 190, yPos, { align: 'right' });
+                yPos += 8;
+                doc.setFontSize(12);
+                doc.text(`${$('#receiptPaymentMethod').text()} ${$('#receiptPaymentAmount').text()}`, 190, yPos, { align: 'right' });
+                yPos += 5;
+                doc.text(`Kembali: ${$('#receiptChange').text()}`, 190, yPos, { align: 'right' });
+                
+                // Add footer
+                yPos += 10;
+                doc.setFontSize(10);
+                doc.text('Terima kasih telah berkunjung', 105, yPos, { align: 'center' });
+                yPos += 5;
+                doc.text(`© ${new Date().getFullYear()} CAFE & RESTO - Hak Cipta oleh Lentera Karya Situbondo`, 105, yPos, { align: 'center' });
+                
+                // Save the PDF
+                doc.save(`Struk_${$('#receiptId').text()}.pdf`);
+                return;
+            } catch (e) {
+                console.log('jsPDF failed, trying html2canvas');
+            }
+            
+            // Method 3: Try html2canvas as last resort
+            try {
+                html2canvas(document.getElementById('receiptTemplate')).then(canvas => {
+                    const imgData = canvas.toDataURL('image/png');
+                    const link = document.createElement('a');
+                    link.href = imgData;
+                    link.download = `Struk_${$('#receiptId').text()}.png`;
+                    link.click();
+                });
+            } catch (e) {
+                console.log('All print methods failed');
+                showToast('Gagal mencetak struk', 'error');
+            }
         }
         
         // Update store info in UI
