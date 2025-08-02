@@ -909,6 +909,36 @@
             font-size: 11px;
             text-align: center;
         }
+
+        /* Backup Restore Styles */
+        .backup-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .backup-btn {
+            flex: 1;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-label {
+            display: block;
+            padding: 12px;
+            background-color: var(--info);
+            color: white;
+            border-radius: var(--rounded-sm);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-label:hover {
+            background-color: #138496;
+        }
     </style>
 </head>
 <body>
@@ -990,6 +1020,19 @@
                     <button id="kitchenDisplayBtn" class="btn btn-sm mb-2">Info Pesanan</button>
                     <button id="manageMembersBtn" class="btn btn-sm mb-2">Kelola Member</button>
                     <button id="manageStoreInfoBtn" class="btn btn-sm">Kelola Info Restoran</button>
+                    
+                    <!-- Backup and Restore Section -->
+                    <div class="mt-3">
+                        <h4 class="panel-title">Backup & Restore</h4>
+                        <div class="backup-actions">
+                            <button id="backupDataBtn" class="btn btn-sm backup-btn">Backup Data</button>
+                            <label for="restoreFile" class="file-label">
+                                <i class="fas fa-upload"></i> Restore
+                            </label>
+                            <input type="file" id="restoreFile" class="file-input" accept=".json">
+                        </div>
+                        <button id="resetDataBtn" class="btn btn-sm btn-danger mt-2" style="width: 100%;">Reset Data</button>
+                    </div>
                 </div>
             </section>
 
@@ -1344,6 +1387,57 @@
             <div class="modal-footer">
                 <button class="btn btn-warning" id="cancelStoreInfo">Batal</button>
                 <button class="btn btn-success" id="saveStoreInfoBtn">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Confirmation Modal -->
+    <div id="backupConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Backup Data</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Data akan di-backup ke file JSON. Lanjutkan?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" id="cancelBackup">Batal</button>
+                <button class="btn btn-success" id="confirmBackup">Backup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restore Confirmation Modal -->
+    <div id="restoreConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Restore Data</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Semua data saat ini akan diganti dengan data dari file backup. Lanjutkan?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" id="cancelRestore">Batal</button>
+                <button class="btn btn-success" id="confirmRestore">Restore</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div id="resetConfirmationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Reset Data</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Semua data akan dihapus dan dikembalikan ke pengaturan awal. Lanjutkan?</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-warning" id="cancelReset">Batal</button>
+                <button class="btn btn-danger" id="confirmReset">Reset</button>
             </div>
         </div>
     </div>
@@ -2047,6 +2141,85 @@
                 }
             });
             
+            // Backup data button
+            $('#backupDataBtn').click(function() {
+                if (currentUser.role === 'admin') {
+                    $('#backupConfirmationModal').show();
+                }
+            });
+            
+            // Confirm backup
+            $('#confirmBackup').click(function() {
+                backupData();
+                $('#backupConfirmationModal').hide();
+            });
+            
+            // Cancel backup
+            $('#cancelBackup').click(function() {
+                $('#backupConfirmationModal').hide();
+            });
+            
+            // Restore data file input change
+            $('#restoreFile').change(function() {
+                if (currentUser.role !== 'admin') return;
+                
+                const file = this.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        if (!data.menus || !data.categories || !data.orders || !data.settings || !data.users || !data.members) {
+                            showToast('File backup tidak valid', 'error');
+                            return;
+                        }
+                        
+                        // Store the backup data temporarily
+                        window.tempBackupData = data;
+                        $('#restoreConfirmationModal').show();
+                    } catch (e) {
+                        showToast('Gagal membaca file backup', 'error');
+                    }
+                };
+                reader.readAsText(file);
+            });
+            
+            // Confirm restore
+            $('#confirmRestore').click(function() {
+                if (window.tempBackupData) {
+                    restoreData(window.tempBackupData);
+                    $('#restoreConfirmationModal').hide();
+                    $('#restoreFile').val('');
+                    window.tempBackupData = null;
+                }
+            });
+            
+            // Cancel restore
+            $('#cancelRestore').click(function() {
+                $('#restoreConfirmationModal').hide();
+                $('#restoreFile').val('');
+                window.tempBackupData = null;
+            });
+            
+            // Reset data button
+            $('#resetDataBtn').click(function() {
+                if (currentUser.role === 'admin') {
+                    $('#resetConfirmationModal').show();
+                }
+            });
+            
+            // Confirm reset
+            $('#confirmReset').click(function() {
+                resetAllData();
+                $('#resetConfirmationModal').hide();
+            });
+            
+            // Cancel reset
+            $('#cancelReset').click(function() {
+                $('#resetConfirmationModal').hide();
+            });
+            
             // Save menu
             $('#saveMenuBtn').click(function() {
                 const id = $('#menuId').val();
@@ -2605,6 +2778,132 @@
                 }
             });
         });
+        
+        // Backup all data to JSON file
+        function backupData() {
+            const backup = {
+                menus: menus,
+                categories: categories,
+                orders: orders,
+                settings: settings,
+                users: users,
+                members: members,
+                backupDate: new Date().toISOString()
+            };
+            
+            const dataStr = JSON.stringify(backup, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            
+            const exportFileName = `backup_cafe_resto_${moment().format('YYYYMMDD_HHmmss')}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileName);
+            linkElement.click();
+            
+            showToast('Backup data berhasil', 'success');
+        }
+        
+        // Restore data from backup file
+        function restoreData(backupData) {
+            try {
+                // Validate backup data
+                if (!backupData.menus || !backupData.categories || !backupData.orders || 
+                    !backupData.settings || !backupData.users || !backupData.members) {
+                    showToast('Format backup tidak valid', 'error');
+                    return;
+                }
+                
+                // Save the backup data
+                menus = backupData.menus;
+                categories = backupData.categories;
+                orders = backupData.orders;
+                settings = backupData.settings;
+                users = backupData.users;
+                members = backupData.members;
+                
+                // Save to localStorage
+                saveMenus();
+                saveCategories();
+                saveOrders();
+                saveSettings();
+                saveUsers();
+                saveMembers();
+                
+                // Reload all data
+                loadMenus();
+                loadCategories();
+                updateOrder();
+                updateStoreInfo();
+                updateTableNumbers();
+                loadMembersForSelect();
+                loadMembersForManagement();
+                
+                showToast('Restore data berhasil', 'success');
+            } catch (e) {
+                console.error('Restore error:', e);
+                showToast('Gagal melakukan restore data', 'error');
+            }
+        }
+        
+        // Reset all data to default
+        function resetAllData() {
+            if (confirm('Apakah Anda yakin ingin mereset semua data? Semua data akan dihapus dan dikembalikan ke pengaturan awal.')) {
+                // Clear all data
+                localStorage.removeItem(STORAGE_KEYS.MENUS);
+                localStorage.removeItem(STORAGE_KEYS.CATEGORIES);
+                localStorage.removeItem(STORAGE_KEYS.ORDERS);
+                localStorage.removeItem(STORAGE_KEYS.SETTINGS);
+                localStorage.removeItem(STORAGE_KEYS.MEMBERS);
+                
+                // Keep current user
+                const currentUser = JSON.parse(localStorage.getItem(STORAGE_KEYS.USER));
+                
+                // Reset users but keep default admin and cashier
+                localStorage.removeItem(STORAGE_KEYS.USERS);
+                
+                // Reinitialize data
+                initializeData();
+                
+                // Reload all data
+                menus = JSON.parse(localStorage.getItem(STORAGE_KEYS.MENUS)) || [];
+                categories = JSON.parse(localStorage.getItem(STORAGE_KEYS.CATEGORIES)) || [];
+                orders = JSON.parse(localStorage.getItem(STORAGE_KEYS.ORDERS)) || [];
+                settings = JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || {};
+                users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+                members = JSON.parse(localStorage.getItem(STORAGE_KEYS.MEMBERS)) || [];
+                
+                // Restore current user
+                if (currentUser) {
+                    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(currentUser));
+                }
+                
+                // Reset current order
+                currentOrder = {
+                    items: [],
+                    subtotal: 0,
+                    total: 0,
+                    discount: 0,
+                    donation: 0,
+                    type: 'dinein',
+                    tableNumber: '1',
+                    note: '',
+                    memberId: null
+                };
+                localStorage.setItem(STORAGE_KEYS.CURRENT_ORDER, JSON.stringify(currentOrder));
+                
+                // Reload UI
+                loadMenus();
+                loadCategories();
+                updateOrder();
+                updateStoreInfo();
+                updateTableNumbers();
+                loadMembersForSelect();
+                loadMembersForManagement();
+                
+                showToast('Data berhasil direset ke pengaturan awal', 'success');
+            }
+        }
         
         // Open edit menu modal
         function openEditMenuModal(menu) {
@@ -3199,6 +3498,10 @@
         
         function saveSettings() {
             localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+        }
+        
+        function saveUsers() {
+            localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
         }
         
         function saveMembers() {
